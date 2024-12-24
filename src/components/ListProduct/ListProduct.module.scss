@@ -28,6 +28,7 @@
   flex-shrink: 0; /* Đảm bảo các sản phẩm không bị thu nhỏ */
   width: 260px;
   margin-right: 20px;
+  margin-top: -40px;
 }
 
 .product img {
@@ -202,11 +203,12 @@
 }
 
 .tym {
-  position: absolute;
+  position: sticky; /* Stick the element within the container */
+  top: 15px; /* Position the sticky element 15px from the top of its parent */
   color: rgb(144, 144, 144);
-  margin-top: 15px; /* Optional: Adjust the vertical position */
-  margin-left: 225px;
+  margin-left: 215px;
   cursor: pointer;
+  z-index: 10; /* Ensure it's on top of other elements */
 }
 
 .review {

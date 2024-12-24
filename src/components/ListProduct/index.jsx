@@ -8,7 +8,6 @@ import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import StarIcon from "@mui/icons-material/Star";
-// import StarBorderIcon from "@mui/icons-material/StarBorder";
 
 const cx = classNames.bind(styles);
 
@@ -24,11 +23,13 @@ function ListProduct({ title }) {
   const scrollableRef = useRef(null);
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(true);
-  const [isFavorited, setIsFavorited] = useState(false);
+  const [favoritedItems, setFavoritedItems] = useState(Array(6).fill(false)); // Store individual favorite state for each product
 
-  // Handle click event to toggle icon
-  const handleClickTym = () => {
-    setIsFavorited(!isFavorited); // Toggle the state
+  // Handle click event to toggle icon for a specific product
+  const handleClickTym = (index) => {
+    setFavoritedItems(
+      (prev) => prev.map((item, idx) => (idx === index ? !item : item)) // Toggle the clicked product's favorite state
+    );
   };
 
   // Scroll left by a fixed distance
@@ -90,8 +91,11 @@ function ListProduct({ title }) {
             .fill(0)
             .map((_, index) => (
               <div key={index} className={cx("product")}>
-                <div className={cx("tym")} onClick={handleClickTym}>
-                  {isFavorited ? (
+                <div
+                  className={cx("tym")}
+                  onClick={() => handleClickTym(index)}
+                >
+                  {favoritedItems[index] ? (
                     <FavoriteIcon style={{ color: "red" }} />
                   ) : (
                     <FavoriteBorderIcon />
@@ -113,11 +117,11 @@ function ListProduct({ title }) {
                   </div>
                   <div className={cx("review")}>
                     <div className={cx("rate")}>
-                      <StarIcon fontSize="inherit"/>
-                      <StarIcon fontSize="inherit"/>
-                      <StarIcon fontSize="inherit"/>
-                      <StarIcon fontSize="inherit"/>
-                      <StarIcon fontSize="inherit"/>
+                      <StarIcon fontSize="inherit" />
+                      <StarIcon fontSize="inherit" />
+                      <StarIcon fontSize="inherit" />
+                      <StarIcon fontSize="inherit" />
+                      <StarIcon fontSize="inherit" />
                     </div>
                     <div className={cx("amount")}>(0)</div>
                   </div>
