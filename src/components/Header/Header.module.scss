@@ -162,7 +162,7 @@
   color: #333;
   text-align: center;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-right: 10px;
+  margin-right: 20px;
   position: relative;
   transition: font-weight 0.3s ease;
 }
@@ -175,7 +175,7 @@
 
 .scroll-button {
   position: absolute;
-  top: 50%;
+  top: 37%;
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.5);
   color: white;

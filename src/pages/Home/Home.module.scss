@@ -50,7 +50,7 @@
   object-fit: contain;
 }
 
-.scroll-button {
+.scroll-button-banner {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -69,10 +69,69 @@
   box-shadow: 0 0 10px #b6b5b5;
 }
 
+.scroll-button-banner.left-banner {
+  left: 10px;
+}
+
+.scroll-button-banner.right-banner {
+  right: 10px;
+}
+
+.list_trademark {
+  display: flex;
+}
+
+.content_trademark {
+  display: flex;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  white-space: nowrap; /* Prevent items from wrapping to the next line */
+  scrollbar-width: none; /* For Firefox */
+  -ms-overflow-style: none; /* For Internet Explorer and Edge */
+}
+
+/* Hide scrollbar in WebKit browsers like Chrome, Safari */
+.content_trademark::-webkit-scrollbar {
+  display: none;
+}
+
+.trademark {
+  margin-right: 20px;
+}
+
+.trademark img {
+  width: 217px;
+  aspect-ratio: 2.05 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.scroll-button {
+  position: absolute;
+  transform: translateY(60%);
+  background-color: rgba(
+    57,
+    57,
+    57,
+    0.5
+  ); /* Slightly transparent white background */
+  color: #fff; /* Icon color */
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
+  transition: background-color 0.3s ease;
+  box-shadow: rgb(184, 193, 202) 0px 0px 10px;
+}
+
 .scroll-button.left {
-  left: 18px;
+  left: 80px;
 }
 
 .scroll-button.right {
-  right: 18px;
+  right: 80px;
 }
