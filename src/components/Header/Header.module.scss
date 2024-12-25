@@ -350,6 +350,7 @@
   border: none;
   background-color: #fff;
   margin-left: auto;
+  cursor: pointer;
 }
 
 .title-cart {
@@ -412,7 +413,6 @@
   right: 0; /* Đảm bảo nó căn phải */
 }
 
-
 .shipment {
   display: flex;
   -webkit-box-pack: justify;
@@ -445,4 +445,50 @@
   margin-bottom: 35px;
   letter-spacing: 0.7px;
   font-family: "SVNMont", sans-serif;
+}
+
+.more {
+  position: fixed;
+  top: 85px;
+  right: 210px;
+  width: auto;
+  height: auto;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  padding: 10px 0px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+
+.item:last-child {
+  border-bottom: none; /* Loại bỏ border-bottom cho phần tử cuối cùng */
+}
+
+.list-more {
+  list-style-type: none; /* Loại bỏ dấu chấm */
+  padding: 0;
+  margin: 0;
+  width: 100%; /* Chiếm toàn bộ chiều rộng */
+}
+
+.item {
+  display: flex;
+  align-items: center; /* Căn giữa nội dung trong mỗi item */
+  padding: 10px;
+  font-size: 16px;
+  color: black;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0; /* Tạo đường phân cách giữa các item */
+}
+
+.item:hover {
+  background-color: #f0f0f0; /* Màu nền khi hover */
+}
+
+.item svg {
+  margin-right: 10px; /* Khoảng cách giữa icon và văn bản */
 }

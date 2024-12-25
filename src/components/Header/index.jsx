@@ -14,16 +14,35 @@ import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { Dialog, Box, DialogActions } from "@mui/material";
+import ManageSearchIcon from "@mui/icons-material/ManageSearch";
+import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 
 const cx = classNames.bind(styles);
 
 const Header = () => {
   const scrollableRef = useRef(null);
+  const divRef = useRef(null);
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(true);
   const [isModalUpload, setIsModalUpload] = useState(false);
   const [isModalLogin, setIsModalLogin] = useState(false);
   const [isModalCart, setIsModalCart] = useState(false);
+  const [isMore, setIsMore] = useState(false);
+  const [selectedCart, setSelectedCart] = useState("delivery");
+
+  const handleOutsideClick = (event) => {
+    if (divRef.current && !divRef.current.contains(event.target)) {
+      setIsMore(false);
+    }
+  };
+
+  // Thêm event listener khi component mount và remove khi unmount
+  useEffect(() => {
+    document.addEventListener("click", handleOutsideClick);
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, []);
 
   const scrollLeft = () => {
     if (scrollableRef.current) {
@@ -82,6 +101,19 @@ const Header = () => {
   const handleCloseModalCart = () => {
     setIsModalCart(false);
   };
+
+  const handleOpenMore = () => {
+    if (isMore === false) {
+      setIsMore(true);
+    } else {
+      setIsMore(false);
+    }
+  };
+
+  const handleButtonCart = (buttonId) => {
+    setSelectedCart(buttonId); // Set state để theo dõi nút nào đang được chọn
+  };
+
   return (
     <header className={cx("header")}>
       <div className={cx("header_container")}>
@@ -127,8 +159,28 @@ const Header = () => {
               <NewspaperIcon fontSize="medium" style={{ color: "#4b4b4b" }} />
               <p>Tạp chí làm đẹp</p>
             </div>
-            <div className={cx("icon-section")}>
+            <div
+              className={cx("icon-section")}
+              onClick={handleOpenMore}
+              ref={divRef}
+            >
               <MoreHorizIcon fontSize="medium" />
+              {isMore && (
+                <div className={cx("more")}>
+                  <ul className={cx("list-more")}>
+                    <li className={cx("item")}>
+                      <SupportAgentIcon
+                        style={{ color: "#4b4b4b", fontSize: "24px" }}
+                      />
+                      Trung tâm hỗ trợ
+                    </li>
+                    <li className={cx("item")}>
+                      <ManageSearchIcon style={{ color: "#4b4b4b" }} />
+                      Tra cứu đơn hàng
+                    </li>
+                  </ul>
+                </div>
+              )}
             </div>
             <div
               className={cx("icon-section")}
@@ -145,7 +197,10 @@ const Header = () => {
               <FavoriteBorderIcon fontSize="medium" />
             </div>
             <div className={cx("icon-section")}>
-              <ShoppingBagOutlinedIcon fontSize="medium" onClick={handleOpenModalCart}/>
+              <ShoppingBagOutlinedIcon
+                fontSize="medium"
+                onClick={handleOpenModalCart}
+              />
             </div>
           </div>
         </div>
@@ -373,21 +428,102 @@ const Header = () => {
             <div className={cx("title-cart")}>Giỏ hàng của tôi</div>
 
             <button onClick={handleCloseModalCart}>
-              <CloseOutlinedIcon />
+              <CloseOutlinedIcon/>
             </button>
           </div>
 
           <div className={cx("body-cart")}>
+
             <div className={cx("page-cart")}>
               <div
-                className={cx("cart-btn")}
-                style={{ backgroundColor: "black", color: "#fff" }}
+                className={classNames(cx("cart-btn"), {
+                  selected: selectedCart === "delivery", // Kiểm tra nếu nút giao hàng được chọn
+                })}
+                style={{
+                  backgroundColor: selectedCart === "delivery" ? "black" : "", // Đổi màu nền nếu nút này được chọn
+                  color: selectedCart === "delivery" ? "#fff" : "", // Đổi màu chữ nếu nút này được chọn
+                }}
+                onClick={() => handleButtonCart("delivery")}
               >
                 Giao hàng (0)
               </div>
-              <div className={cx("cart-btn")}>Lấy tại cửa hàng (0)</div>
+              <div
+                className={classNames(cx("cart-btn"), {
+                  selected: selectedCart === "pickup",
+                })}
+                style={{
+                  backgroundColor: selectedCart === "pickup" ? "black" : "",
+                  color: selectedCart === "pickup" ? "#fff" : "",
+                }}
+                onClick={() => handleButtonCart("pickup")}
+              >
+                Lấy tại cửa hàng (0)
+              </div>
             </div>
-            <div className={cx("cart")}>
+
+            <div>
+              {selectedCart === "delivery" && (
+                <div className={cx("cart")}>
+                  Bạn chưa có sản phẩm nào trong giỏ hàng
+                </div>
+              )}
+
+              {selectedCart === "delivery" && (
+                <div className={cx("checkout")}>
+                  <div className={cx("shipment")}>
+                    <div className={cx("title-checkout")}>Giao hàng</div>
+                    <div className={cx("price")}>0đ</div>
+                  </div>
+
+                  <div
+                    className={cx("shipment")}
+                    style={{ marginBottom: "16px", color: "rgb(182 182 182)" }}
+                  >
+                    <div className={cx("title-checkout")}>Click & Collect</div>
+                    <div className={cx("price")}>0đ</div>
+                  </div>
+
+                  <div className={cx("btn-checkout")}>
+                    <button type="submit">
+                      Tiếp tục với hình thức giao hàng
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div>
+              {selectedCart === "pickup" && (
+                <div className={cx("cart")}>
+                  Bạn chưa có sản phẩm nào trong giỏ hàng Click & Collect
+                </div>
+              )}
+
+              {selectedCart === "pickup" && (
+                <div className={cx("checkout")}>
+                  <div className={cx("shipment")}>
+                    <div className={cx("title-checkout")}>Giao hàng</div>
+                    <div className={cx("price")}>0đ</div>
+                  </div>
+
+                  <div
+                    className={cx("shipment")}
+                    style={{ marginBottom: "16px", color: "rgb(182 182 182)" }}
+                  >
+                    <div className={cx("title-checkout")}>Click & Collect</div>
+                    <div className={cx("price")}>0đ</div>
+                  </div>
+
+                  <div className={cx("btn-checkout")}>
+                    <button type="submit">
+                      Tiếp tục với hình thức giao hàng Click & Collect
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* <div className={cx("cart")}>
               Bạn chưa có sản phẩm nào trong giỏ hàng
             </div>
             <div className={cx("checkout")}>
@@ -405,7 +541,7 @@ const Header = () => {
               <div className={cx("btn-checkout")}>
                 <button type="submit">Tiếp tục với hình thức giao hàng</button>
               </div>
-            </div>
+            </div> */}
           </div>
         </Box>
       </Dialog>
