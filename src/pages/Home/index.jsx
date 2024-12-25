@@ -11,7 +11,12 @@ import banner5 from "../../assets/images/472a3c1a-e1c7-494a-9b0f-20810d5bdc23.we
 import th1 from "../../assets/images/th1.webp";
 import th2 from "../../assets/images/th2.webp";
 import th3 from "../../assets/images/th3.webp";
+import ch1 from "../../assets/images/ch1.webp";
+import ch2 from "../../assets/images/ch2.webp";
+import ch3 from "../../assets/images/ch3.webp";
+import logoSale from "../../assets/images/logo_sale.webp";
 import ListProduct from "../../components/ListProduct";
+import ButtonAll from "../../components/ButtonAll";
 
 const cx = classNames.bind(styles);
 
@@ -116,6 +121,7 @@ const Home = () => {
       {/* Content Section */}
       <div className={cx("home_content")}>
         <ListProduct title="Top sản phẩm bán chạy" />
+        <ButtonAll />
       </div>
 
       {/* Trademark Section */}
@@ -164,8 +170,57 @@ const Home = () => {
         )}
       </div>
 
+      <div className={cx("flash-sale")}>
+        <div className={cx("header-sale")}>
+          <div className={cx("logo-sale")}>
+            <img src={logoSale} alt="" />
+          </div>
+
+          <div className={cx("time-sale")}>
+            <div className={cx("title-sale")}>Thời gian còn lại</div>
+            <div className={cx("time-sale")}>
+              <div className={cx("time")}>
+                <div>
+                  <span className={cx("countdown-number")}>00</span>ngày
+                </div>
+                <div>
+                  <span className={cx("countdown-number")}>00</span>giờ
+                </div>
+                <div>
+                  <span className={cx("countdown-number")}>00</span>phút
+                </div>
+                <div>
+                  <span className={cx("countdown-number")}>00</span>giây
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className={cx("btn-sale")}>
+            <button>Xem tất cả</button>
+          </div>
+        </div>
+        <div className={cx("list-sale")}>
+          <ListProduct />
+        </div>
+      </div>
+
+      <div className={cx("list_genuine")}>
+        <div className={cx("content_genuine")}>
+          <div className={cx("genuine")}>
+            <img src={ch1} alt="ch 1" />
+          </div>
+          <div className={cx("genuine")}>
+            <img src={ch2} alt="ch 2" />
+          </div>
+          <div className={cx("genuine")}>
+            <img src={ch3} alt="ch 3" />
+          </div>
+        </div>
+      </div>
+
       <div className={cx("home_content")}>
         <ListProduct title="Sản phẩm mới" />
+        <ButtonAll />
       </div>
     </div>
   );

@@ -101,7 +101,9 @@ function ListProduct({ title }) {
                     <FavoriteBorderIcon />
                   )}
                 </div>
-                <img src={product} alt="Product" />
+                <div className={cx("productList-img")}>
+                  <img src={product} alt="Product" />
+                </div>
                 <div className={cx("product_info")}>
                   <a href="/">GOODAL</a>
                   <div className={cx("description")}>
@@ -137,9 +139,6 @@ function ListProduct({ title }) {
             <ArrowRightIcon />
           </button>
         )}
-      </div>
-      <div className={cx("btn_viewAll")}>
-        <button>Xem tất cả</button>
       </div>
     </div>
   );
