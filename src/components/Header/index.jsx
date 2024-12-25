@@ -22,6 +22,7 @@ const Header = () => {
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(true);
   const [isModalUpload, setIsModalUpload] = useState(false);
+  const [isModalLogin, setIsModalLogin] = useState(false);
 
   const scrollLeft = () => {
     if (scrollableRef.current) {
@@ -63,6 +64,14 @@ const Header = () => {
 
   const handleCloseModal = () => {
     setIsModalUpload(false);
+  };
+
+  const handleOpenModalLogin = () => {
+    setIsModalLogin(true);
+  };
+
+  const handleCloseModalLogin = () => {
+    setIsModalLogin(false);
   };
   return (
     <header className={cx("header")}>
@@ -115,6 +124,7 @@ const Header = () => {
             <div
               className={cx("icon-section")}
               style={{ borderLeft: "groove" }}
+              onClick={handleOpenModalLogin}
             >
               <UserIcon
                 fontSize="medium"
@@ -180,7 +190,7 @@ const Header = () => {
           <DialogActions>
             <div className={cx("btn_exit")}>
               <button onClick={handleCloseModal}>
-                <CloseOutlinedIcon/>
+                <CloseOutlinedIcon />
               </button>
             </div>
           </DialogActions>
@@ -276,6 +286,54 @@ const Header = () => {
                   <div className={cx("title-upload")}>Chụp bằng webcam</div>
                 </div>
               </div>
+            </div>
+          </div>
+        </Box>
+      </Dialog>
+
+      <Dialog
+        open={isModalLogin} // Ensure this is boolean
+        onClose={handleCloseModalLogin}
+        PaperProps={{
+          style: {
+            marginTop: "-30px", // Dịch lên trên 40px
+            borderRadius: "16px", // Bo góc 16px
+          },
+        }}
+      >
+        <Box>
+          <DialogActions>
+            <div className={cx("btn_exit")}>
+              <button onClick={handleCloseModalLogin}>
+                <CloseOutlinedIcon />
+              </button>
+            </div>
+          </DialogActions>
+          <div className={cx("content-login")}>
+            <div className={cx("search-image")}>
+              <div className={cx("title")}>Đăng nhập</div>
+              <div
+                className={cx("title-description")}
+                style={{ padding: "0px 62px" }}
+              >
+                Bạn chưa có tài khoản? Không cần đăng ký. Đăng nhập nhanh với
+                Beauty Box bằng số điện thoại.
+              </div>
+            </div>
+
+            <div className={cx("auth")}>
+              <div className={cx("input-login")}>
+                <input type="text" name="" id="" />
+              </div>
+              <button type="submit">Đăng nhập</button>
+            </div>
+            <div className={cx("text-login")}>
+              *Vui lòng không hủy đơn hàng khi đã thanh toán*
+            </div>
+            <div className={cx("note-login")}>
+              Đăng nhập ngay để mua sắm dễ dàng hơn, sử dụng những tiện ích mới
+              nhất và tận hưởng thêm nhiều ưu đãi độc quyền dành riêng cho thành
+              viên Beauty Box.
             </div>
           </div>
         </Box>
