@@ -23,6 +23,7 @@ const Header = () => {
   const [isRightVisible, setIsRightVisible] = useState(true);
   const [isModalUpload, setIsModalUpload] = useState(false);
   const [isModalLogin, setIsModalLogin] = useState(false);
+  const [isModalCart, setIsModalCart] = useState(false);
 
   const scrollLeft = () => {
     if (scrollableRef.current) {
@@ -72,6 +73,14 @@ const Header = () => {
 
   const handleCloseModalLogin = () => {
     setIsModalLogin(false);
+  };
+
+  const handleOpenModalCart = () => {
+    setIsModalCart(true);
+  };
+
+  const handleCloseModalCart = () => {
+    setIsModalCart(false);
   };
   return (
     <header className={cx("header")}>
@@ -136,7 +145,7 @@ const Header = () => {
               <FavoriteBorderIcon fontSize="medium" />
             </div>
             <div className={cx("icon-section")}>
-              <ShoppingBagOutlinedIcon fontSize="medium" />
+              <ShoppingBagOutlinedIcon fontSize="medium" onClick={handleOpenModalCart}/>
             </div>
           </div>
         </div>
@@ -176,6 +185,7 @@ const Header = () => {
         )}
       </div>
 
+      {/* Search upload image */}
       <Dialog
         open={isModalUpload} // Ensure this is boolean
         onClose={handleCloseModal}
@@ -291,6 +301,7 @@ const Header = () => {
         </Box>
       </Dialog>
 
+      {/* Login */}
       <Dialog
         open={isModalLogin} // Ensure this is boolean
         onClose={handleCloseModalLogin}
@@ -334,6 +345,66 @@ const Header = () => {
               Đăng nhập ngay để mua sắm dễ dàng hơn, sử dụng những tiện ích mới
               nhất và tận hưởng thêm nhiều ưu đãi độc quyền dành riêng cho thành
               viên Beauty Box.
+            </div>
+          </div>
+        </Box>
+      </Dialog>
+
+      {/* Giỏ hàng */}
+      <Dialog
+        open={isModalCart} // Đảm bảo giá trị này là boolean
+        onClose={handleCloseModalCart}
+        disablePortal
+        PaperProps={{
+          style: {
+            margin: "0px", // Loại bỏ margin mặc định
+            position: "fixed",
+            top: "0px",
+            right: "0px",
+            height: "100vh", // Sử dụng 100vh để đảm bảo chiều cao màn hình
+            width: "490px",
+            overflow: "hidden",
+            maxHeight: "100vh", // Đảm bảo không bị giới hạn chiều cao
+          },
+        }}
+      >
+        <Box>
+          <div className={cx("header-cart")}>
+            <div className={cx("title-cart")}>Giỏ hàng của tôi</div>
+
+            <button onClick={handleCloseModalCart}>
+              <CloseOutlinedIcon />
+            </button>
+          </div>
+
+          <div className={cx("body-cart")}>
+            <div className={cx("page-cart")}>
+              <div
+                className={cx("cart-btn")}
+                style={{ backgroundColor: "black", color: "#fff" }}
+              >
+                Giao hàng (0)
+              </div>
+              <div className={cx("cart-btn")}>Lấy tại cửa hàng (0)</div>
+            </div>
+            <div className={cx("cart")}>
+              Bạn chưa có sản phẩm nào trong giỏ hàng
+            </div>
+            <div className={cx("checkout")}>
+              <div className={cx("shipment")}>
+                <div className={cx("title-checkout")}>Giao hàng</div>
+                <div className={cx("price")}>0đ</div>
+              </div>
+              <div
+                className={cx("shipment")}
+                style={{ marginBottom: "16px", color: "rgb(182 182 182)" }}
+              >
+                <div className={cx("title-checkout")}>Click & Collect</div>
+                <div className={cx("price")}>0đ</div>
+              </div>
+              <div className={cx("btn-checkout")}>
+                <button type="submit">Tiếp tục với hình thức giao hàng</button>
+              </div>
             </div>
           </div>
         </Box>
