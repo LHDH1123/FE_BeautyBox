@@ -16,6 +16,7 @@ import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
 import { Dialog, Box, DialogActions } from "@mui/material";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
+import Cart from "../Cart";
 
 const cx = classNames.bind(styles);
 
@@ -428,12 +429,11 @@ const Header = () => {
             <div className={cx("title-cart")}>Giỏ hàng của tôi</div>
 
             <button onClick={handleCloseModalCart}>
-              <CloseOutlinedIcon/>
+              <CloseOutlinedIcon />
             </button>
           </div>
 
           <div className={cx("body-cart")}>
-
             <div className={cx("page-cart")}>
               <div
                 className={classNames(cx("cart-btn"), {
@@ -463,9 +463,10 @@ const Header = () => {
 
             <div>
               {selectedCart === "delivery" && (
-                <div className={cx("cart")}>
-                  Bạn chưa có sản phẩm nào trong giỏ hàng
-                </div>
+                // <div className={cx("cart")}>
+                //   Bạn chưa có sản phẩm nào trong giỏ hàng
+                // </div>
+                <Cart />
               )}
 
               {selectedCart === "delivery" && (
