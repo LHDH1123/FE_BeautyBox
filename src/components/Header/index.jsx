@@ -17,6 +17,8 @@ import { Dialog, Box, DialogActions } from "@mui/material";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import SupportAgentIcon from "@mui/icons-material/SupportAgent";
 import Cart from "../Cart";
+import CartFav from "../CartFav";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
@@ -28,8 +30,22 @@ const Header = () => {
   const [isModalUpload, setIsModalUpload] = useState(false);
   const [isModalLogin, setIsModalLogin] = useState(false);
   const [isModalCart, setIsModalCart] = useState(false);
+  const [isModalLike, setIsModalLike] = useState(false);
   const [isMore, setIsMore] = useState(false);
   const [selectedCart, setSelectedCart] = useState("delivery");
+  const navigate = useNavigate();
+
+  const handleNavigateStore = () => {
+    navigate("/stores");
+  };
+
+  const handleNavigateSupport = () => {
+    navigate("/help-center");
+  };
+
+  const handleNavigateProfile = () => {
+    navigate("/profile");
+  };
 
   const handleOutsideClick = (event) => {
     if (divRef.current && !divRef.current.contains(event.target)) {
@@ -103,6 +119,14 @@ const Header = () => {
     setIsModalCart(false);
   };
 
+  const handleOpenModalLike = () => {
+    setIsModalLike(true);
+  };
+
+  const handleCloseModalLike = () => {
+    setIsModalLike(false);
+  };
+
   const handleOpenMore = () => {
     if (isMore === false) {
       setIsMore(true);
@@ -112,7 +136,7 @@ const Header = () => {
   };
 
   const handleButtonCart = (buttonId) => {
-    setSelectedCart(buttonId); // Set state để theo dõi nút nào đang được chọn
+    setSelectedCart(buttonId);
   };
 
   return (
@@ -152,7 +176,7 @@ const Header = () => {
           </div>
 
           <div className={cx("menu-section")}>
-            <div className={cx("icon-section")}>
+            <div className={cx("icon-section")} onClick={handleNavigateStore}>
               <StoreIcon fontSize="medium" style={{ color: "#4b4b4b" }} />
               <p>Hệ thống cửa hàng</p>
             </div>
@@ -169,13 +193,13 @@ const Header = () => {
               {isMore && (
                 <div className={cx("more")}>
                   <ul className={cx("list-more")}>
-                    <li className={cx("item")}>
+                    <li className={cx("item")} onClick={handleNavigateSupport}>
                       <SupportAgentIcon
                         style={{ color: "#4b4b4b", fontSize: "24px" }}
                       />
                       Trung tâm hỗ trợ
                     </li>
-                    <li className={cx("item")}>
+                    <li className={cx("item")} onClick={handleNavigateProfile}>
                       <ManageSearchIcon style={{ color: "#4b4b4b" }} />
                       Tra cứu đơn hàng
                     </li>
@@ -195,7 +219,10 @@ const Header = () => {
               <p>Đăng nhập</p>
             </div>
             <div className={cx("icon-section")}>
-              <FavoriteBorderIcon fontSize="medium" />
+              <FavoriteBorderIcon
+                fontSize="medium"
+                onClick={handleOpenModalLike}
+              />
             </div>
             <div className={cx("icon-section")}>
               <ShoppingBagOutlinedIcon
@@ -408,19 +435,19 @@ const Header = () => {
 
       {/* Giỏ hàng */}
       <Dialog
-        open={isModalCart} // Đảm bảo giá trị này là boolean
+        open={isModalCart}
         onClose={handleCloseModalCart}
         disablePortal
         PaperProps={{
           style: {
-            margin: "0px", // Loại bỏ margin mặc định
+            margin: "0px",
             position: "fixed",
             top: "0px",
             right: "0px",
-            height: "100vh", // Sử dụng 100vh để đảm bảo chiều cao màn hình
+            height: "100vh",
             width: "490px",
             overflow: "hidden",
-            maxHeight: "100vh", // Đảm bảo không bị giới hạn chiều cao
+            maxHeight: "100vh",
           },
         }}
       >
@@ -523,26 +550,42 @@ const Header = () => {
                 </div>
               )}
             </div>
+          </div>
+        </Box>
+      </Dialog>
 
-            {/* <div className={cx("cart")}>
-              Bạn chưa có sản phẩm nào trong giỏ hàng
+      {/* Ưa thích */}
+
+      <Dialog
+        open={isModalLike}
+        onClose={handleCloseModalLike}
+        disablePortal
+        PaperProps={{
+          style: {
+            margin: "0px",
+            position: "fixed",
+            top: "0px",
+            right: "0px",
+            height: "100vh",
+            width: "378px",
+            overflow: "hidden",
+            maxHeight: "100vh",
+          },
+        }}
+      >
+        <Box>
+          <div className={cx("header-cart")}>
+            <div className={cx("title-fav")} style={{ margin: "10px 0px" }}>
+              Ưa thích
             </div>
-            <div className={cx("checkout")}>
-              <div className={cx("shipment")}>
-                <div className={cx("title-checkout")}>Giao hàng</div>
-                <div className={cx("price")}>0đ</div>
-              </div>
-              <div
-                className={cx("shipment")}
-                style={{ marginBottom: "16px", color: "rgb(182 182 182)" }}
-              >
-                <div className={cx("title-checkout")}>Click & Collect</div>
-                <div className={cx("price")}>0đ</div>
-              </div>
-              <div className={cx("btn-checkout")}>
-                <button type="submit">Tiếp tục với hình thức giao hàng</button>
-              </div>
-            </div> */}
+
+            <button style={{ fontSize: "14px", fontWeight: "700" }}>
+              Xóa hết
+            </button>
+          </div>
+
+          <div className={cx("body-fav")}>
+            <CartFav />
           </div>
         </Box>
       </Dialog>

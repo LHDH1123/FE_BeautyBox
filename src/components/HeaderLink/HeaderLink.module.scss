@@ -1,0 +1,69 @@
+.header-link {
+  padding-top: 5px;
+  display: flex;
+}
+
+.link {
+  display: flex;
+  list-style-type: none; /* Xóa dấu chấm */
+  padding: 0; /* Loại bỏ khoảng cách trong */
+  margin: 0; /* Loại bỏ khoảng cách ngoài */
+  height: 100%; /* Đảm bảo chiều cao để căn giữa chính xác */
+}
+
+.link-li {
+  font-size: 24px;
+  display: flex;
+  align-items: center; /* Căn giữa theo chiều dọc */
+}
+
+.link-li a {
+  text-decoration: none;
+  color: #797979;
+  font-size: 14px;
+  font-family: ui-monospace;
+  letter-spacing: 0.8px;
+}
+
+.title {
+  font-size: 25px;
+  line-height: 25px;
+  text-transform: uppercase;
+  margin: 15px 0px 15px;
+  font-weight: 700;
+  text-align: left;
+  font-family: "SVNMont", sans-serif;
+}
+
+.search {
+  margin-left: auto;
+  display: flex;
+  justify-content: flex-end; /* Căn phần tử con về phía phải */
+  align-items: flex-end; /* Căn phần tử con về phía dưới */
+}
+
+.scan-search {
+  display: flex;
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  align-items: center; /* Căn giữa theo chiều dọc */
+  background-color: #ffffff;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.scan-search:hover {
+  background-color: #f7f7f7;
+  border-radius: 15px;
+}
+
+.title-search {
+  font-size: 14px;
+  font-family: "SVNMont", sans-serif;
+}
+
+.scan-search img {
+  width: 30px;
+  height: 30px;
+}

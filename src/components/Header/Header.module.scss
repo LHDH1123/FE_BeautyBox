@@ -487,8 +487,20 @@
 
 .item:hover {
   background-color: #f0f0f0; /* Màu nền khi hover */
+  font-weight: 500;
 }
 
 .item svg {
   margin-right: 10px; /* Khoảng cách giữa icon và văn bản */
+}
+.body-fav {
+  padding: 20px 0px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.title-fav {
+  font-size: 18px;
+  font-family: "SVNMont", sans-serif;
 }
