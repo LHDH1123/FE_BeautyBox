@@ -5,7 +5,7 @@
   width: 100%;
   height: auto;
   background-color: #ffffff;
-  z-index: 1000; /* Đảm bảo header nằm trên các phần tử khác */
+  z-index: 20000; /* Đảm bảo header nằm trên các phần tử khác */
 }
 
 .header_container {

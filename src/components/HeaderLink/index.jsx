@@ -35,12 +35,14 @@ function HeaderLink({ title }) {
         <div className={cx("title")}>{title}</div>
       </div>
 
-      <div className={cx("search")}>
-        <button className={cx("scan-search")}>
-          <img src={ScanIcon} alt="" />
-          <div className={cx("title-search")}>Tìm kiếm bằng hình ảnh</div>
-        </button>
-      </div>
+      {title !== "Cửa hàng" && (
+        <div className={cx("search")}>
+          <button className={cx("scan-search")}>
+            <img src={ScanIcon} alt="" />
+            <div className={cx("title-search")}>Tìm kiếm bằng hình ảnh</div>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
