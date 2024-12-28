@@ -5,7 +5,7 @@
   width: 100%;
   height: auto;
   background-color: #ffffff;
-  z-index: 20000; /* Đảm bảo header nằm trên các phần tử khác */
+  z-index: 1200; /* Đảm bảo header nằm trên các phần tử khác */
 }
 
 .header_container {
@@ -478,7 +478,7 @@
 .item {
   display: flex;
   align-items: center; /* Căn giữa nội dung trong mỗi item */
-  padding: 10px;
+  padding: 18px 10px;
   font-size: 16px;
   color: black;
   cursor: pointer;
@@ -503,4 +503,21 @@
 .title-fav {
   font-size: 18px;
   font-family: "SVNMont", sans-serif;
+}
+.title-li,
+.titleLi-desc,
+.item {
+  font-family: "SVNMont", sans-serif;
+  letter-spacing: 0.7px;
+}
+
+.title-li {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.titleLi-desc {
+  font-size: 10px;
+  color: #8f8f8f;
 }

@@ -3,6 +3,7 @@
   justify-content: space-between;
   align-items: stretch;
   height: 100%;
+  margin: 0px 6px;
 }
 
 .banner_major,
@@ -90,11 +91,6 @@
   -ms-overflow-style: none; /* For Internet Explorer and Edge */
 }
 
-.content_genuine {
-  display: flex;
-  padding: 10px 0px;
-}
-
 /* Hide scrollbar in WebKit browsers like Chrome, Safari */
 .content_trademark::-webkit-scrollbar {
   display: none;
@@ -103,15 +99,6 @@
 .trademark {
   margin-right: 20px;
   cursor: pointer;
-}
-
-.genuine {
-  margin-right: 20px;
-  cursor: pointer;
-}
-
-.genuine:hover {
-  transform: translateY(-10px);
 }
 
 .trademark:hover {
@@ -123,6 +110,20 @@
   aspect-ratio: 2.05 / 1;
   border-radius: 8px;
   overflow: hidden;
+}
+
+.content_genuine {
+  display: flex;
+  padding: 10px 0px;
+}
+
+.genuine {
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.genuine:hover {
+  transform: translateY(-10px);
 }
 
 .genuine img {
