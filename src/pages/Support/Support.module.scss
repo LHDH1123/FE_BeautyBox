@@ -1,0 +1,57 @@
+.support {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0px 170px;
+}
+
+.list-service {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+  margin: 40px 0px;
+}
+
+.service {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #f9f9f9;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
+  cursor: pointer;
+}
+
+.service:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 36px;
+}
+
+.service a {
+  text-decoration: none;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333333;
+  transition: color 0.3s ease;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+//   margin-bottom: 10px;
+  color: #333333;
+}

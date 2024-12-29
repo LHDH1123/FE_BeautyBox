@@ -15,6 +15,8 @@ export default function Router() {
         <Route path="/help-center" element={<Support />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/brands" element={<Brand />} />
+        <Route path="/brands" element={<Brand />} />
+        <Route path="/help-center" element={<Support />} />
       </Route>
     </Routes>
   );
