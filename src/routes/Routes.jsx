@@ -5,6 +5,7 @@ import Store from "../pages/Store";
 import Support from "../pages/Support";
 import Profile from "../pages/Profile";
 import Brand from "../pages/Brand";
+import Product from "../pages/Product";
 
 export default function Router() {
   return (
@@ -17,6 +18,7 @@ export default function Router() {
         <Route path="/brands" element={<Brand />} />
         <Route path="/brands" element={<Brand />} />
         <Route path="/help-center" element={<Support />} />
+        <Route path="/product" element={<Product />} />
       </Route>
     </Routes>
   );

@@ -1,0 +1,30 @@
+.filter {
+  display: flex;
+  margin-top: 15px;
+}
+.filter-header {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: "SVNMont", sans-serif;
+}
+
+.filter-results {
+  display: flex;
+  margin-left: auto;
+  align-items: center;
+}
+
+.filter-results span {
+  font-size: 14px;
+  font-weight: 400;
+  font-family: "SVNMont", sans-serif;
+}
+
+.filter-select {
+  padding: 4px;
+  margin-left: 10px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  outline: none; /* Loại bỏ viền mặc định khi focus */
+}
