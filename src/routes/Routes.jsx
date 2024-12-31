@@ -6,6 +6,7 @@ import Support from "../pages/Support";
 import Profile from "../pages/Profile";
 import Brand from "../pages/Brand";
 import Product from "../pages/Product";
+import Error404 from "../pages/Error404";
 
 export default function Router() {
   return (
@@ -16,9 +17,11 @@ export default function Router() {
         <Route path="/help-center" element={<Support />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/brands" element={<Brand />} />
-        <Route path="/brands" element={<Brand />} />
-        <Route path="/help-center" element={<Support />} />
         <Route path="/product" element={<Product />} />
+        <Route path="/notfound" element={<Error404 />} />
+
+
+        <Route path="*" element={<Error404 />} />
       </Route>
     </Routes>
   );
