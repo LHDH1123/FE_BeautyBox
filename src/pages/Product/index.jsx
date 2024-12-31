@@ -5,22 +5,24 @@ import HeaderLink from "../../components/HeaderLink";
 import ListCategory from "../../components/ListCategory";
 import Sidebar from "../../components/Sidebar";
 import Filter from "../../components/Filter";
+import { FilterProvider } from "../../Context/FilterContext"; // Import FilterProvider
 
 const cx = classNames.bind(styles);
 
 const Product = () => {
-  const listFilter = ["Giá sản phẩm"];
   return (
-    <div className={cx("product")}>
-      <HeaderLink title="Sản phẩm" />
-      <Filter total={794} />
-      <div className={cx("container")}>
-        <div className={cx("sidebar")}>
-          <Sidebar listFilter={listFilter} />
+    <FilterProvider>
+      <div className={cx("product")}>
+        <HeaderLink title="Sản phẩm" />
+        <Filter total={794} />
+        <div className={cx("container")}>
+          <div className={cx("sidebar")}>
+            <Sidebar />
+          </div>
+          <ListCategory />
         </div>
-        <ListCategory />
       </div>
-    </div>
+    </FilterProvider>
   );
 };
 
