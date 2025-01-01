@@ -139,6 +139,7 @@
 
 .main_header {
   display: flex;
+  position: relative;
   align-items: center;
   overflow-x: hidden; /* Ẩn nội dung vượt khỏi khung */
   white-space: nowrap; /* Ngăn thẻ xuống dòng */
@@ -171,6 +172,23 @@
   cursor: pointer;
   font-weight: bold;
   z-index: 1;
+}
+
+.menu-dropdown {
+  position: fixed;
+  top: 142px;
+  left: 0;
+  width: 100%;
+  background-color: #fff; /* Nền của dropdown */
+  border-bottom: 3px solid transparent; /* Viền dưới có độ dày 3px và trong suốt */
+  border-image: linear-gradient(
+      90deg,
+      rgb(255, 212, 0) 0%,
+      rgb(199, 49, 48) 50.52%,
+      rgb(102, 54, 149) 99.61%
+    )
+    1; /* Áp dụng gradient vào border */
+  z-index: 1000;
 }
 
 .scroll-button {
@@ -479,7 +497,7 @@
   display: flex;
   align-items: center; /* Căn giữa nội dung trong mỗi item */
   padding: 18px 10px;
-  font-size: 16px;
+  font-size: 14px;
   color: black;
   cursor: pointer;
   border-bottom: 1px solid #f0f0f0; /* Tạo đường phân cách giữa các item */

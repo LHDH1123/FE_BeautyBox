@@ -17,6 +17,7 @@ import { Dialog, Box, DialogActions } from "@mui/material";
 import Cart from "../Cart";
 import CartFav from "../CartFav";
 import { useNavigate } from "react-router-dom";
+import Collection from "../Collection";
 
 const cx = classNames.bind(styles);
 
@@ -33,6 +34,29 @@ const Header = () => {
   // const [isLogin, setIsLogin] = useState(false);
   const [selectedCart, setSelectedCart] = useState("delivery");
   const navigate = useNavigate();
+  const [hoveredMenu, setHoveredMenu] = useState(null);
+
+  const menuHeaders = [
+    { id: 1, label: "Thương hiệu" },
+    { id: 2, label: "Khuyến mãi hot" },
+    { id: 3, label: "Sản phẩm cao cấp" },
+    { id: 4, label: "Trang điểm" },
+    { id: 5, label: "Chăm sóc da" },
+    { id: 6, label: "Chăm sóc cá nhân" },
+    { id: 7, label: "Sản phẩm cao cấp" },
+    { id: 8, label: "Trang điểm" },
+    { id: 9, label: "Chăm sóc da" },
+    { id: 10, label: "Chăm sóc cá nhân" },
+    { id: 11, label: "Sản phẩm cao cấp" },
+    { id: 12, label: "Trang điểm" },
+    { id: 13, label: "Chăm sóc da" },
+    { id: 14, label: "Chăm sóc cá nhân" },
+  ];
+  const handleNavigate = (label) => {
+    if (label === "Thương hiệu") {
+      navigate("/brands");
+    }
+  };
 
   const handleNavigateStore = () => {
     navigate("/stores");
@@ -44,10 +68,6 @@ const Header = () => {
 
   const handleNavigateProfile = () => {
     navigate("/profile");
-  };
-
-  const handleNavigateBrand = () => {
-    navigate("/brands");
   };
 
   const handleOutsideClick = (event) => {
@@ -388,25 +408,25 @@ const Header = () => {
             <ArrowLeftIcon />
           </button>
         )}
-        <div className={cx("main_header", "scrollable")} ref={scrollableRef}>
-          <div className={cx("menu-header")} onClick={handleNavigateBrand}>
-            Thương hiệu
-          </div>
-          <div className={cx("menu-header")}>Khuyến mãi hot</div>
-          <div className={cx("menu-header")}>Sản phẩm cao cấp</div>
-          <div className={cx("menu-header")}>Trang điểm</div>
-          <div className={cx("menu-header")}>Chăm sóc da</div>
-          <div className={cx("menu-header")}>Chăm sóc cá nhân</div>
-          <div className={cx("menu-header")}>Chăm sóc cơ thể</div>
-          <div className={cx("menu-header")}>Mã giảm</div>
-          <div className={cx("menu-header")}>Sản phẩm mới</div>
-
-          <div className={cx("menu-header")}>Chăm sóc cơ thể</div>
-          <div className={cx("menu-header")}>Mã giảm</div>
-          <div className={cx("menu-header")}>Sản phẩm mới</div>
-          <div className={cx("menu-header")}>Chăm sóc cơ thể</div>
-          <div className={cx("menu-header")}>Mã giảm</div>
-          <div className={cx("menu-header")}>Sản phẩm mới</div>
+        <div className={cx("main_header", "scrollable")}>
+          {menuHeaders.map((menu) => (
+            <div
+              key={menu.id}
+              className={cx("menu-header")}
+              onClick={() => handleNavigate(menu.label)}
+              onMouseEnter={() => setHoveredMenu(menu.id)}
+              onMouseLeave={() => {
+                setHoveredMenu(null);
+              }}
+            >
+              {menu.label}
+              {hoveredMenu === menu.id && (
+                <div className={cx("menu-dropdown")}>
+                  <Collection props={menu.label} />
+                </div>
+              )}
+            </div>
+          ))}
         </div>
         {isRightVisible && (
           <button
@@ -705,7 +725,6 @@ const Header = () => {
       </Dialog>
 
       {/* Ưa thích */}
-
       <Dialog
         open={isModalLike}
         onClose={handleCloseModalLike}
