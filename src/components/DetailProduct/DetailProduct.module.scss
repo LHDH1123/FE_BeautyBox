@@ -1,0 +1,283 @@
+/* Detail Product CSS */
+
+.detail {
+  display: flex;
+  gap: 20px;
+}
+
+.img__content {
+  display: flex;
+}
+
+.img_slider {
+  overflow-y: hidden;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  height: 400px;
+}
+
+.list-img {
+  width: 90px;
+  height: 90px;
+  overflow: hidden;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.list-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.img-main {
+  width: 490px;
+  height: 400px;
+  overflow: hidden;
+  margin-top: 12px;
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+.img-main img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.btn {
+  text-align: center;
+  padding: 5px;
+}
+
+.btn button {
+  width: 30px;
+  height: 30px;
+  border: none;
+  background-color: #fff;
+  cursor: pointer;
+}
+
+.detail__content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.detail__content h1 {
+  font-size: 24px;
+  color: black;
+}
+
+.product-price {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.promotion {
+  background-color: #fffae6;
+  padding: 10px;
+  border: 1px dashed #f1c40f;
+  border-radius: 8px;
+}
+
+.promotion p {
+  margin: 0;
+  font-size: 14px;
+  color: #f39c12;
+}
+
+.shopping-options {
+  padding: 20px;
+  padding-bottom: 0px;
+  border: 2px solid transparent;
+  background: linear-gradient(white, white) padding-box padding-box,
+    linear-gradient(
+        90deg,
+        rgb(255, 212, 0) 0%,
+        rgb(199, 49, 48) 50.52%,
+        rgb(102, 54, 149) 99.61%
+      )
+      border-box border-box;
+  border-radius: 10px;
+}
+
+.shopping-options ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.shopping-options li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.shopping-options input[type="radio"] {
+  accent-color: #3498db;
+}
+
+.shopping-options label {
+  font-size: 16px;
+  font-weight: 700;
+  color: black;
+  font-family: "SVNMont", sans-serif;
+}
+
+.title-shopping h4 {
+  font-size: 19px;
+  font-weight: 700;
+  font-family: "SVNMont", sans-serif;
+  margin: 0px;
+  margin-bottom: 10px;
+}
+
+.note {
+  /* Styles chung cho toàn bộ phần tử */
+  font-size: 16px;
+  margin-left: 30px;
+  margin-bottom: 20px;
+}
+
+.soldOut {
+  color: #da0000;
+  font-weight: 700;
+}
+
+.storeName {
+  color: black;
+  font-weight: 700;
+}
+
+.suggestion {
+  color: #0992d0;
+  margin-left: 5px;
+}
+
+.store {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  text-align: right;
+  padding: 10px;
+  display: flex; /* Enable flexbox layout */
+  align-items: center; /* Vertically center content */
+  justify-content: right;
+}
+
+.store a {
+  font-size: 16px;
+  font-weight: 700;
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.checkout {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* ... Các styles còn lại */
+
+.div-quantity {
+  display: flex;
+  width: auto;
+  height: 50px;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  border: 1px solid rgb(223, 223, 223);
+  border-radius: 38px;
+}
+
+.div-quantity button {
+  border: none;
+  background-color: transparent;
+  padding-top: 7px;
+  padding-bottom: 3px;
+  cursor: pointer;
+}
+
+.quantity {
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  font-family: "SVNMont", sans-serif;
+  color: black;
+  padding: 0px 8px;
+  width: 10px;
+}
+
+.add-cart {
+  flex-grow: 1; /* Cho phép phần tử này giãn nở để chiếm toàn bộ chiều rộng còn lại */
+}
+
+.add-cart button {
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 600;
+  background-color: black;
+  border-radius: 38px;
+  color: #fff;
+  border: none;
+  padding: 14px 23px;
+  width: 100%;
+  cursor: pointer;
+}
+
+.add-cart span {
+  margin-left: 10px;
+}
+
+.add-cart button > div {
+  /* Áp dụng cho tất cả các div con của .checkout */
+  flex-grow: 1; /* Cho phép các phần tử giãn nở để chiếm đầy khoảng trống */
+}
+
+.buy button {
+  font-size: 16px;
+  font-weight: 600;
+  background: linear-gradient(90deg, #ffd400, #c73130 50.52%, #663695 99.61%);
+  border-radius: 38px;
+  color: #fff;
+  border: none;
+  padding: 14px 23px;
+  text-transform: uppercase;
+  height: 50px;
+  cursor: pointer;
+}
+
+.like {
+  cursor: pointer;
+}
+
+.like button {
+  display: flex;
+  -webkit-box-pack: center;
+  justify-content: center;
+  -webkit-box-align: center;
+  align-items: center;
+  background-color: #fff;
+  border: solid 1px black;
+  border-radius: 100%;
+  height: 50px;
+  padding: 0px 14px;
+  cursor: pointer;
+}

@@ -13,6 +13,10 @@
 //   height: 0px; /* Ẩn thanh cuộn ngang nếu có */
 // }
 
+.collection-info {
+  text-align: left;
+}
+
 .title-collection {
   display: flex;
   align-items: center;
@@ -38,19 +42,23 @@
 }
 
 .infos {
+  display: inline-block; /* Hiển thị nội tuyến, giữ độ rộng ôm nội dung */
+  width: auto;
   margin-top: 18px;
   text-align: left;
 }
 
 .title-info {
-  margin-bottom: 18px; /* Giảm khoảng cách giữa các dòng */
+  width: auto;
+  margin: 0 0 18px 0; /* Loại bỏ các khoảng cách bên trên và bên trái, giữ khoảng cách phía dưới */
+  padding: 0; /* Đảm bảo không có khoảng cách bên trong */
   font-size: 14px;
   color: black;
-  // text-transform: uppercase;
   font-family: "SVNMont", sans-serif;
   will-change: transform; /* Giúp cải thiện hiệu suất render */
   font-weight: normal;
   cursor: pointer;
+  text-align: left; /* Căn chữ sát bên trái */
 }
 
 .img-collection {

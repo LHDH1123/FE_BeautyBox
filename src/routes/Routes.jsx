@@ -7,6 +7,7 @@ import Profile from "../pages/Profile";
 import Brand from "../pages/Brand";
 import Product from "../pages/Product";
 import Error404 from "../pages/Error404";
+import Detail from "../pages/Detail";
 
 export default function Router() {
   return (
@@ -18,8 +19,7 @@ export default function Router() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/brands" element={<Brand />} />
         <Route path="/product" element={<Product />} />
-        <Route path="/notfound" element={<Error404 />} />
-
+        <Route path="/detail" element={<Detail />} />
 
         <Route path="*" element={<Error404 />} />
       </Route>
