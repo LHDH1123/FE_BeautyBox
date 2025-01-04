@@ -1,13 +1,13 @@
 import { Route, Routes } from "react-router-dom";
-import Home from "../pages/Home";
-import LayoutDefault from "../Layouts/LayoutDefault";
-import Store from "../pages/Store";
-import Support from "../pages/Support";
-import Profile from "../pages/Profile";
-import Brand from "../pages/Brand";
-import Product from "../pages/Product";
-import Error404 from "../pages/Error404";
-import Detail from "../pages/Detail";
+import Home from "../Client/pages/Home";
+import LayoutDefault from "../Client/Layouts/LayoutDefault";
+import Store from "../Client/pages/Store";
+import Support from "../Client/pages/Support";
+import Profile from "../Client/pages/Profile";
+import Brand from "../Client/pages/Brand";
+import Product from "../Client/pages/Product";
+import Error404 from "../Client/pages/Error404";
+import Detail from "../Client/pages/Detail";
 
 export default function Router() {
   return (

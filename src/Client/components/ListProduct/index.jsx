@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./ListProduct.module.scss";
 import PropTypes from "prop-types";
-import product from "../../assets/images/f9bd5ae3-dc72-438e-8343-6aaba2c3f3da.webp";
+import product from "../../../assets/images/f9bd5ae3-dc72-438e-8343-6aaba2c3f3da.webp";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";

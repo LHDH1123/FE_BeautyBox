@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./ListCategory.module.scss";
-import product from "../../assets/images/f9bd5ae3-dc72-438e-8343-6aaba2c3f3da.webp";
+import product from "../../../assets/images/f9bd5ae3-dc72-438e-8343-6aaba2c3f3da.webp";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import StarIcon from "@mui/icons-material/Star";

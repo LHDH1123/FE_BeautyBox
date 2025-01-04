@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames/bind";
 import styles from "./CategoryHeader.module.scss";
-import img1 from "../../assets/images/categoryHeader.webp";
+import img1 from "../../../assets/images/categoryHeader.webp";
 import PropTypes from "prop-types";
 
 const cx = classNames.bind(styles);

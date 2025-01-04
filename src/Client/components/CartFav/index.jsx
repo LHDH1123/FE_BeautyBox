@@ -2,7 +2,7 @@ import React from "react";
 import PropTypes from "prop-types";
 import classNames from "classnames/bind";
 import styles from "./CartFav.module.scss";
-import imgLogo from "../../assets/images/product.webp";
+import imgLogo from "../../../assets/images/product.webp";
 
 const cx = classNames.bind(styles);
 

@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Header.module.scss";
-import logo from "../../assets/images/logo.webp";
-import ScanIcon from "../../assets/scan-image.gif";
+import logo from "../../../assets/images/logo.webp";
+import ScanIcon from "../../../assets/scan-image.gif";
 import SearchIcon from "@mui/icons-material/Search";
 import StoreIcon from "@mui/icons-material/Storefront";
 import NewspaperIcon from "@mui/icons-material/Newspaper";

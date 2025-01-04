@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames/bind";
 import styles from "./Collection.module.scss";
-import img1 from "../../assets/images/menu-image-brand.webp";
+import img1 from "../../../assets/images/menu-image-brand.webp";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PropTypes from "prop-types";
 

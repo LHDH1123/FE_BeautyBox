@@ -4,9 +4,9 @@ import classNames from "classnames/bind";
 import styles from "./Trademark.module.scss";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
-import th1 from "../../assets/images/th1.webp";
-import th2 from "../../assets/images/th2.webp";
-import th3 from "../../assets/images/th3.webp";
+import th1 from "../../../assets/images/th1.webp";
+import th2 from "../../../assets/images/th2.webp";
+import th3 from "../../../assets/images/th3.webp";
 
 const cx = classNames.bind(styles);
 

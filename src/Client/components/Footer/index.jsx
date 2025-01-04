@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Footer.module.scss";
-import logo from "../../assets/images/logo.webp";
+import logo from "../../../assets/images/logo.webp";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 

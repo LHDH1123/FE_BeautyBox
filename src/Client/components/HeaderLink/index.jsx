@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import classNames from "classnames/bind";
 import styles from "./HeaderLink.module.scss";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import ScanIcon from "../../assets/scan-image.gif";
+import ScanIcon from "../../../assets/scan-image.gif";
 
 const cx = classNames.bind(styles);
 

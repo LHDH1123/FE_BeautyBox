@@ -1,10 +1,10 @@
 import React, { useState, useRef } from "react";
 import classNames from "classnames/bind";
 import styles from "./DetailProduct.module.scss";
-import detail2 from "../../assets/images/detail2.webp";
-import detail3 from "../../assets/images/detail3.webp";
-import detail4 from "../../assets/images/detail4.webp";
-import detail1 from "../../assets/images/detail1.webp";
+import detail2 from "../../../assets/images/detail2.webp";
+import detail3 from "../../../assets/images/detail3.webp";
+import detail4 from "../../../assets/images/detail4.webp";
+import detail1 from "../../../assets/images/detail1.webp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RemoveIcon from "@mui/icons-material/Remove";
