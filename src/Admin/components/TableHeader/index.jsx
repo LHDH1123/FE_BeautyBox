@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames/bind";
 import styles from "./TableHeader.module.scss";
 import SearchIcon from "@mui/icons-material/Search";
-import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
+// import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import TuneIcon from "@mui/icons-material/Tune";
 
 const cx = classNames.bind(styles);
@@ -19,9 +19,9 @@ const TableHeader = () => {
         </div>
 
         <div className={cx("filter")}>
-          <div className={cx("search-path")}>
+          {/* <div className={cx("search-path")}>
             <FilterAltOutlinedIcon />
-          </div>
+          </div> */}
 
           <div className={cx("form-sort")}>
             <TuneIcon />

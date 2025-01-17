@@ -122,7 +122,7 @@ const Dashboard = () => {
                 borderBottom: "solid 1px #ddd",
               }}
             >
-              Purchase & Sales
+              Doanh thu năm
             </Typography>
             <BarChart
               width={700}
@@ -147,7 +147,7 @@ const Dashboard = () => {
 
         <div className={cx("best-seller")}>
           <div className={cx("card-header")}>
-            <div className={cx("card-title")}>Recent Products</div>
+            <div className={cx("card-title")}>Sản phẩm gần đây</div>
             <div className={cx("view-all-link")}>
               <a href="/" className={cx("view-all")}>
                 View All
@@ -161,8 +161,8 @@ const Dashboard = () => {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Products</th>
-                    <th>Price</th>
+                    <th>Sản phẩm</th>
+                    <th>Giá</th>
                   </tr>
                 </thead>
                 <tbody>

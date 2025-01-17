@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Product.module.scss";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
@@ -7,10 +7,23 @@ import loggo from "../../../assets/images/ch1.webp";
 import Header from "../../../Admin/components/Header";
 import TableHeader from "../../components/TableHeader";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import CategoryIcon from "@mui/icons-material/Category";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import SearchIcon from "@mui/icons-material/Search";
+import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 
 const cx = classNames.bind(styles);
 
 const Product = () => {
+  const [isBrand, setIsBrand] = useState(false);
+
+  const handleSelectBrand = () => {
+    if (isBrand) {
+      setIsBrand(false);
+    } else {
+      setIsBrand(true);
+    }
+  };
   return (
     <div className={cx("table")}>
       <Header title="Sản Phẩm" />
@@ -19,9 +32,32 @@ const Product = () => {
         <TableHeader />
 
         <div className={cx("card")}>
-          <h1>card</h1>
-        </div>
+          <div className={cx("tag-filter")} onClick={handleSelectBrand}>
+            <LocalOfferIcon fontSize="inherit" />
+            <div className={cx("title-tag")}>Thương hiệu</div>
+            <KeyboardArrowDownIcon />
+          </div>
+          {isBrand && (
+            <div className={cx("select-tag")}>
+              <div className={cx("tag")}>THE FACE SHOP</div>
+              <div className={cx("tag")}>THE FACE SHOP</div>
+            </div>
+          )}
 
+          <div className={cx("tag-filter")}>
+            <CategoryIcon fontSize="inherit" />
+            <div className={cx("title-tag")}>Danh mục</div>
+            <KeyboardArrowDownIcon />
+          </div>
+          {/* <div className={cx("select-category")}>
+            <div className={cx("tag")}>THE FACE SHOP</div>
+            <div className={cx("tag")}>THE FACE SHOP</div>
+          </div> */}
+          <div className={cx("btn-search")}>
+            <SearchIcon fontSize="small" />
+            Tìm kiếm
+          </div>
+        </div>
         <div className={cx("brand-list")}>
           <table className={cx("table", "datanew")}>
             <thead>

@@ -44,9 +44,19 @@
 }
 
 .nav > .submenu > a:hover,
-.nav > .submenu > a:focus {
+.nav > .submenu > a:focus,
+.nav > .submenu.active > a {
   background-color: #f9f9f9;
   border-left-color: #ffaf8e;
+  color: #ffaf8e;
+}
+
+.nav > .submenu > ul > .submenu > a:hover,
+.nav > .submenu > ul > .submenu > a:focus,
+.nav > .submenu > ul > .submenu.active > a {
+  background-color: #f6f6f6;
+  border-left-color: #ffaf8e;
+  color: #ffaf8e;
 }
 
 .nav > .submenu > ul {
@@ -81,7 +91,14 @@
   margin-left: 8px;
 }
 
+/* Active submenu */
 .nav > .submenu > a.active {
+  background-color: #ffeed8;
+  border-left-color: #ffaf8e;
+  color: #ffaf8e;
+}
+
+.nav > .submenu > ul > .submenu > a.active {
   background-color: #ffeed8;
   border-left-color: #ffaf8e;
   color: #ffaf8e;

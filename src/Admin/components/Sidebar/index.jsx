@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useState } from "react";
 import classNames from "classnames/bind";
+import { useLocation, Link } from "react-router-dom"; // Sử dụng useLocation và Link
 import styles from "./SidebarAdmin.module.scss";
 import logo from "../../../assets/images/logo.webp";
 import DashboardIcon from "@mui/icons-material/Dashboard";
@@ -14,10 +15,18 @@ import LogoutIcon from "@mui/icons-material/Logout";
 const cx = classNames.bind(styles);
 
 const Sidebar = () => {
+  const location = useLocation();
+  const [activePath, setActivePath] = useState(location.pathname);
+
+  // Hàm để thay đổi trạng thái active
+  const handleActive = (path) => {
+    setActivePath(path);
+  };
+
   return (
     <div className={cx("sidebar")}>
       <div className={cx("sidebar-img")}>
-        <img src={logo} alt="" />
+        <img src={logo} alt="Logo" />
       </div>
       <ul className={cx("nav")}>
         <li className={cx("submenu")}>
@@ -25,11 +34,15 @@ const Sidebar = () => {
             <span>Trang chính</span>
           </div>
           <ul>
-            <li className={cx("submenu")}>
-              <a href="/adminbb">
+            <li
+              className={cx("submenu", {
+                active: activePath === "/adminbb",
+              })}
+            >
+              <Link to="/adminbb" onClick={() => handleActive("/adminbb")}>
                 <DashboardIcon fontSize="small" />
                 <span>Trang chủ</span>
-              </a>
+              </Link>
             </li>
           </ul>
         </li>
@@ -39,29 +52,57 @@ const Sidebar = () => {
             <span>Quản lý sản phẩm</span>
           </div>
           <ul>
-            <li className={cx("submenu")}>
-              <a href="/adminbb/product-list">
+            <li
+              className={cx("submenu", {
+                active: activePath === "/adminbb/product-list",
+              })}
+            >
+              <Link
+                to="/adminbb/product-list"
+                onClick={() => handleActive("/adminbb/product-list")}
+              >
                 <InventoryIcon fontSize="small" />
                 <span>Sản phẩm</span>
-              </a>
+              </Link>
             </li>
-            <li className={cx("submenu")}>
-              <a href="/adminbb/category">
+            <li
+              className={cx("submenu", {
+                active: activePath === "/adminbb/category",
+              })}
+            >
+              <Link
+                to="/adminbb/category"
+                onClick={() => handleActive("/adminbb/category")}
+              >
                 <CategoryIcon fontSize="small" />
                 <span>Danh mục</span>
-              </a>
+              </Link>
             </li>
-            <li className={cx("submenu")}>
-              <a href="/adminbb/brand-list">
+            <li
+              className={cx("submenu", {
+                active: activePath === "/adminbb/brand-list",
+              })}
+            >
+              <Link
+                to="/adminbb/brand-list"
+                onClick={() => handleActive("/adminbb/brand-list")}
+              >
                 <LocalOfferIcon fontSize="small" />
                 <span>Thương hiệu</span>
-              </a>
+              </Link>
             </li>
-            <li className={cx("submenu")}>
-              <a href="/adminbb/flashsale">
+            <li
+              className={cx("submenu", {
+                active: activePath === "/adminbb/flashsale",
+              })}
+            >
+              <Link
+                to="/adminbb/flashsale"
+                onClick={() => handleActive("/adminbb/flashsale")}
+              >
                 <FlashOnIcon fontSize="small" />
                 <span>Flash Sale</span>
-              </a>
+              </Link>
             </li>
           </ul>
         </li>
@@ -71,17 +112,31 @@ const Sidebar = () => {
             <span>Quản lý người dùng</span>
           </div>
           <ul>
-            <li className={cx("submenu")}>
-              <a href="/adminbb/user">
+            <li
+              className={cx("submenu", {
+                active: activePath === "/adminbb/user",
+              })}
+            >
+              <Link
+                to="/adminbb/user"
+                onClick={() => handleActive("/adminbb/user")}
+              >
                 <PersonIcon fontSize="small" />
                 <span>Người dùng</span>
-              </a>
+              </Link>
             </li>
-            <li className={cx("submenu")}>
-              <a href="/adminbb/role">
+            <li
+              className={cx("submenu", {
+                active: activePath === "/adminbb/role",
+              })}
+            >
+              <Link
+                to="/adminbb/role"
+                onClick={() => handleActive("/adminbb/role")}
+              >
                 <ShieldIcon fontSize="small" />
                 <span>Vai trò & Quyền</span>
-              </a>
+              </Link>
             </li>
           </ul>
         </li>
@@ -91,11 +146,18 @@ const Sidebar = () => {
             <span>Cài đặt</span>
           </div>
           <ul>
-            <li className={cx("submenu")}>
-              <a href="/adminbb">
+            <li
+              className={cx("submenu", {
+                active: activePath === "/adminbb/logout",
+              })}
+            >
+              <Link
+                to="/adminbb/logout"
+                onClick={() => handleActive("/adminbb/logout")}
+              >
                 <LogoutIcon fontSize="small" />
                 <span>Đăng xuất</span>
-              </a>
+              </Link>
             </li>
           </ul>
         </li>

@@ -11,14 +11,11 @@ const cx = classNames.bind(styles);
 const Table = () => {
   return (
     <div className={cx("table")}>
-      <Header title="Thương hiệu" />
+      <Header title="Thương Hiệu" />
 
       <div className={cx("table-list")}>
         <TableHeader /> 
 
-        <div className={cx("card")}>
-          <h1>card</h1>
-        </div>
         <div className={cx("brand-list")}>
           <table className={cx("table", "datanew")}>
             <thead>

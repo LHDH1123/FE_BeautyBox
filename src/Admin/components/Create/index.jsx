@@ -10,6 +10,7 @@ import img from "../../../assets/images/product.webp";
 import InfoIcon from "@mui/icons-material/Info";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
@@ -18,6 +19,7 @@ const Create = ({ title }) => {
   const [isImg, setIsImg] = useState(true);
   const [isPrice, setIsPrice] = useState(true);
   const [isActive, setIsActive] = useState(true); // Trạng thái ban đầu là "Hoạt động"
+  const navigate = useNavigate();
 
   const handleStatusChange = (status) => {
     setIsActive(status); // Cập nhật trạng thái khi chọn
@@ -47,6 +49,10 @@ const Create = ({ title }) => {
     }
   };
 
+  const handleProduct = () => {
+    navigate("/adminbb/product-list");
+  };
+
   return (
     <div className={cx("create")}>
       <div className={cx("header")}>
@@ -62,7 +68,7 @@ const Create = ({ title }) => {
             )}
           </div>
         </div>
-        <div className={cx("btn-add")}>
+        <div className={cx("btn-add")} onClick={handleProduct}>
           <ArrowBackIcon fontSize="inherit" />
           <button>Quay lại sản phẩm</button>
         </div>
@@ -109,7 +115,16 @@ const Create = ({ title }) => {
                 </div>
                 <div className={cx("info-item")}>
                   <div className={cx("title-item")}>Thương hiệu </div>
-                  <select className={cx("form-control")}>
+                  <select
+                    className={cx("form-control")}
+                    styles={{
+                      option: (provided, state) => ({
+                        ...provided,
+                        backgroundColor: state.isFocused ? "#FFA500" : "red", // Màu khi hover
+                        color: state.isFocused ? "red" : "black",
+                      }),
+                    }}
+                  >
                     <option value="">Chọn</option>
                     <option value="electronics">Điện tử</option>
                     <option value="fashion">Thời trang</option>
