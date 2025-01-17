@@ -1,0 +1,243 @@
+.welcome {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background: #fff;
+  border-radius: 10px;
+}
+
+.welcome-text {
+  display: flex;
+  align-items: center;
+}
+
+.title-welcome {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.text {
+  font-size: 16px;
+  color: #666;
+  margin-left: 5px;
+}
+
+.calendar {
+  display: flex;
+  align-items: center;
+}
+
+.filter-calender {
+  display: flex;
+  align-items: center;
+}
+
+.sales-cards {
+  display: flex;
+  gap: 30px;
+  margin: 30px 0px;
+}
+
+.total-sale {
+  display: flex;
+  align-items: center;
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  flex-direction: initial;
+  width: 45%;
+  border: solid 1px #bcbbbb;
+}
+.total-sale img {
+  margin-left: auto;
+}
+
+.total-oder {
+  display: flex;
+  background-color: #ff9f43;
+  border-radius: 10px;
+  padding: 20px;
+  flex-direction: initial;
+  width: 20%;
+  color: #fff;
+  align-items: center;
+}
+
+.total-oder img {
+  margin-left: auto;
+  height: 70px;
+  width: 70px;
+  color: #fff;
+}
+
+.card h6 {
+  color: #ff9f43;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0px;
+  margin-bottom: 20px;
+}
+
+.card h3 {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0px;
+  margin-bottom: 8px;
+}
+
+.card span {
+  margin-right: 15px;
+}
+
+.title-card {
+  margin-top: 5px;
+  margin-bottom: 15px;
+}
+
+.pg-green {
+  background-color: #1b2850;
+}
+
+.content {
+  display: flex;
+  gap: 20px;
+}
+
+.recharts {
+  flex: 55%;
+}
+
+.best-seller {
+  background-color: #fff;
+  border: solid 1px #ddd;
+  border-radius: 10px;
+  flex: 45%;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  border-bottom: solid 1px #ddd;
+}
+
+.view-all-link {
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.view-all-link:hover .view-all,
+.view-all-link:hover .icon {
+  color: #ff6347; /* Thay đổi màu khi hover, có thể thay đổi theo nhu cầu */
+}
+
+.icon {
+  color: #5b6670;
+  margin-left: 5px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: #333;
+}
+
+.view-all {
+  text-decoration: none;
+  color: #5b6670;
+}
+
+.card-body {
+  padding: 0px 16px;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+}
+
+.table th,
+.table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table th {
+  font-size: 16px;
+  padding: 20px;
+}
+
+.table td {
+  font-size: 14px;
+  color: #333;
+}
+
+.productimgname {
+  display: flex;
+  align-items: center;
+}
+
+.product-img {
+  margin-right: 10px;
+}
+
+.product-img img {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+}
+
+.productimgname a {
+  text-decoration: none;
+  color: #495057;
+}
+
+.productimgname a:hover {
+  text-decoration: underline;
+}
+
+.table tr:hover {
+  background-color: #f1f1f1;
+}
+
+.table td:last-child {
+  color: #495057; /* Màu sắc giá */
+}
+
+.table tr:last-child td {
+  border-bottom: none; /* Loại bỏ đường viền dưới cho dòng cuối */
+}
+
+.calendar {
+  border: solid 1px #ebebeb;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+.calendar input {
+  font-size: 14px;
+  border: none;
+  margin-left: 10px;
+  outline: none;
+  width: 500px;
+}
+
+  // .select-cal {
+  //   position: fixed;
+  //   border: solid 1px #ddd;
+  //   top: 0;
+  //   right: 0;
+  //   z-index: 10;
+  // }
+

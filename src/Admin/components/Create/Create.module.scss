@@ -1,0 +1,229 @@
+.header {
+  display: flex;
+  align-items: center;
+  background: #fafafa;
+  padding-bottom: 20px;
+}
+
+.btn-add {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.title-page {
+  font-weight: 700;
+  color: #092c4c;
+  font-size: 22px;
+  margin-bottom: 5px;
+}
+
+.title-desc {
+  font-size: 14px;
+  color: #495057;
+  font-weight: 400;
+}
+
+.btn-add {
+  display: flex;
+  align-items: center;
+  -ms-flex-align: center;
+  background: #092c4c;
+  padding: 8px 11px;
+  color: #ffffff;
+  border-radius: 8px;
+  height: 21px;
+}
+
+.btn-add button {
+  border: none;
+  background: #092c4c;
+  padding: 8px 5px;
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 14px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.content {
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  margin: 0 0 20px 0px;
+  padding: 0 0 20px 0;
+  border-bottom: 1px solid rgba(145, 158, 171, 0.3);
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  cursor: pointer;
+}
+
+.title-header {
+  font-size: 16px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+.icon {
+  margin-left: auto;
+}
+
+.info {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* Ba cột có chiều rộng bằng nhau */
+  gap: 16px; /* Khoảng cách giữa các mục */
+  margin-bottom: 20px;
+}
+
+.info-item {
+  flex: 1 1 calc(33.33% - 10px); /* Mỗi mục chiếm 1/3 chiều rộng */
+}
+
+.title-item {
+  font-size: 14px;
+  font-weight: 600;
+  color: #5b6670;
+  margin-bottom: 8px;
+}
+
+.form-control {
+  width: 100%; /* Make the input field take full width of its parent */
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 8px 16px;
+  border: solid 1px #cfcfcf;
+  outline: none;
+  color: #585757;
+}
+
+.desc-input {
+  width: 100%; /* Make the input field take full width of its parent */
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 8px 16px;
+  border: solid 1px #cfcfcf;
+  outline: none;
+  color: #585757;
+  height: 150px;
+  cursor: pointer;
+}
+
+.title-length {
+  font-size: 12px;
+  font-weight: 600;
+  color: #5b6670;
+  margin: 8px 0px;
+  margin-bottom: 20px;
+}
+
+.input-blocks {
+  margin-bottom: 0;
+  width: 137px;
+  height: 123px;
+  border: 1px dashed rgba(145, 158, 171, 0.32);
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.img-upload {
+  width: 137px;
+  height: 123px;
+  border-radius: 10px;
+  border: 1px solid var(--Stroke, rgba(145, 158, 171, 0.3));
+  text-align: center;
+  position: relative; /* Cần thiết để căn chỉnh icon xóa */
+  display: flex;
+  justify-content: center; /* Căn giữa ảnh theo chiều ngang */
+  align-items: center; /* Căn giữa ảnh theo chiều dọc */
+}
+
+.img-upload img {
+  width: 80%; /* Đảm bảo ảnh chiếm hết chiều rộng của khối */
+  height: auto; /* Giữ tỉ lệ ảnh */
+  padding: 10px;
+  border-radius: 5px; /* Thêm góc bo tròn cho ảnh */
+}
+
+.img-upload a {
+  position: absolute;
+  top: 2px; /* Điều chỉnh vị trí icon xóa từ trên */
+  right: 2px; /* Điều chỉnh vị trí icon xóa từ bên phải */
+  padding: 5px; /* Khoảng cách xung quanh icon */
+  cursor: pointer; /* Thêm hiệu ứng khi hover */
+}
+
+.info-image {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin: 30px 0px;
+}
+
+///
+///
+.checkbox {
+  margin-right: 8px; /* Khoảng cách giữa checkbox và nhãn */
+  //   accent-color: #ff9f43; /* Thay đổi màu checkbox */
+  color: #5b6670;
+  cursor: pointer;
+}
+
+.checkbox-input {
+  display: flex;
+}
+
+.input-status {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-right: 40px;
+}
+
+.input-status input {
+  margin-top: 5px;
+}
+
+.title-checkbox {
+  font-size: 14px;
+  font-weight: 600;
+  color: #5b6670;
+}
+
+.btn-addproduct {
+  float: right;
+  padding: 30px 20px;
+}
+
+.btn-cancel {
+  background: #67748e;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+.btn-submit {
+  background: #ff9f43;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 700;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 3px;
+  margin-left: 15px;
+  cursor: pointer;
+}

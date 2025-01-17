@@ -1,0 +1,144 @@
+.table-list {
+  padding: 20px;
+  background-color: #ffffff;
+  transition: all 0.5s ease-in-out;
+  position: relative;
+  border-radius: 4px;
+  border: 1px solid #dbe0e6;
+  box-shadow: none;
+}
+
+.brand-list {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: solid 1px #dee2e6;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #fff;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: #333;
+}
+
+.table thead tr {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.table thead th {
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #495057;
+  position: relative;
+}
+
+.table thead th input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+}
+
+.table tbody tr {
+  border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.table tbody td {
+  padding: 12px 16px;
+  vertical-align: middle;
+}
+
+.checkboxs input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.checkboxs .checkmarks {
+  display: none;
+}
+
+.d-flex {
+  display: flex;
+  align-items: center;
+}
+
+.d-flex img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.badge-linesuccess {
+  background-color: #e6f9f0;
+  color: #28a745;
+}
+
+.action-table-data {
+  text-align: center;
+}
+
+.edit-delete-action {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.edit-delete-action a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.edit-delete-action a:hover {
+  background-color: #f1f1f1;
+}
+
+.edit-delete-action a i {
+  font-size: 16px;
+  color: #007bff;
+}
+
+.edit-delete-action a i.feather-trash-2 {
+  color: #dc3545;
+}
+
+.icon {
+  border: solid 1px #dee2e6;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.icon svg {
+  display: flex;
+  font-size: 18px;
+  padding: 5px;
+}
+
+.name-product {
+  display: flex;
+  align-items: center;
+}
+
+.name {
+  margin-left: 10px;
+}

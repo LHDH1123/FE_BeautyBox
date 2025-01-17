@@ -1,0 +1,46 @@
+.header {
+    display: flex;
+    align-items: center;
+    background: #fafafa;
+    padding-bottom: 20px;
+  }
+  
+  .btn-add {
+    margin-left: auto;
+    cursor: pointer;
+  }
+  
+  .title-page {
+    font-weight: 700;
+    color: #092c4c;
+    font-size: 22px;
+    margin-bottom: 5px;
+  }
+  
+  .title-desc {
+    font-size: 14px;
+    color: #495057;
+    font-weight: 400;
+  }
+  
+  .btn-add {
+    display: flex;
+    align-items: center;
+    -ms-flex-align: center;
+    background: #ff9f43;
+    padding: 8px 11px;
+    color: #ffffff;
+    border-radius: 8px;
+    height: 21px;
+  }
+  
+  .btn-add button {
+    border: none;
+    background: #ff9f43;
+    padding: 8px 5px;
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 14px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
