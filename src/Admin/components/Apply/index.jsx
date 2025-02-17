@@ -1,15 +1,19 @@
+// src/components/Apply/Apply.js
 import React, { useState, useRef, useEffect } from "react";
 import classNames from "classnames/bind";
 import styles from "./Apply.module.scss";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { changeMulti } from "../../../services/brand.service";
+import { useSelectedBrands } from "../../Context/BrandContext"; // Import context
 
 const cx = classNames.bind(styles);
 
-const Apply = ({ selectedBrands }) => {
+const Apply = () => {
   const [isBrand, setIsBrand] = useState(false);
   const [selectedTag, setSelectedTag] = useState("Tất cả"); // Lưu tag được chọn
   const dropdownRef = useRef(null);
+
+  const { selectedBrands } = useSelectedBrands(); // Use context to get selectedBrands
 
   const tags = ["Xóa tất cả", "Hoạt động", "Không hoạt động"];
 

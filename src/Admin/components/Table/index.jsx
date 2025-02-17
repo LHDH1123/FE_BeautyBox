@@ -1,3 +1,4 @@
+// src/components/Table/Table.js
 import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Table.module.scss";
@@ -10,12 +11,18 @@ import {
   deletebrand,
   getBrands,
 } from "../../../services/brand.service";
+import { useSelectedBrands } from "../../Context/BrandContext"; // Import context
+
 const cx = classNames.bind(styles);
 
 const Table = () => {
   const [brands, setBrands] = useState([]);
-  const [selectAll, setSelectAll] = useState(false); // Thêm state cho checkbox "cb-all"
-  const [selectedBrands, setSelectedBrands] = useState([]);
+  const {
+    selectedBrands,
+    toggleSelectedBrand,
+    selectAllBrands,
+    deselectAllBrands,
+  } = useSelectedBrands(); // Use context
 
   useEffect(() => {
     const fetchBrands = async () => {
@@ -56,34 +63,19 @@ const Table = () => {
   };
 
   const handleSelectAll = () => {
-    const newSelectAll = !selectAll;
-    setSelectAll(newSelectAll);
-
-    if (newSelectAll) {
-      setSelectedBrands(brands.map((brand) => brand._id)); // Chọn tất cả
+    if (selectedBrands.length === brands.length) {
+      deselectAllBrands(); // Bỏ chọn tất cả
     } else {
-      setSelectedBrands([]); // Bỏ chọn tất cả
+      selectAllBrands(brands); // Chọn tất cả
     }
   };
-
-  const handleSelectOne = (id) => {
-    setSelectedBrands((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((brandId) => brandId !== id)
-        : [...prevSelected, id]
-    );
-  };
-
-  useEffect(() => {
-    setSelectAll(selectedBrands.length === brands.length && brands.length > 0);
-  }, [selectedBrands, brands]);
 
   return (
     <div className={cx("table")}>
       <Header title="Thương Hiệu" />
 
       <div className={cx("table-list")}>
-        <TableHeader selectedBrands={selectedBrands} />
+        <TableHeader />
 
         <div className={cx("brand-list")}>
           <table className={cx("table", "datanew")}>
@@ -94,7 +86,10 @@ const Table = () => {
                     type="checkbox"
                     name=""
                     id=""
-                    checked={selectAll}
+                    checked={
+                      selectedBrands.length === brands.length &&
+                      brands.length > 0
+                    }
                     onChange={handleSelectAll}
                   />
                 </th>
@@ -113,7 +108,7 @@ const Table = () => {
                       <input
                         type="checkbox"
                         checked={selectedBrands.includes(brand._id)}
-                        onChange={() => handleSelectOne(brand._id)}
+                        onChange={() => toggleSelectedBrand(brand._id)}
                       />
                       <span className={cx("checkmarks")}></span>
                     </label>

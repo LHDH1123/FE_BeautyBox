@@ -1,3 +1,4 @@
+// src/components/TableHeader/TableHeader.js
 import React from "react";
 import classNames from "classnames/bind";
 import styles from "./TableHeader.module.scss";
@@ -5,10 +6,13 @@ import SearchIcon from "@mui/icons-material/Search";
 // import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import TuneIcon from "@mui/icons-material/Tune";
 import Apply from "../Apply";
+import { useSelectedBrands } from "../../Context/BrandContext"; // Import context
 
 const cx = classNames.bind(styles);
 
-const TableHeader = ({ selectedBrands }) => {
+const TableHeader = () => {
+  const { selectedBrands } = useSelectedBrands(); // Use context to get selectedBrands
+
   return (
     <div className={cx("tableHeader")}>
       <div className={cx("table-top")}>
@@ -18,9 +22,8 @@ const TableHeader = ({ selectedBrands }) => {
             <SearchIcon />
           </div>
         </div>
-
-        <Apply selectedBrands={selectedBrands} />
-
+        <Apply selectedBrands={selectedBrands} />{" "}
+        {/* No need to pass down selectedBrands manually */}
         <div className={cx("filter")}>
           {/* <div className={cx("search-path")}>
             <FilterAltOutlinedIcon />
