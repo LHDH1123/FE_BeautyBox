@@ -1,18 +1,13 @@
-// src/components/TableHeader/TableHeader.js
 import React from "react";
 import classNames from "classnames/bind";
 import styles from "./TableHeader.module.scss";
 import SearchIcon from "@mui/icons-material/Search";
-// import FilterAltOutlinedIcon from "@mui/icons-material/FilterAltOutlined";
 import TuneIcon from "@mui/icons-material/Tune";
 import Apply from "../Apply";
-import { useSelectedBrands } from "../../Context/BrandContext"; // Import context
 
 const cx = classNames.bind(styles);
 
-const TableHeader = () => {
-  const { selectedBrands } = useSelectedBrands(); // Use context to get selectedBrands
-
+const TableHeader = ({ selectedBrands, fetchBrands }) => {
   return (
     <div className={cx("tableHeader")}>
       <div className={cx("table-top")}>
@@ -22,17 +17,12 @@ const TableHeader = () => {
             <SearchIcon />
           </div>
         </div>
-        <Apply selectedBrands={selectedBrands} />{" "}
-        {/* No need to pass down selectedBrands manually */}
+        <Apply selectedBrands={selectedBrands} fetchBrands={fetchBrands} />
         <div className={cx("filter")}>
-          {/* <div className={cx("search-path")}>
-            <FilterAltOutlinedIcon />
-          </div> */}
-
           <div className={cx("form-sort")}>
             <TuneIcon />
             <select className={cx("select")}>
-              <option>Sắp xếp </option>
+              <option>Sắp xếp</option>
               <option>Mới nhất</option>
               <option>Cũ nhất</option>
             </select>

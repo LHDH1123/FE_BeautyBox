@@ -257,7 +257,7 @@ const Header = ({ title }) => {
                 className={cx("btn-submit")}
                 onClick={handleAddBrand}
               >
-                Tạo mới
+                Cập nhật
               </button>
             </div>
           </div>

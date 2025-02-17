@@ -1,19 +1,15 @@
-// src/components/Apply/Apply.js
 import React, { useState, useRef, useEffect } from "react";
 import classNames from "classnames/bind";
 import styles from "./Apply.module.scss";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { changeMulti } from "../../../services/brand.service";
-import { useSelectedBrands } from "../../Context/BrandContext"; // Import context
 
 const cx = classNames.bind(styles);
 
-const Apply = () => {
+const Apply = ({ selectedBrands, fetchBrands }) => {
   const [isBrand, setIsBrand] = useState(false);
-  const [selectedTag, setSelectedTag] = useState("Tất cả"); // Lưu tag được chọn
+  const [selectedTag, setSelectedTag] = useState("Tất cả");
   const dropdownRef = useRef(null);
-
-  const { selectedBrands } = useSelectedBrands(); // Use context to get selectedBrands
 
   const tags = ["Xóa tất cả", "Hoạt động", "Không hoạt động"];
 
@@ -44,9 +40,7 @@ const Apply = () => {
       alert("Vui lòng chọn ít nhất một thương hiệu.");
       return;
     }
-
     let data = {};
-
     switch (selectedTag) {
       case "Xóa tất cả":
         data = {
@@ -55,7 +49,6 @@ const Apply = () => {
           value: true,
         };
         break;
-
       case "Hoạt động":
         data = {
           ids: selectedBrands,
@@ -63,7 +56,6 @@ const Apply = () => {
           value: true,
         };
         break;
-
       case "Không hoạt động":
         data = {
           ids: selectedBrands,
@@ -71,17 +63,15 @@ const Apply = () => {
           value: false,
         };
         break;
-
       default:
         return;
     }
-
     try {
       await changeMulti(data);
+      await fetchBrands();
       console.log(data);
     } catch (error) {
       console.error("Lỗi khi cập nhật:", error);
-      alert("Có lỗi xảy ra, vui lòng thử lại.");
     }
   };
 
@@ -107,7 +97,7 @@ const Apply = () => {
         )}
       </div>
 
-      <div className={cx("submit")} onClick={() => handleApply()}>
+      <div className={cx("submit")} onClick={handleApply}>
         <button>Áp dụng</button>
       </div>
     </div>
