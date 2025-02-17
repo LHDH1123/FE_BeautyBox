@@ -155,6 +155,28 @@
   flex-direction: column;
 }
 
+.input-blocks:hover {
+  cursor: pointer;
+}
+
 .title-img {
   font-size: 14px;
+}
+
+.info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.select-role {
+  width: 131%; /* Make the input field take full width of its parent */
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 8px 16px;
+  border: solid 1px #cfcfcf;
+  outline: none;
+  color: #585757;
+  margin-bottom: 16px;
+  cursor: pointer;
 }

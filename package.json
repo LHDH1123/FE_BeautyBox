@@ -12,6 +12,7 @@
     "@radix-ui/react-popover": "^1.1.4",
     "@syncfusion/ej2-react-calendars": "^28.1.39",
     "autoprefixer": "^10.4.20",
+    "axios": "^1.7.9",
     "classnames": "^2.5.1",
     "cra-template": "1.2.0",
     "date-fns": "^4.1.0",

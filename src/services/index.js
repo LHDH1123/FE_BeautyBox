@@ -1,0 +1,1 @@
+export * as brandService from "./brand.service";
