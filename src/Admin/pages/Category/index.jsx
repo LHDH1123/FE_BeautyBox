@@ -6,14 +6,30 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import Header from "../../../Admin/components/Header";
 import TableHeader from "../../components/TableHeader";
 import {
+  changeStatus,
   deleteCategory,
   getCategorys,
+  getDetail,
+  updateCategory,
 } from "../../../services/category.service";
+import { Box, Dialog, DialogActions, Switch } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import { createCategorySelect } from "../../../helper/select-tree";
 
 const cx = classNames.bind(styles);
 
 const Category = () => {
   const [getAllCategory, setGetAllCategory] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedCategorys, setSelectedCategorys] = useState([]);
+
+  const [isModalAdd, setIsModalAdd] = useState(false);
+  const [editCategory, setEditCategory] = useState({
+    title: "",
+    parent_id: "",
+    status: false,
+  });
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchCategorys = async () => {
     const response = await getCategorys();
@@ -28,45 +44,108 @@ const Category = () => {
 
   const handleChangeStatus = async (id, currentStatus) => {
     try {
-      console.log(id);
-      console.log(currentStatus);
-      // const newStatus = !currentStatus;
-      // setBrands((prevBrands) =>
-      //   prevBrands.map((brand) =>
-      //     brand._id === id ? { ...brand, status: newStatus } : brand
-      //   )
-      // );
-      // await changeStatus(id, newStatus);
+      const newStatus = !currentStatus;
+      const response = await changeStatus(id, newStatus);
+      if (response) {
+        setGetAllCategory((prevCategories) =>
+          prevCategories.map((category) =>
+            category._id === id ? { ...category, status: newStatus } : category
+          )
+        );
+      }
     } catch (error) {
       console.error("Lỗi khi thay đổi trạng thái:", error);
     }
   };
 
   const handleDeleteCategory = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa thương hiệu này không?")) return;
+    if (!window.confirm("Bạn có chắc muốn xóa danh mục này không?")) return;
     try {
       await deleteCategory(id);
-      setGetAllCategory((prevBrands) =>
-        prevBrands.filter((brand) => brand._id !== id)
+      setGetAllCategory((prevCategories) =>
+        prevCategories.filter((category) => category._id !== id)
       );
     } catch (error) {
-      console.error("Lỗi khi xóa thương hiệu:", error);
+      console.error("Lỗi khi xóa danh mục:", error);
     }
+  };
+
+  const handleSelectAll = () => {
+    const newSelectAll = !selectAll;
+    setSelectAll(newSelectAll);
+
+    if (newSelectAll) {
+      setSelectedCategorys(getAllCategory.map((brand) => brand._id)); // Select all
+    } else {
+      setSelectedCategorys([]); // Deselect all
+    }
+  };
+
+  const handleSelectOne = (id) => {
+    setSelectedCategorys((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((brandId) => brandId !== id)
+        : [...prevSelected, id]
+    );
+  };
+
+  const handleCloseModal = () => {
+    setIsModalAdd(!isModalAdd);
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    setEditCategory((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleOpenModal = async (id) => {
+    setIsModalAdd(true);
+    const getCategory = await getDetail(id);
+    setEditCategory(getCategory);
+  };
+
+  const handleUpdate = async () => {
+    if (editCategory) {
+      try {
+        await updateCategory(editCategory._id, editCategory);
+        fetchCategorys();
+        setIsModalAdd(false);
+      } catch (error) {
+        console.error("Error updating category:", error);
+      }
+    }
+  };
+
+  const filteredCategorys = getAllCategory.filter((category) =>
+    category.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSearchCategory = (event) => {
+    setSearchQuery(event.target.value);
   };
 
   return (
     <div className={cx("table")}>
       <Header title="Danh mục" fetchCategorys={fetchCategorys} />
-
       <div className={cx("table-list")}>
-        <TableHeader />
-
+        <TableHeader
+          selectedCategorys={selectedCategorys}
+          fetchCategorys={fetchCategorys}
+          handleSearchCategory={handleSearchCategory}
+        />
         <div className={cx("brand-list")}>
           <table className={cx("table", "datanew")}>
             <thead>
               <tr>
                 <th className={cx("no-sort")}>
-                  <input type="checkbox" name="" id="" />
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                  />
                 </th>
                 <th>Danh mục</th>
                 <th>Ngày tạo</th>
@@ -75,11 +154,15 @@ const Category = () => {
               </tr>
             </thead>
             <tbody>
-              {getAllCategory.map((category) => (
+              {filteredCategorys.map((category) => (
                 <tr key={category._id}>
                   <td>
                     <label className={cx("checkboxs")}>
-                      <input type="checkbox" />
+                      <input
+                        type="checkbox"
+                        checked={selectedCategorys.includes(category._id)}
+                        onChange={() => handleSelectOne(category._id)}
+                      />
                       <span className={cx("checkmarks")}></span>
                     </label>
                   </td>
@@ -102,7 +185,10 @@ const Category = () => {
                   </td>
                   <td className={cx("action-table-data")}>
                     <div className={cx("edit-delete-action")}>
-                      <div className={cx("icon")}>
+                      <div
+                        className={cx("icon")}
+                        onClick={() => handleOpenModal(category._id)}
+                      >
                         <ModeEditOutlineOutlinedIcon
                           style={{ color: "#3577f1" }}
                         />
@@ -121,6 +207,81 @@ const Category = () => {
           </table>
         </div>
       </div>
+
+      <Dialog
+        open={isModalAdd}
+        onClose={handleCloseModal}
+        PaperProps={{
+          style: {
+            marginTop: "-30px",
+            borderRadius: "16px",
+            height: "400px",
+            width: "500px",
+          },
+        }}
+      >
+        <Box>
+          <DialogActions>
+            <div className={cx("btn_exit")}>
+              <button onClick={handleCloseModal}>
+                <CloseIcon fontSize="small" style={{ color: "red" }} />
+              </button>
+            </div>
+          </DialogActions>
+          <div className={cx("modalContent")}>
+            <div className={cx("title")}>Chỉnh sửa danh mục</div>
+            <div className={cx("formGroup")}>
+              <div className={cx("label")}>Tên danh mục</div>
+              <input
+                type="text"
+                name="title"
+                className={cx("input")}
+                value={editCategory.title}
+                onChange={handleInputChange}
+              />
+            </div>
+            <div className={cx("formGroup")}>
+              <div className={cx("label")}>Danh mục cha</div>
+              <select
+                id="parent_id"
+                name="parent_id"
+                className={cx("input")}
+                value={editCategory.parent_id} // Thêm dòng này để hiển thị giá trị đã chọn
+                onChange={handleInputChange}
+              >
+                <option value="">Chọn danh mục cha</option>
+                {createCategorySelect(getAllCategory)}
+              </select>
+            </div>
+            <div className={cx("status")}>
+              <div className={cx("label")}>Trạng thái</div>
+              <div className={cx("switch")}>
+                <Switch
+                  name="status"
+                  checked={editCategory.status}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </div>
+            <div className={cx("buttons")}>
+              <button
+                type="button"
+                className={cx("btn-cancel")}
+                onClick={handleCloseModal}
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                className={cx("btn-submit")}
+                onClick={handleUpdate}
+              >
+                Cập nhật
+              </button>
+            </div>
+          </div>
+        </Box>
+      </Dialog>
     </div>
   );
 };

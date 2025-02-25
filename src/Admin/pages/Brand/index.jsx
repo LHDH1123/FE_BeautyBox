@@ -127,7 +127,7 @@ const Brand = () => {
     if (getBrand) {
       setEditBrand({
         name: getBrand.name || "",
-        status: getBrand.status || "",
+        status: getBrand.status || false,
         thumbnail: getBrand.thumbnail || "",
       });
     }

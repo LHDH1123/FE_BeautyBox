@@ -7,22 +7,34 @@ import Apply from "../Apply";
 
 const cx = classNames.bind(styles);
 
-const TableHeader = ({ selectedBrands, fetchBrands, handleSearchChange }) => {
+const TableHeader = ({
+  selectedBrands,
+  fetchBrands,
+  handleSearchChange,
+  selectedCategorys,
+  fetchCategorys,
+  handleSearchCategory,
+}) => {
+  const handleSearch = (event) => {
+    if (handleSearchChange) handleSearchChange(event);
+    if (handleSearchCategory) handleSearchCategory(event);
+  };
   return (
     <div className={cx("tableHeader")}>
       <div className={cx("table-top")}>
         <div className={cx("search-set")}>
           <div className={cx("search-input")}>
-            <input
-              type="text"
-              placeholder="Tìm kiếm"
-              onChange={handleSearchChange}
-            />
+            <input type="text" placeholder="Tìm kiếm" onChange={handleSearch} />
             <SearchIcon />
           </div>
         </div>
 
-        <Apply selectedBrands={selectedBrands} fetchBrands={fetchBrands} />
+        <Apply
+          selectedBrands={selectedBrands}
+          fetchBrands={fetchBrands}
+          selectedCategorys={selectedCategorys}
+          fetchCategorys={fetchCategorys}
+        />
 
         <div className={cx("filter")}>
           <div className={cx("form-sort")}>

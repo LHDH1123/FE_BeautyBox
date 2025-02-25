@@ -213,7 +213,7 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
               <div className={cx("switch")}>
                 <Switch
                   {...label}
-                  defaultChecked
+                  name="status"
                   checked={category.status}
                   onChange={handleChangeCategory}
                 />

@@ -35,7 +35,6 @@ const data = [
 const cx = classNames.bind(styles);
 
 const Dashboard = () => {
-
   return (
     <div className={cx("dashboard")}>
       <div className={cx("welcome")}>
@@ -55,11 +54,10 @@ const Dashboard = () => {
               type="text"
               className={cx("form-control")}
               placeholder="Select"
-              value="01/03/1992 - 02/03/2002"
+              defaultValue="01/03/1992 - 02/03/2002"
             />
-            <div className={cx("select-cal")}>
-              
-            </div>
+
+            <div className={cx("select-cal")}></div>
           </div>
 
           <div className={cx("btn-replay")}>
