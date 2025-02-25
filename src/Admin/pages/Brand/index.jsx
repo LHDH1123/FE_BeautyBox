@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Brand.module.scss";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
@@ -9,6 +9,8 @@ import {
   changeStatus,
   deletebrand,
   getBrands,
+  getDetail,
+  updateBrand,
 } from "../../../services/brand.service";
 import { Box, Dialog, DialogActions, Switch } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -18,16 +20,26 @@ const cx = classNames.bind(styles);
 
 const Brand = () => {
   const [brands, setBrands] = useState([]);
-  const [selectAll, setSelectAll] = useState(false); // State for "Select All" checkbox
+  const [selectAll, setSelectAll] = useState(false);
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [isModalEditBrand, setIsModalEditBrand] = useState(false);
+  const [getBrand, setGetBrand] = useState([]);
+  const [editBrand, setEditBrand] = useState({
+    name: "",
+    status: false,
+    thumbnail: "",
+  });
+  const [searchQuery, setSearchQuery] = useState("");
+  const fileInputRef = useRef(null);
 
   const handleCloseModalEdit = () => {
     setIsModalEditBrand(false);
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = async (id) => {
     setIsModalEditBrand(true);
+    const getBrand = await getDetail(id);
+    setGetBrand(getBrand);
   };
 
   const fetchBrands = async () => {
@@ -89,13 +101,66 @@ const Brand = () => {
     setSelectAll(selectedBrands.length === brands.length && brands.length > 0);
   }, [selectedBrands, brands]);
 
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setGetBrand({ ...getBrand, thumbnail: imageUrl });
+    }
+  };
+
+  const handleClickChangeImage = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Open file picker for image
+    }
+  };
+
+  const handleInputChange = (event) => {
+    const { name, value, type, checked } = event.target;
+    setEditBrand((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  useEffect(() => {
+    if (getBrand) {
+      setEditBrand({
+        name: getBrand.name || "",
+        status: getBrand.status || "",
+        thumbnail: getBrand.thumbnail || "",
+      });
+    }
+  }, [getBrand]);
+
+  const handleUpdate = async () => {
+    if (editBrand) {
+      try {
+        await updateBrand(getBrand._id, editBrand);
+        fetchBrands();
+        setIsModalEditBrand(false);
+      } catch (error) {
+        console.error("Error updating brand:", error);
+      }
+    }
+  };
+
+  const filteredBrands = brands.filter((brand) =>
+    brand.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSearchChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <div className={cx("table")}>
-      <Header title="Thương Hiệu" />
+      <Header title="Thương Hiệu" fetchBrands={fetchBrands} />
       <div className={cx("table-list")}>
         <TableHeader
           selectedBrands={selectedBrands}
           fetchBrands={fetchBrands}
+          handleSearchChange={handleSearchChange}
         />
         <div className={cx("brand-list")}>
           <table className={cx("table", "datanew")}>
@@ -116,7 +181,7 @@ const Brand = () => {
               </tr>
             </thead>
             <tbody>
-              {brands.map((brand) => (
+              {filteredBrands.map((brand) => (
                 <tr key={brand._id}>
                   <td>
                     <label className={cx("checkboxs")}>
@@ -156,7 +221,7 @@ const Brand = () => {
                     <div className={cx("edit-delete-action")}>
                       <div
                         className={cx("icon")}
-                        onClick={() => handleOpenModal()}
+                        onClick={() => handleOpenModal(brand._id)}
                       >
                         <ModeEditOutlineOutlinedIcon
                           style={{ color: "#3577f1" }}
@@ -176,13 +241,14 @@ const Brand = () => {
           </table>
         </div>
       </div>
+
       <Dialog
-        open={isModalEditBrand} // Ensure this is boolean
+        open={isModalEditBrand}
         onClose={handleCloseModalEdit}
         PaperProps={{
           style: {
-            marginTop: "-30px", // Dịch lên trên 40px
-            borderRadius: "16px", // Bo góc 16px
+            marginTop: "-30px",
+            borderRadius: "16px",
             height: "460px",
             width: "500px",
           },
@@ -205,7 +271,13 @@ const Brand = () => {
 
             <div className={cx("formGroup")}>
               <div className={cx("label")}>Thương hiệu</div>
-              <input type="text" name="name" className={cx("input")} />
+              <input
+                type="text"
+                name="name"
+                className={cx("input")}
+                value={editBrand.name}
+                onChange={handleInputChange}
+              />
             </div>
 
             <div
@@ -218,25 +290,45 @@ const Brand = () => {
                   <input
                     type="file"
                     name="thumbnail"
-                    accept="thumbnail/*"
+                    accept="image/*"
                     style={{ display: "none" }}
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
                   />
-                  <AddCircleOutlineIcon
-                    fontSize="inherit"
-                    style={{ color: "#ff9f43" }}
-                  />
-                  <div className={cx("title-img")}>Thêm hình ảnh</div>
+                  {getBrand.thumbnail ? (
+                    <img
+                      src={getBrand.thumbnail}
+                      alt="Logo"
+                      className={cx("preview-img")}
+                    />
+                  ) : (
+                    <>
+                      <AddCircleOutlineIcon
+                        fontSize="inherit"
+                        style={{ color: "#ff9f43" }}
+                      />
+                      <div className={cx("title-img")}>Thêm hình ảnh</div>
+                    </>
+                  )}
                 </label>
               </div>
-              <button type="button" className={cx("btn-change")}>
-                Xóa ảnh
+              <button
+                type="button"
+                className={cx("btn-change")}
+                onClick={handleClickChangeImage}
+              >
+                Thay đổi ảnh
               </button>
             </div>
 
             <div className={cx("status")}>
               <div className={cx("label")}>Trạng thái</div>
               <div className={cx("switch")}>
-                <Switch name="status" />
+                <Switch
+                  name="status"
+                  checked={editBrand.status}
+                  onChange={handleInputChange}
+                />
               </div>
             </div>
 
@@ -248,7 +340,11 @@ const Brand = () => {
               >
                 Hủy
               </button>
-              <button type="submit" className={cx("btn-submit")}>
+              <button
+                type="submit"
+                className={cx("btn-submit")}
+                onClick={() => handleUpdate()}
+              >
                 Cập nhật
               </button>
             </div>

@@ -10,6 +10,16 @@ export async function getBrands() {
   }
 }
 
+export async function getDetail(id) {
+  try {
+    const response = await AxiosInstance.get(`/brands/${id}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching brands:", error);
+    return null;
+  }
+}
+
 export async function addBrand(brand) {
   try {
     const response = await AxiosInstance.post("/brands/create", brand);
@@ -30,7 +40,7 @@ export async function deletebrand(id) {
   }
 }
 
-export async function editBrand(id, brand) {
+export async function updateBrand(id, brand) {
   try {
     const response = await AxiosInstance.patch(`/brands/edit/${id}`, brand);
     return response;

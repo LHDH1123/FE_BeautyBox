@@ -84,9 +84,18 @@
   text-align: center;
 }
 
+.badge:hover {
+  cursor: pointer;
+}
+
 .badge-linesuccess {
   background-color: #e6f9f0;
   color: #28a745;
+}
+
+.badge-linered {
+  background-color: #e6f9f0;
+  color: red;
 }
 
 .action-table-data {

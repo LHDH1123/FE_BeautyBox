@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Header.module.scss";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
@@ -6,24 +6,44 @@ import CloseIcon from "@mui/icons-material/Close";
 import { Box, Dialog, DialogActions, Switch } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { addBrand } from "../../../services/brand.service";
+import { addCategory, getCategorys } from "../../../services/category.service";
+import { createCategorySelect } from "../../../helper/select-tree";
 
 const cx = classNames.bind(styles);
 
-const Header = ({ title }) => {
+const Header = ({ title, fetchCategorys, fetchBrands }) => {
   const [isModalAdd, setIsModalAdd] = useState(false);
   const [isModalAddBrand, setIsModalAddBrand] = useState(false);
   const [isModalAddRole, setIsModalAddRole] = useState(false);
   const [isModalAddUser, setIsModalAddUser] = useState(false);
-
-  const navigate = useNavigate();
-
-  const label = { inputProps: { "aria-label": "Switch demo" } };
-
   const [brand, setBrand] = useState({
     name: "",
     thumbnail: null,
     status: true,
   });
+  const [category, setCategory] = useState({
+    title: "",
+    parent_id: "",
+    status: true,
+  });
+  const [getAllCategory, setGetAllCategory] = useState([]);
+  const fileInputRef = useRef(null);
+  const [getBrand, setGetBrand] = useState([]);
+
+  const navigate = useNavigate();
+
+  const label = { inputProps: { "aria-label": "Switch demo" } };
+
+  const fetchAllCategorys = async () => {
+    const response = await getCategorys();
+    if (response) {
+      setGetAllCategory(response);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllCategorys();
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -33,74 +53,96 @@ const Header = ({ title }) => {
     }));
   };
 
+  const handleChangeCategory = (e) => {
+    const { name, value, type, checked } = e.target;
+    setCategory((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
   const handleCloseModalAdd = () => {
     if (title === "Danh mục") {
-      if (isModalAdd === true) {
-        setIsModalAdd(false);
-      } else {
-        setIsModalAdd(true);
-      }
+      setIsModalAdd(!isModalAdd);
     }
-
     if (title === "Thương Hiệu") {
-      if (isModalAddBrand === true) {
-        setIsModalAddBrand(false);
-      } else {
-        setIsModalAddBrand(true);
-      }
+      setIsModalAddBrand(!isModalAddBrand);
     }
-
     if (title === "Sản Phẩm") {
       navigate("/adminbb/create-product");
     }
-
     if (title === "Vai Trò & Quyền") {
-      if (isModalAddRole === true) {
-        setIsModalAddRole(false);
-      } else {
-        setIsModalAddRole(true);
-      }
+      setIsModalAddRole(!isModalAddRole);
     }
-
     if (title === "Người Dùng") {
-      if (isModalAddUser === true) {
-        setIsModalAddUser(false);
-      } else {
-        setIsModalAddUser(true);
-      }
+      setIsModalAddUser(!isModalAddUser);
     }
   };
 
   const handleAddBrand = async () => {
-    console.log(brand);
-
-    if (!brand.name) {
-      alert("Vui lòng nhập tên thương hiệu!");
-      return;
-    }
-
-    // Nếu không có ảnh, đặt giá trị mặc định hoặc cảnh báo người dùng
-    if (!brand.thumbnail) {
-      alert("Vui lòng tải lên ảnh thương hiệu!");
+    brand.thumbnail = getBrand;
+    if (!brand.name || !brand.thumbnail) {
+      alert("Vui lòng nhập tên thương hiệu và tải lên ảnh thương hiệu!");
       return;
     }
 
     try {
       const formData = new FormData();
       formData.append("name", brand.name);
-      formData.append("status", brand.status ?? true); // Mặc định là true nếu không có giá trị
-      formData.append("thumbnail", brand.thumbnail); // Ảnh được chọn từ input file
+      formData.append("status", brand.status ?? true);
+      formData.append("thumbnail", brand.thumbnail.thumbnail);
 
       const response = await addBrand(formData);
-
       if (response) {
         console.log("Thêm thương hiệu thành công:", response);
+
+        await fetchBrands();
+        setIsModalAddBrand(false);
+      } else {
+        alert("Không có phản hồi từ server.");
       }
-      setIsModalAddBrand(false);
-      
     } catch (error) {
       console.error("Lỗi khi thêm thương hiệu:", error);
       alert("Đã xảy ra lỗi! Vui lòng thử lại.");
+    }
+  };
+
+  const handleAddCateogy = async () => {
+    if (!category.title) {
+      alert("Vui lòng nhập tên danh mục!");
+      return;
+    }
+    try {
+      const formData = new FormData();
+      formData.append("title", category.title);
+      formData.append("status", category.status ?? true);
+      formData.append("parent_id", category.parent_id);
+
+      const response = await addCategory(formData);
+      fetchCategorys();
+      fetchAllCategorys();
+      if (response) {
+        console.log("Thêm danh mục thành công:", response);
+      }
+      setIsModalAdd(false);
+      setCategory([]);
+    } catch (error) {
+      console.error("Lỗi khi thêm thương hiệu:", error);
+      alert("Đã xảy ra lỗi! Vui lòng thử lại.");
+    }
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const imageUrl = URL.createObjectURL(file);
+      setGetBrand({ ...getBrand, thumbnail: imageUrl });
+    }
+  };
+
+  const handleClickChangeImage = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click(); // Open file picker for image
     }
   };
 
@@ -112,6 +154,7 @@ const Header = ({ title }) => {
           <div className={cx("title-desc")}>Quản Lý {title} Của Bạn</div>
         </div>
       </div>
+
       <div className={cx("btn-add")} onClick={handleCloseModalAdd}>
         <AddCircleOutlineIcon />
         <button>
@@ -119,15 +162,15 @@ const Header = ({ title }) => {
         </button>
       </div>
 
-      {/* Add Category */}
+      {/* Add Category Modal */}
       <Dialog
-        open={isModalAdd} // Ensure this is boolean
+        open={isModalAdd}
         onClose={handleCloseModalAdd}
         PaperProps={{
           style: {
-            marginTop: "-30px", // Dịch lên trên 40px
-            borderRadius: "16px", // Bo góc 16px
-            height: "300px",
+            marginTop: "-30px",
+            borderRadius: "16px",
+            height: "400px",
             width: "500px",
           },
         }}
@@ -140,17 +183,40 @@ const Header = ({ title }) => {
               </button>
             </div>
           </DialogActions>
-
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Tạo danh mục</div>
             <div className={cx("formGroup")}>
+              <div className={cx("label")}>Tên danh mục</div>
+              <input
+                type="text"
+                name="title"
+                className={cx("input")}
+                value={category.title}
+                onChange={handleChangeCategory}
+              />
+            </div>
+            <div className={cx("formGroup")}>
               <div className={cx("label")}>Danh mục cha</div>
-              <input type="text" className={cx("input")} />
+              <select
+                id="parent_id"
+                name="parent_id"
+                className={cx("input")}
+                value={category.parent_id || ""}
+                onChange={handleChangeCategory}
+              >
+                <option value="">Chọn danh mục cha</option>
+                {createCategorySelect(getAllCategory)}
+              </select>
             </div>
             <div className={cx("status")}>
               <div className={cx("label")}>Trạng thái</div>
               <div className={cx("switch")}>
-                <Switch {...label} defaultChecked />
+                <Switch
+                  {...label}
+                  defaultChecked
+                  checked={category.status}
+                  onChange={handleChangeCategory}
+                />
               </div>
             </div>
             <div className={cx("buttons")}>
@@ -161,7 +227,11 @@ const Header = ({ title }) => {
               >
                 Hủy
               </button>
-              <button type="submit" className={cx("btn-submit")}>
+              <button
+                type="submit"
+                className={cx("btn-submit")}
+                onClick={handleAddCateogy}
+              >
                 Tạo mới
               </button>
             </div>
@@ -169,14 +239,14 @@ const Header = ({ title }) => {
         </Box>
       </Dialog>
 
-      {/* Add brand */}
+      {/* Add Brand Modal */}
       <Dialog
-        open={isModalAddBrand} // Ensure this is boolean
+        open={isModalAddBrand}
         onClose={handleCloseModalAdd}
         PaperProps={{
           style: {
-            marginTop: "-30px", // Dịch lên trên 40px
-            borderRadius: "16px", // Bo góc 16px
+            marginTop: "-30px",
+            borderRadius: "16px",
             height: "460px",
             width: "500px",
           },
@@ -190,10 +260,8 @@ const Header = ({ title }) => {
               </button>
             </div>
           </DialogActions>
-
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Tạo thương hiệu</div>
-
             <div className={cx("formGroup")}>
               <div className={cx("label")}>Thương hiệu</div>
               <input
@@ -204,7 +272,6 @@ const Header = ({ title }) => {
                 onChange={handleChange}
               />
             </div>
-
             <div
               className={cx("formGroup")}
               style={{ display: "flex", alignItems: "center" }}
@@ -215,28 +282,36 @@ const Header = ({ title }) => {
                   <input
                     type="file"
                     name="thumbnail"
-                    accept="thumbnail/*"
+                    accept="image/*"
                     style={{ display: "none" }}
-                    onChange={handleChange}
+                    ref={fileInputRef}
+                    onChange={handleImageChange}
                   />
-                  <AddCircleOutlineIcon
-                    fontSize="inherit"
-                    style={{ color: "#ff9f43" }}
-                  />
-                  <div className={cx("title-img")}>
-                    {brand.thumbnail ? brand.thumbnail.name : "Thêm hình ảnh"}
-                  </div>
+                  {getBrand.thumbnail ? (
+                    <img
+                      src={getBrand.thumbnail}
+                      alt="Logo"
+                      className={cx("preview-img")}
+                    />
+                  ) : (
+                    <>
+                      <AddCircleOutlineIcon
+                        fontSize="inherit"
+                        style={{ color: "#ff9f43" }}
+                      />
+                      <div className={cx("title-img")}>Thêm hình ảnh</div>
+                    </>
+                  )}
                 </label>
               </div>
               <button
                 type="button"
                 className={cx("btn-change")}
-                onClick={() => setBrand({ ...brand, thumbnail: null })}
+                onClick={handleClickChangeImage}
               >
-                Xóa ảnh
+                Thay đổi ảnh
               </button>
             </div>
-
             <div className={cx("status")}>
               <div className={cx("label")}>Trạng thái</div>
               <div className={cx("switch")}>
@@ -247,9 +322,12 @@ const Header = ({ title }) => {
                 />
               </div>
             </div>
-
             <div className={cx("buttons")}>
-              <button type="button" className={cx("btn-cancel")}>
+              <button
+                type="button"
+                className={cx("btn-cancel")}
+                onClick={handleCloseModalAdd}
+              >
                 Hủy
               </button>
               <button
@@ -264,14 +342,14 @@ const Header = ({ title }) => {
         </Box>
       </Dialog>
 
-      {/* Add role */}
+      {/* Add Role Modal */}
       <Dialog
-        open={isModalAddRole} // Ensure this is boolean
+        open={isModalAddRole}
         onClose={handleCloseModalAdd}
         PaperProps={{
           style: {
-            marginTop: "-30px", // Dịch lên trên 40px
-            borderRadius: "16px", // Bo góc 16px
+            marginTop: "-30px",
+            borderRadius: "16px",
             height: "270px",
             width: "500px",
           },
@@ -285,14 +363,12 @@ const Header = ({ title }) => {
               </button>
             </div>
           </DialogActions>
-
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Tạo vai trò</div>
             <div className={cx("formGroup")}>
               <div className={cx("label")}>Tên vai trò</div>
               <input type="text" className={cx("input")} />
             </div>
-
             <div className={cx("buttons")}>
               <button
                 type="button"
@@ -309,17 +385,12 @@ const Header = ({ title }) => {
         </Box>
       </Dialog>
 
-      {/* Add user */}
+      {/* Add User Modal */}
       <Dialog
-        open={isModalAddUser} // Ensure this is boolean
+        open={isModalAddUser}
         onClose={handleCloseModalAdd}
         PaperProps={{
-          style: {
-            marginTop: "-30px", // Dịch lên trên 40px
-            borderRadius: "16px", // Bo góc 16px
-            // height: "460px",
-            width: "500px",
-          },
+          style: { marginTop: "-30px", borderRadius: "16px", width: "500px" },
         }}
       >
         <Box>
@@ -330,7 +401,6 @@ const Header = ({ title }) => {
               </button>
             </div>
           </DialogActions>
-
           <div className={cx("modalContent")} style={{ marginLeft: "15px" }}>
             <div className={cx("title")}>Tạo người dùng</div>
             <div
@@ -368,7 +438,7 @@ const Header = ({ title }) => {
               </div>
               <div className={cx("formGroup")}>
                 <div className={cx("label")}>Vai trò</div>
-                <select className={cx("select-role")} id="">
+                <select className={cx("select-role")}>
                   <option value="">Chọn vai trò</option>
                   <option value="">Admin</option>
                   <option value="">Quản lý nội dung</option>
