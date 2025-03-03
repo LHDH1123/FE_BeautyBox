@@ -140,27 +140,29 @@
   width: 137px;
   height: 123px;
   border-radius: 10px;
-  border: 1px solid var(--Stroke, rgba(145, 158, 171, 0.3));
-  text-align: center;
-  position: relative; /* Cần thiết để căn chỉnh icon xóa */
+  border: 1px solid rgba(145, 158, 171, 0.3);
+  position: relative;
   display: flex;
-  justify-content: center; /* Căn giữa ảnh theo chiều ngang */
-  align-items: center; /* Căn giữa ảnh theo chiều dọc */
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Cắt phần ảnh thừa */
 }
 
 .img-upload img {
-  width: 80%; /* Đảm bảo ảnh chiếm hết chiều rộng của khối */
-  height: auto; /* Giữ tỉ lệ ảnh */
-  padding: 10px;
-  border-radius: 5px; /* Thêm góc bo tròn cho ảnh */
+  width: 100%; /* Chiếm toàn bộ chiều rộng của .img-upload */
+  height: 100%; /* Chiếm toàn bộ chiều cao */
+  object-fit: cover; /* Giữ tỷ lệ ảnh và lấp đầy khung */
+  border-radius: 5px;
 }
 
-.img-upload a {
+.img-upload button {
   position: absolute;
   top: 2px; /* Điều chỉnh vị trí icon xóa từ trên */
   right: 2px; /* Điều chỉnh vị trí icon xóa từ bên phải */
   padding: 5px; /* Khoảng cách xung quanh icon */
   cursor: pointer; /* Thêm hiệu ứng khi hover */
+  border: none;
+  background: transparent;
 }
 
 .info-image {
@@ -225,5 +227,16 @@
   border: none;
   border-radius: 3px;
   margin-left: 15px;
+  cursor: pointer;
+}
+
+.form-select {
+  width: 100%; /* Make the input field take full width of its parent */
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 8px 16px;
+  border: solid 1px #cfcfcf;
+  outline: none;
+  color: #585757;
   cursor: pointer;
 }

@@ -73,6 +73,7 @@
   width: 100px;
   height: 45px;
   object-fit: contain;
+  border-radius: 10px;
 }
 
 .badge {
@@ -268,4 +269,10 @@
 .preview-img {
   width: 117px;
   height: 78px;
+}
+
+.pagnigation {
+  display: flex;
+  margin-top: 10px;
+  justify-content: flex-end;
 }

@@ -20,6 +20,7 @@ const cx = classNames.bind(styles);
 
 const Category = () => {
   const [getAllCategory, setGetAllCategory] = useState([]);
+  const [selectCategory, setSelectAllCategory] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedCategorys, setSelectedCategorys] = useState([]);
 
@@ -34,7 +35,8 @@ const Category = () => {
   const fetchCategorys = async () => {
     const response = await getCategorys();
     if (response) {
-      setGetAllCategory(response);
+      setGetAllCategory(buildCategoryHierarchy(response));
+      setSelectAllCategory(response);
     }
   };
 
@@ -62,12 +64,21 @@ const Category = () => {
     if (!window.confirm("Bạn có chắc muốn xóa danh mục này không?")) return;
     try {
       await deleteCategory(id);
-      setGetAllCategory((prevCategories) =>
-        prevCategories.filter((category) => category._id !== id)
-      );
+      await fetchCategorys();
     } catch (error) {
       console.error("Lỗi khi xóa danh mục:", error);
     }
+  };
+
+  const getAllCategoryIds = (categories) => {
+    let ids = [];
+    categories.forEach((category) => {
+      ids.push(category._id);
+      if (category.children && category.children.length > 0) {
+        ids = ids.concat(getAllCategoryIds(category.children)); // Lấy ID danh mục con
+      }
+    });
+    return ids;
   };
 
   const handleSelectAll = () => {
@@ -75,9 +86,10 @@ const Category = () => {
     setSelectAll(newSelectAll);
 
     if (newSelectAll) {
-      setSelectedCategorys(getAllCategory.map((brand) => brand._id)); // Select all
+      const allIds = getAllCategoryIds(getAllCategory); // Lấy tất cả ID danh mục (bao gồm con)
+      setSelectedCategorys(allIds);
     } else {
-      setSelectedCategorys([]); // Deselect all
+      setSelectedCategorys([]); // Bỏ chọn tất cả
     }
   };
 
@@ -127,6 +139,81 @@ const Category = () => {
     setSearchQuery(event.target.value);
   };
 
+  const buildCategoryHierarchy = (categories) => {
+    const categoryMap = {};
+    const tree = [];
+
+    // Khởi tạo mỗi danh mục trong categoryMap
+    categories.forEach((category) => {
+      categoryMap[category._id] = { ...category, children: [] };
+    });
+
+    // Xây dựng cấu trúc cây
+    categories.forEach((category) => {
+      if (category.parent_id && categoryMap[category.parent_id]) {
+        categoryMap[category.parent_id].children.push(
+          categoryMap[category._id]
+        );
+      } else {
+        tree.push(categoryMap[category._id]);
+      }
+    });
+
+    return tree;
+  };
+
+  const renderCategoryRows = (categories, level = 0) => {
+    return categories.map((category) => (
+      <React.Fragment key={category._id}>
+        <tr>
+          <td>
+            <label className={cx("checkboxs")}>
+              <input
+                type="checkbox"
+                checked={selectedCategorys.includes(category._id)}
+                onChange={() => handleSelectOne(category._id)}
+              />
+              <span className={cx("checkmarks")}></span>
+            </label>
+          </td>
+          <td style={{ color: "#495057", fontWeight: "600" }}>
+            {"--".repeat(level)} {category.title}
+          </td>
+          <td>{new Date(category.createdAt).toLocaleDateString("vi-VN")}</td>
+          <td>
+            <span
+              className={cx(
+                "badge",
+                category.status ? "badge-linesuccess" : "badge-linered"
+              )}
+              onClick={() => handleChangeStatus(category._id, category.status)}
+            >
+              {category.status ? "Hoạt động" : "Không hoạt động"}
+            </span>
+          </td>
+          <td className={cx("action-table-data")}>
+            <div className={cx("edit-delete-action")}>
+              <div
+                className={cx("icon")}
+                onClick={() => handleOpenModal(category._id)}
+              >
+                <ModeEditOutlineOutlinedIcon style={{ color: "#3577f1" }} />
+              </div>
+              <div
+                className={cx("icon")}
+                onClick={() => handleDeleteCategory(category._id)}
+              >
+                <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
+              </div>
+            </div>
+          </td>
+        </tr>
+        {category.children.length > 0 &&
+          renderCategoryRows(category.children, level + 1)}
+      </React.Fragment>
+    ));
+  };
+
   return (
     <div className={cx("table")}>
       <Header title="Danh mục" fetchCategorys={fetchCategorys} />
@@ -154,7 +241,8 @@ const Category = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredCategorys.map((category) => (
+              {renderCategoryRows(filteredCategorys)}
+              {/* {filteredCategorys.map((category) => (
                 <tr key={category._id}>
                   <td>
                     <label className={cx("checkboxs")}>
@@ -166,7 +254,9 @@ const Category = () => {
                       <span className={cx("checkmarks")}></span>
                     </label>
                   </td>
-                  <td style={{ fontWeight: "600" }}>{category.title}</td>
+                  <td style={{ fontWeight: "600", color: "#333" }}>
+                    {category.title}
+                  </td>
                   <td>
                     {new Date(category.createdAt).toLocaleDateString("vi-VN")}
                   </td>
@@ -202,7 +292,7 @@ const Category = () => {
                     </div>
                   </td>
                 </tr>
-              ))}
+              ))} */}
             </tbody>
           </table>
         </div>
@@ -250,7 +340,7 @@ const Category = () => {
                 onChange={handleInputChange}
               >
                 <option value="">Chọn danh mục cha</option>
-                {createCategorySelect(getAllCategory)}
+                {createCategorySelect(selectCategory)}
               </select>
             </div>
             <div className={cx("status")}>

@@ -51,7 +51,7 @@ const Apply = ({
 
     switch (selectedTag) {
       case "Xóa tất cả":
-        data = { ids: selectedBrands, key: "delete", value: true };
+        data = { ids: selectedBrands, key: "deleted", value: true };
         dataCategory = { ids: selectedCategorys, key: "delete", value: true };
         break;
       case "Hoạt động":

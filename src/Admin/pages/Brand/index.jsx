@@ -12,7 +12,7 @@ import {
   getDetail,
   updateBrand,
 } from "../../../services/brand.service";
-import { Box, Dialog, DialogActions, Switch } from "@mui/material";
+import { Box, Dialog, DialogActions, Pagination, Switch } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -31,6 +31,17 @@ const Brand = () => {
   });
   const [searchQuery, setSearchQuery] = useState("");
   const fileInputRef = useRef(null);
+
+  //pagnigation
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+  const totalPage = Math.ceil(brands.length / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentBrands = brands.slice(indexOfFirstItem, indexOfLastItem);
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
 
   const handleCloseModalEdit = () => {
     setIsModalEditBrand(false);
@@ -58,7 +69,16 @@ const Brand = () => {
 
     try {
       await deletebrand(id);
-      setBrands((prevBrands) => prevBrands.filter((brand) => brand._id !== id));
+      const updatedBrands = brands.filter((brand) => brand._id !== id);
+      setBrands(updatedBrands);
+
+      // Tính lại totalPage sau khi xóa
+      const newTotalPage = Math.ceil(updatedBrands.length / itemsPerPage);
+
+      // Nếu trang hiện tại không còn dữ liệu và không phải trang đầu tiên, quay về trang 1
+      if (currentPage > newTotalPage) {
+        setCurrentPage(1);
+      }
     } catch (error) {
       console.error("Lỗi khi xóa thương hiệu:", error);
     }
@@ -83,9 +103,18 @@ const Brand = () => {
     setSelectAll(newSelectAll);
 
     if (newSelectAll) {
-      setSelectedBrands(brands.map((brand) => brand._id)); // Select all
+      setSelectedBrands([
+        ...new Set([
+          ...selectedBrands,
+          ...currentBrands.map((brand) => brand._id),
+        ]),
+      ]);
     } else {
-      setSelectedBrands([]); // Deselect all
+      setSelectedBrands(
+        selectedBrands.filter(
+          (id) => !currentBrands.some((brand) => brand._id === id)
+        )
+      );
     }
   };
 
@@ -98,20 +127,27 @@ const Brand = () => {
   };
 
   useEffect(() => {
-    setSelectAll(selectedBrands.length === brands.length && brands.length > 0);
-  }, [selectedBrands, brands]);
+    setSelectAll(
+      currentBrands.length > 0 &&
+        currentBrands.every((brand) => selectedBrands.includes(brand._id))
+    );
+  }, [selectedBrands, currentBrands]);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setGetBrand({ ...getBrand, thumbnail: imageUrl });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setGetBrand({ ...getBrand, thumbnail: reader.result }); // Lưu URL của ảnh vào state
+      };
+      reader.readAsDataURL(file);
+      setEditBrand((prev) => ({ ...prev, thumbnail: file })); // Lưu file thật vào state để gửi lên server
     }
   };
 
   const handleClickChangeImage = () => {
     if (fileInputRef.current) {
-      fileInputRef.current.click(); // Open file picker for image
+      fileInputRef.current.click();
     }
   };
 
@@ -149,6 +185,8 @@ const Brand = () => {
     brand.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  const displayedBrands = searchQuery ? filteredBrands : currentBrands;
+
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
   };
@@ -181,7 +219,7 @@ const Brand = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredBrands.map((brand) => (
+              {displayedBrands.map((brand) => (
                 <tr key={brand._id}>
                   <td>
                     <label className={cx("checkboxs")}>
@@ -193,7 +231,9 @@ const Brand = () => {
                       <span className={cx("checkmarks")}></span>
                     </label>
                   </td>
-                  <td style={{ fontWeight: "600" }}>{brand.name}</td>
+                  <td style={{ fontWeight: "600", color: "#333" }}>
+                    {brand.name}
+                  </td>
                   <td>
                     <span className={cx("d-flex")}>
                       <img src={brand.thumbnail} alt={brand.name} />
@@ -240,6 +280,15 @@ const Brand = () => {
             </tbody>
           </table>
         </div>
+        {!searchQuery && (
+          <Pagination
+            className={cx("pagnigation")}
+            count={totalPage}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="secondary"
+          />
+        )}
       </div>
 
       <Dialog

@@ -71,3 +71,13 @@ export async function changeMultiCategory(data) {
     return null;
   }
 }
+
+export async function getNameCategory(id) {
+  try {
+    const response = await AxiosInstance.get(`/categorys/${id}`);
+    return response.title;
+  } catch (error) {
+    console.error("Error fetching categorys:", error);
+    return null;
+  }
+}

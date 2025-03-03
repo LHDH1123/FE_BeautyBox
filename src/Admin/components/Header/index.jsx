@@ -98,6 +98,12 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
 
         await fetchBrands();
         setIsModalAddBrand(false);
+        setBrand({
+          name: "",
+          thumbnail: null,
+          status: true,
+        });
+        setGetBrand([]);
       } else {
         alert("Không có phản hồi từ server.");
       }
@@ -135,10 +141,22 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setGetBrand({ ...getBrand, thumbnail: imageUrl });
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setGetBrand({ ...getBrand, thumbnail: reader.result }); // Lưu URL của ảnh vào state
+      };
+      reader.readAsDataURL(file);
+      setBrand((prev) => ({ ...prev, thumbnail: file })); // Lưu file thật vào state để gửi lên server
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (getBrand.thumbnail) {
+        URL.revokeObjectURL(getBrand.thumbnail);
+      }
+    };
+  }, [getBrand.thumbnail]);
 
   const handleClickChangeImage = () => {
     if (fileInputRef.current) {
@@ -191,7 +209,7 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
                 type="text"
                 name="title"
                 className={cx("input")}
-                value={category.title}
+                value={category.title || ""}
                 onChange={handleChangeCategory}
               />
             </div>
@@ -277,7 +295,7 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
               style={{ display: "flex", alignItems: "center" }}
             >
               <div>
-                <div className={cx("label")}>thumbnail</div>
+                <div className={cx("label")}>Logo</div>
                 <label className={cx("input-blocks")}>
                   <input
                     type="file"
@@ -335,7 +353,7 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
                 className={cx("btn-submit")}
                 onClick={handleAddBrand}
               >
-                Cập nhật
+                Tạo mới
               </button>
             </div>
           </div>

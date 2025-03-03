@@ -71,3 +71,13 @@ export async function changeMulti(data) {
     return null;
   }
 }
+
+export async function getNameBrand(id) {
+  try {
+    const response = await AxiosInstance.get(`/brands/${id}`);
+    return response.name;
+  } catch (error) {
+    console.error("Error fetching brands:", error);
+    return null;
+  }
+}

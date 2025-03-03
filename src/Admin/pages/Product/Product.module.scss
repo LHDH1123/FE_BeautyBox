@@ -50,7 +50,7 @@
 }
 
 .table tbody td {
-  padding: 12px 16px;
+  padding: 12px 12px;
   vertical-align: middle;
 }
 
@@ -72,6 +72,7 @@
 .d-flex img {
   width: 50px;
   height: 50px;
+  border-radius: 10px;
   object-fit: cover;
 }
 
@@ -84,9 +85,18 @@
   text-align: center;
 }
 
+.badge:hover {
+  cursor: pointer;
+}
+
 .badge-linesuccess {
   background-color: #e6f9f0;
   color: #28a745;
+}
+
+.badge-linered {
+  background-color: #e6f9f0;
+  color: red;
 }
 
 .action-table-data {
@@ -141,6 +151,12 @@
 
 .name {
   margin-left: 10px;
+  max-width: 200px; // Điều chỉnh chiều rộng tùy ý
+  display: -webkit-box;
+  -webkit-line-clamp: 2; // Hiển thị tối đa 2 dòng
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word; // Nếu có từ quá dài, tự động xuống dòng
 }
 
 .card {
@@ -202,4 +218,9 @@
 .tag:hover {
   background: #ff9f43;
   color: #ffffff;
+}
+
+td {
+  color: #646b72;
+  font-size: 14px;
 }

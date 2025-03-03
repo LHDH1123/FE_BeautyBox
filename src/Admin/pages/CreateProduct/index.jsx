@@ -7,7 +7,7 @@ const cx = classNames.bind(styles);
 
 const CreateProduct = () => {
   return (
-    <div className={cx("Create")}>
+    <div className={cx("ceate")}>
       <Create title="Sản phẩm mới" />
     </div>
   );
