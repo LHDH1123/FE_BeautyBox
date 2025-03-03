@@ -71,4 +71,3 @@ export async function changeMultiProduct(data) {
     return null;
   }
 }
-

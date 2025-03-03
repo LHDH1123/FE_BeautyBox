@@ -14,10 +14,14 @@ const TableHeader = ({
   selectedCategorys,
   fetchCategorys,
   handleSearchCategory,
+  selectedProducts,
+  fetchProducts,
+  handleSearchChangeProduct,
 }) => {
   const handleSearch = (event) => {
     if (handleSearchChange) handleSearchChange(event);
     if (handleSearchCategory) handleSearchCategory(event);
+    if (handleSearchChangeProduct) handleSearchChangeProduct(event);
   };
   return (
     <div className={cx("tableHeader")}>
@@ -34,6 +38,8 @@ const TableHeader = ({
           fetchBrands={fetchBrands}
           selectedCategorys={selectedCategorys}
           fetchCategorys={fetchCategorys}
+          selectedProducts={selectedProducts}
+          fetchProducts={fetchProducts}
         />
 
         <div className={cx("filter")}>

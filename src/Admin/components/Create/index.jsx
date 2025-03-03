@@ -14,11 +14,15 @@ import { createCategorySelect } from "../../../helper/select-tree";
 import { getCategorys } from "../../../services/category.service";
 import { getBrands } from "../../../services/brand.service";
 import { TextField } from "@mui/material";
-import { addProduct } from "../../../services/product.service";
+import {
+  addProduct,
+  getDetailProduct,
+  updateProduct,
+} from "../../../services/product.service";
 
 const cx = classNames.bind(styles);
 
-const Create = ({ title }) => {
+const Create = ({ title, productId }) => {
   const [isInfo, setIsInfo] = useState(true);
   const [isImg, setIsImg] = useState(true);
   const [isPrice, setIsPrice] = useState(true);
@@ -41,6 +45,19 @@ const Create = ({ title }) => {
   });
   const [images, setImages] = useState([]);
   const [divImages, setDivImages] = useState([]);
+  const [editProduct, setEditProduct] = useState({
+    title: "",
+    SKU: "",
+    category_id: "",
+    brand_id: "",
+    status: true,
+    description: "",
+    price: "",
+    discountPercentage: "",
+    stock: "",
+    thumbnail: [],
+    position: "",
+  });
 
   const fileInputRef = useRef(null);
 
@@ -97,64 +114,110 @@ const Create = ({ title }) => {
   useEffect(() => {
     fetchCategorys();
     fetchBrands();
+    if (title === "Chỉnh sửa sản phẩm") {
+      fetchProducts();
+    }
   }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
 
-    setProduct((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : type === "number"
-          ? String(value) || 0
-          : files
-          ? Array.from(files)
-          : value,
-    }));
+    if (title === "Chỉnh sửa sản phẩm") {
+      setEditProduct((prev) => ({
+        ...prev,
+        [name]:
+          type === "checkbox"
+            ? checked
+            : type === "number"
+            ? String(value) || 0
+            : files
+            ? Array.from(files)
+            : value,
+      }));
+    } else {
+      setProduct((prev) => ({
+        ...prev,
+        [name]:
+          type === "checkbox"
+            ? checked
+            : type === "number"
+            ? String(value) || 0
+            : files
+            ? Array.from(files)
+            : value,
+      }));
+    }
   };
 
   const handleAdd = async () => {
-    const formData = new FormData();
-    formData.append("title", product.title);
-    formData.append("SKU", product.SKU);
-    formData.append("category_id", product.category_id);
-    formData.append("brand_id", product.brand_id);
-    formData.append("status", isActive);
-    formData.append("description", product.description);
-    formData.append("price", product.price);
-    formData.append("discountPercentage", product.discountPercentage);
-    formData.append("stock", product.stock);
-    formData.append("position", product.position);
+    if (title === "Chỉnh sửa sản phẩm") {
+      editProduct.thumbnail = divImages;
+      editProduct.status = isActive;
 
-    // **Thêm tất cả file ảnh vào FormData**
-    images.forEach((image) => {
-      formData.append("thumbnail", image);
-    });
+      try {
+        const response = await updateProduct(editProduct._id, editProduct);
+        if (response) {
+          console.log("Chỉnh sửa sản phẩm thành công!", response);
+          navigate("/adminbb/product-list");
 
-    try {
-      const response = await addProduct(formData);
-      if (response) {
-        console.log("✅ Thêm sản phẩm thành công!", response);
-        navigate("/adminbb/product-list");
-
-        setProduct({
-          title: "",
-          SKU: "",
-          category_id: "",
-          brand_id: "",
-          status: true,
-          description: "",
-          price: "",
-          discountPercentage: "",
-          stock: "",
-          thumbnail: [],
-          position: "",
-        });
+          setProduct({
+            title: "",
+            SKU: "",
+            category_id: "",
+            brand_id: "",
+            status: true,
+            description: "",
+            price: "",
+            discountPercentage: "",
+            stock: "",
+            thumbnail: [],
+            position: "",
+          });
+        }
+      } catch (error) {
+        console.error("❌ Lỗi:", error);
       }
-    } catch (error) {
-      console.error("❌ Lỗi:", error);
+    } else {
+      const formData = new FormData();
+      formData.append("title", product.title);
+      formData.append("SKU", product.SKU);
+      formData.append("category_id", product.category_id);
+      formData.append("brand_id", product.brand_id);
+      formData.append("status", isActive);
+      formData.append("description", product.description);
+      formData.append("price", product.price);
+      formData.append("discountPercentage", product.discountPercentage);
+      formData.append("stock", product.stock);
+      formData.append("position", product.position);
+
+      // **Thêm tất cả file ảnh vào FormData**
+      images.forEach((image) => {
+        formData.append("thumbnail", image);
+      });
+
+      try {
+        const response = await addProduct(formData);
+        if (response) {
+          console.log("✅ Thêm sản phẩm thành công!", response);
+          navigate("/adminbb/product-list");
+
+          setProduct({
+            title: "",
+            SKU: "",
+            category_id: "",
+            brand_id: "",
+            status: true,
+            description: "",
+            price: "",
+            discountPercentage: "",
+            stock: "",
+            thumbnail: [],
+            position: "",
+          });
+        }
+      } catch (error) {
+        console.error("❌ Lỗi:", error);
+      }
     }
   };
 
@@ -169,6 +232,20 @@ const Create = ({ title }) => {
   const handleRemoveImage = (index) => {
     setDivImages((prev) => prev.filter((_, i) => i !== index));
   };
+
+  const fetchProducts = async () => {
+    const response = await getDetailProduct(productId);
+    if (response) {
+      setEditProduct(response[0]);
+      setDivImages(response[0].thumbnail);
+    }
+  };
+
+  useEffect(() => {
+    if (editProduct?.status !== undefined) {
+      setIsActive(editProduct.status);
+    }
+  }, [editProduct]);
 
   return (
     <div className={cx("create")}>
@@ -216,6 +293,7 @@ const Create = ({ title }) => {
                     type="text"
                     name="title"
                     className={cx("form-control")}
+                    value={editProduct?.title || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -225,6 +303,7 @@ const Create = ({ title }) => {
                     type="text"
                     name="SKU"
                     className={cx("form-control")}
+                    value={editProduct?.SKU || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -236,6 +315,7 @@ const Create = ({ title }) => {
                   <select
                     name="category_id"
                     className={cx("form-select")}
+                    value={editProduct?.category_id || ""}
                     onChange={handleChange}
                   >
                     <option value="">Chọn danh mục</option>
@@ -247,14 +327,8 @@ const Create = ({ title }) => {
                   <select
                     name="brand_id"
                     className={cx("form-select")}
+                    value={editProduct?.brand_id || ""}
                     onChange={handleChange}
-                    styles={{
-                      option: (provided, state) => ({
-                        ...provided,
-                        backgroundColor: state.isFocused ? "#FFA500" : "red", // Màu khi hover
-                        color: state.isFocused ? "red" : "black",
-                      }),
-                    }}
                   >
                     <option value="">Chọn thương hiệu</option>
                     {getAllBrand.map((brand) => (
@@ -277,6 +351,7 @@ const Create = ({ title }) => {
                         id="active"
                         name="status"
                         checked={isActive}
+                        value={editProduct.status}
                         onChange={() => handleStatusChange(true)}
                       />
                       <div className={cx("title-checkbox")}>Hoạt động</div>
@@ -288,6 +363,7 @@ const Create = ({ title }) => {
                         id="inactive"
                         name="status"
                         checked={!isActive}
+                        value={editProduct.status}
                         onChange={() => handleStatusChange(false)}
                       />
                       <div className={cx("title-checkbox")}>
@@ -306,6 +382,7 @@ const Create = ({ title }) => {
                       variant="outlined"
                       size="small"
                       sx={{ width: 80, height: 32 }} // Giảm chiều cao và padding
+                      value={editProduct.position}
                       onChange={handleChange}
                       InputProps={{
                         inputProps: {
@@ -329,6 +406,7 @@ const Create = ({ title }) => {
                   type="text"
                   maxLength="60"
                   name="description"
+                  value={editProduct?.description || ""}
                   onChange={handleChange}
                   className={cx("desc-input")}
                 />
@@ -391,19 +469,6 @@ const Create = ({ title }) => {
                   </button>
                 </div>
               ))}
-
-              {/* <div className={cx("img-upload")}>
-                <img src={img} alt="" />
-                <a href="/">
-                  <CancelIcon fontSize="inherit" style={{ color: "red" }} />
-                </a>
-              </div>
-              <div className={cx("img-upload")}>
-                <img src={img} alt="" />
-                <a href="/">
-                  <CancelIcon fontSize="inherit" style={{ color: "red" }} />
-                </a>
-              </div> */}
             </div>
           )}
         </div>
@@ -432,6 +497,7 @@ const Create = ({ title }) => {
                     type="text"
                     name="price"
                     className={cx("form-control")}
+                    value={editProduct?.price || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -441,6 +507,7 @@ const Create = ({ title }) => {
                     type="text"
                     name="discountPercentage"
                     className={cx("form-control")}
+                    value={editProduct?.discountPercentage || ""}
                     onChange={handleChange}
                   />
                 </div>
@@ -453,6 +520,7 @@ const Create = ({ title }) => {
                     type="text"
                     name="stock"
                     className={cx("form-control")}
+                    value={editProduct?.stock || ""}
                     onChange={handleChange}
                   />
                 </div>

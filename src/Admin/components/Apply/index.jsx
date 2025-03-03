@@ -4,6 +4,7 @@ import styles from "./Apply.module.scss";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { changeMulti } from "../../../services/brand.service";
 import { changeMultiCategory } from "../../../services/category.service";
+import { changeMultiProduct } from "../../../services/product.service";
 
 const cx = classNames.bind(styles);
 
@@ -12,6 +13,8 @@ const Apply = ({
   fetchBrands,
   fetchCategorys,
   selectedCategorys,
+  selectedProducts,
+  fetchProducts,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState("Tất cả");
@@ -48,19 +51,23 @@ const Apply = ({
 
     let data = {};
     let dataCategory = {};
+    let dataProduct = {};
 
     switch (selectedTag) {
       case "Xóa tất cả":
         data = { ids: selectedBrands, key: "deleted", value: true };
         dataCategory = { ids: selectedCategorys, key: "delete", value: true };
+        dataProduct = { ids: selectedProducts, key: "delete", value: true };
         break;
       case "Hoạt động":
         data = { ids: selectedBrands, key: "status", value: true };
         dataCategory = { ids: selectedCategorys, key: "status", value: true };
+        dataProduct = { ids: selectedProducts, key: "status", value: true };
         break;
       case "Không hoạt động":
         data = { ids: selectedBrands, key: "status", value: false };
         dataCategory = { ids: selectedCategorys, key: "status", value: false };
+        dataProduct = { ids: selectedProducts, key: "status", value: false };
         break;
       default:
         return;
@@ -83,6 +90,15 @@ const Apply = ({
         }
         await changeMultiCategory(dataCategory);
         await fetchCategorys();
+      }
+
+      if (selectedProducts !== undefined) {
+        if (selectedTag === "Xóa tất cả") {
+          if (!window.confirm("Bạn có chắc muốn xóa thương hiệu này không?"))
+            return;
+        }
+        await changeMultiProduct(dataProduct);
+        await fetchProducts();
       }
     } catch (error) {
       console.error("Lỗi khi cập nhật:", error);

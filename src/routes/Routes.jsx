@@ -42,7 +42,7 @@ export default function Router() {
         <Route path="role" element={<RoleAdmin />} />
         <Route path="flashsale" element={<FlashSale />} />
         <Route path="create-product" element={<CreateProduct />} />
-        <Route path="edit-product" element={<EditProduct />} />
+        <Route path="/adminbb/edit-product/:id" element={<EditProduct />} />
         <Route path="*" element={<Error404 />} />
       </Route>
     </Routes>
