@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Product.module.scss";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
@@ -27,6 +27,8 @@ const cx = classNames.bind(styles);
 const Product = () => {
   const [isSelectBrand, setIsSelectBrand] = useState(false);
   const [isSelectCategory, setIsSelectCategory] = useState(false);
+  const [selectCategory, setSelectCategory] = useState("Danh mục");
+  const [selectBrand, setSelectBrand] = useState("Thương hiệu");
   const [listProducts, setListProducts] = useState([]);
   const navigate = useNavigate();
   const [isAllChecked, setIsAllChecked] = useState(false);
@@ -112,14 +114,12 @@ const Product = () => {
       console.error("Error fetching brands:", error);
     }
   };
-  console.log(listCategorys);
+
   useEffect(() => {
     fetchProducts();
     fetchBrands();
     fetchCategorys();
   }, []);
-
-  const dropdownBrandRef = useRef(null);
 
   const handleSelectBrand = () => {
     setIsSelectBrand((prev) => !prev);
@@ -176,9 +176,56 @@ const Product = () => {
     setSearchQuery(event.target.value);
   };
 
-  const filteredProducts = listProducts.filter((product) =>
+  const searchProducts = listProducts.filter((product) =>
     product.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleSelectTagBrand = (name) => {
+    setSelectBrand(name);
+    setIsSelectBrand(false);
+  };
+
+  const handleSelectTagCategory = (name) => {
+    setSelectCategory(name);
+    setIsSelectCategory(false);
+  };
+
+  const handleSearchFilter = () => {
+    console.log(selectBrand);
+    console.log(selectCategory);
+
+    // Nếu chọn tất cả cả hai, lấy lại danh sách sản phẩm gốc
+    if (
+      (selectBrand === "Tất cả" && selectCategory === "Tất cả") ||
+      selectBrand === "Tất cả" ||
+      selectCategory === "Tất cả"
+    ) {
+      fetchProducts();
+      return;
+    }
+
+    // Dùng danh sách sản phẩm gốc để tránh lỗi khi lọc liên tiếp
+    let filteredProducts = [...listProducts];
+
+    // Lọc theo thương hiệu nếu không phải là "Tất cả"
+    if (selectBrand !== "Tất cả" && selectBrand !== "Thương hiệu") {
+      filteredProducts = filteredProducts.filter((product) =>
+        product.nameBrand.toLowerCase().includes(selectBrand.toLowerCase())
+      );
+    }
+
+    // Lọc theo danh mục nếu không phải là "Tất cả"
+    if (selectCategory !== "Tất cả" && selectCategory !== "Danh mục") {
+      filteredProducts = filteredProducts.filter((product) =>
+        product.nameCategory
+          .toLowerCase()
+          .includes(selectCategory.toLowerCase())
+      );
+    }
+
+    // Cập nhật danh sách sản phẩm sau khi lọc
+    setListProducts(filteredProducts);
+  };
 
   return (
     <div className={cx("table")}>
@@ -194,34 +241,70 @@ const Product = () => {
         <div className={cx("card")}>
           <div className={cx("tag-filter")} onClick={handleSelectBrand}>
             <LocalOfferIcon fontSize="inherit" />
-            <div className={cx("title-tag")}>Thương hiệu</div>
+            <div className={cx("title-tag")}>{selectBrand}</div>
             <KeyboardArrowDownIcon />
           </div>
           {isSelectBrand && (
-            <div className={cx("select-tag")} ref={dropdownBrandRef}>
+            <div className={cx("select-tag")}>
+              <div
+                className={cx("tag")}
+                key=""
+                onClick={() => {
+                  handleSelectTagBrand("Tất cả");
+                }}
+              >
+                Tất cả
+              </div>
               {listBrands.map((brand) => (
-                <div className={cx("tag")} key={brand.id}>
+                <div
+                  className={cx("tag")}
+                  key={brand.id}
+                  onClick={() => {
+                    handleSelectTagBrand(brand.name);
+                  }}
+                >
                   {brand.name}
                 </div>
               ))}
             </div>
           )}
 
-          <div className={cx("tag-filter")} onClick={handleSelectCategory}>
+          <div
+            className={cx("tag-filterCategory")}
+            onClick={handleSelectCategory}
+          >
             <CategoryIcon fontSize="inherit" />
-            <div className={cx("title-tag")}>Danh mục</div>
+            <div className={cx("title-tagCategory")}>{selectCategory}</div>
             <KeyboardArrowDownIcon />
           </div>
           {isSelectCategory && (
-            <div className={cx("select-tag")} style={{ marginLeft: "165px" }}>
+            <div
+              className={cx("select-tagCategory")}
+              style={{ marginLeft: "165px" }}
+            >
+              <div
+                className={cx("tagCategory")}
+                key=""
+                onClick={() => {
+                  handleSelectTagCategory("Tất cả");
+                }}
+              >
+                Tất cả
+              </div>
               {listCategorys.map((category) => (
-                <div className={cx("tag")} key={category.id}>
+                <div
+                  className={cx("tagCategory")}
+                  key={category.id}
+                  onClick={() => {
+                    handleSelectTagCategory(category.name);
+                  }}
+                >
                   {category.name}
                 </div>
               ))}
             </div>
           )}
-          <div className={cx("btn-search")}>
+          <div className={cx("btn-search")} onClick={handleSearchFilter}>
             <SearchIcon fontSize="small" />
             Tìm kiếm
           </div>
@@ -249,7 +332,7 @@ const Product = () => {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product) => (
+              {searchProducts.map((product) => (
                 <tr key={product.SKU} style={{ marginLeft: "4px" }}>
                   <td>
                     <label className={cx("checkboxs")}>

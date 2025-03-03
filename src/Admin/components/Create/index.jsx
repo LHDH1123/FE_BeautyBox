@@ -293,7 +293,11 @@ const Create = ({ title, productId }) => {
                     type="text"
                     name="title"
                     className={cx("form-control")}
-                    value={editProduct?.title || ""}
+                    value={
+                      title === "Chỉnh sửa sản phẩm"
+                        ? editProduct?.title || ""
+                        : product?.title || ""
+                    }
                     onChange={handleChange}
                   />
                 </div>
@@ -303,7 +307,11 @@ const Create = ({ title, productId }) => {
                     type="text"
                     name="SKU"
                     className={cx("form-control")}
-                    value={editProduct?.SKU || ""}
+                    value={
+                      title === "Chỉnh sửa sản phẩm"
+                        ? editProduct?.SKU || ""
+                        : product?.SKU || ""
+                    }
                     onChange={handleChange}
                   />
                 </div>
@@ -311,23 +319,15 @@ const Create = ({ title, productId }) => {
 
               <div className={cx("info")}>
                 <div className={cx("info-item")}>
-                  <div className={cx("title-item")}>Danh mục</div>
-                  <select
-                    name="category_id"
-                    className={cx("form-select")}
-                    value={editProduct?.category_id || ""}
-                    onChange={handleChange}
-                  >
-                    <option value="">Chọn danh mục</option>
-                    {createCategorySelect(getAllCategory)}
-                  </select>
-                </div>
-                <div className={cx("info-item")}>
                   <div className={cx("title-item")}>Thương hiệu </div>
                   <select
                     name="brand_id"
                     className={cx("form-select")}
-                    value={editProduct?.brand_id || ""}
+                    value={
+                      title === "Chỉnh sửa sản phẩm"
+                        ? editProduct?.brand_id || ""
+                        : product?.brand_id || ""
+                    }
                     onChange={handleChange}
                   >
                     <option value="">Chọn thương hiệu</option>
@@ -336,6 +336,22 @@ const Create = ({ title, productId }) => {
                         {brand.name}
                       </option>
                     ))}
+                  </select>
+                </div>
+                <div className={cx("info-item")}>
+                  <div className={cx("title-item")}>Danh mục</div>
+                  <select
+                    name="category_id"
+                    className={cx("form-select")}
+                    value={
+                      title === "Chỉnh sửa sản phẩm"
+                        ? editProduct?.category_id || ""
+                        : product?.category_id || ""
+                    }
+                    onChange={handleChange}
+                  >
+                    <option value="">Chọn danh mục</option>
+                    {createCategorySelect(getAllCategory)}
                   </select>
                 </div>
               </div>
@@ -352,6 +368,11 @@ const Create = ({ title, productId }) => {
                         name="status"
                         checked={isActive}
                         value={editProduct.status}
+                        // value={
+                        //   title === "Chỉnh sửa sản phẩm"
+                        //     ? editProduct?.SKU || ""
+                        //     : product?.SKU || ""
+                        // }
                         onChange={() => handleStatusChange(true)}
                       />
                       <div className={cx("title-checkbox")}>Hoạt động</div>
@@ -382,7 +403,11 @@ const Create = ({ title, productId }) => {
                       variant="outlined"
                       size="small"
                       sx={{ width: 80, height: 32 }} // Giảm chiều cao và padding
-                      value={editProduct.position}
+                      value={
+                        title === "Chỉnh sửa sản phẩm"
+                          ? editProduct?.position || ""
+                          : product?.position || ""
+                      }
                       onChange={handleChange}
                       InputProps={{
                         inputProps: {
@@ -406,7 +431,11 @@ const Create = ({ title, productId }) => {
                   type="text"
                   maxLength="60"
                   name="description"
-                  value={editProduct?.description || ""}
+                  value={
+                    title === "Chỉnh sửa sản phẩm"
+                      ? editProduct?.description || ""
+                      : product?.description || ""
+                  }
                   onChange={handleChange}
                   className={cx("desc-input")}
                 />
@@ -497,7 +526,11 @@ const Create = ({ title, productId }) => {
                     type="text"
                     name="price"
                     className={cx("form-control")}
-                    value={editProduct?.price || ""}
+                    value={
+                      title === "Chỉnh sửa sản phẩm"
+                        ? editProduct?.price || ""
+                        : product?.price || ""
+                    }
                     onChange={handleChange}
                   />
                 </div>
@@ -507,7 +540,11 @@ const Create = ({ title, productId }) => {
                     type="text"
                     name="discountPercentage"
                     className={cx("form-control")}
-                    value={editProduct?.discountPercentage || ""}
+                    value={
+                      title === "Chỉnh sửa sản phẩm"
+                        ? editProduct?.discountPercentage || ""
+                        : product?.discountPercentage || ""
+                    }
                     onChange={handleChange}
                   />
                 </div>
@@ -520,7 +557,11 @@ const Create = ({ title, productId }) => {
                     type="text"
                     name="stock"
                     className={cx("form-control")}
-                    value={editProduct?.stock || ""}
+                    value={
+                      title === "Chỉnh sửa sản phẩm"
+                        ? editProduct?.stock || ""
+                        : product?.stock || ""
+                    }
                     onChange={handleChange}
                   />
                 </div>
