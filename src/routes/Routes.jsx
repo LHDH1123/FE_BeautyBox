@@ -17,6 +17,7 @@ import RoleAdmin from "../Admin/pages/Role";
 import Dashboard from "../Admin/pages/Dashboard";
 import FlashSale from "../Admin/pages/FlashSale";
 import CreateProduct from "../Admin/pages/CreateProduct";
+import DetailProduct from "../Admin/pages/DetailProduct";
 import EditProduct from "../Admin/pages/EditProduct";
 
 export default function Router() {
@@ -42,7 +43,8 @@ export default function Router() {
         <Route path="role" element={<RoleAdmin />} />
         <Route path="flashsale" element={<FlashSale />} />
         <Route path="create-product" element={<CreateProduct />} />
-        <Route path="/adminbb/edit-product/:id" element={<EditProduct />} />
+        <Route path="detail-product/:id" element={<DetailProduct />} />
+        <Route path="edit-product/:id" element={<EditProduct />} />
         <Route path="*" element={<Error404 />} />
       </Route>
     </Routes>

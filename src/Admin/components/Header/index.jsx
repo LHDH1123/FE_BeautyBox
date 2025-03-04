@@ -169,16 +169,24 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
       <div className={cx("title-header")}>
         <div className={cx("title")}>
           <div className={cx("title-page")}>{title}</div>
-          <div className={cx("title-desc")}>Quản Lý {title} Của Bạn</div>
+          {title === "Chi tiết sản phẩm" ? (
+            <div className={cx("title-desc")}>
+              Chi tiết đầy đủ của một sản phẩm
+            </div>
+          ) : (
+            <div className={cx("title-desc")}>Quản Lý {title} Của Bạn</div>
+          )}
         </div>
       </div>
 
-      <div className={cx("btn-add")} onClick={handleCloseModalAdd}>
-        <AddCircleOutlineIcon />
-        <button>
-          {title === "Vai Trò & Quyền" ? "Thêm Vai Trò" : `Thêm ${title}`}
-        </button>
-      </div>
+      {title !== "Chi tiết sản phẩm" && (
+        <div className={cx("btn-add")} onClick={handleCloseModalAdd}>
+          <AddCircleOutlineIcon />
+          <button>
+            {title === "Vai Trò & Quyền" ? "Thêm Vai Trò" : `Thêm ${title}`}
+          </button>
+        </div>
+      )}
 
       {/* Add Category Modal */}
       <Dialog

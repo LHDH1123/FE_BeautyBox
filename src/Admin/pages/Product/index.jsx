@@ -227,6 +227,10 @@ const Product = () => {
     setListProducts(filteredProducts);
   };
 
+  const handleDetailProduct = (id) => {
+    navigate(`/adminbb/detail-product/${id}`);
+  };
+
   return (
     <div className={cx("table")}>
       <Header title="Sản Phẩm" />
@@ -382,7 +386,10 @@ const Product = () => {
                   </td>
                   <td className={cx("action-table-data")}>
                     <div className={cx("edit-delete-action")}>
-                      <div className={cx("icon")}>
+                      <div
+                        className={cx("icon")}
+                        onClick={() => handleDetailProduct(product._id)}
+                      >
                         <RemoveRedEyeOutlinedIcon />
                       </div>
                       <div
