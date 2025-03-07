@@ -1,7 +1,7 @@
 import React from "react";
 import classNames from "classnames/bind";
 import styles from "./EditProduct.module.scss";
-import Create from "../../components/Create";
+import Create from "../../../components/Create";
 import { useParams } from "react-router-dom";
 
 const cx = classNames.bind(styles);

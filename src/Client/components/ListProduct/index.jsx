@@ -2,12 +2,14 @@ import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./ListProduct.module.scss";
 import PropTypes from "prop-types";
-import product from "../../../assets/images/f9bd5ae3-dc72-438e-8343-6aaba2c3f3da.webp";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import StarIcon from "@mui/icons-material/Star";
+import { getAllProducts } from "../../../services/product.service";
+import { getNameBrand } from "../../../services/brand.service";
+import { getNameCategory } from "../../../services/category.service";
 
 const cx = classNames.bind(styles);
 
@@ -22,37 +24,36 @@ ListProduct.defaultProps = {
 function ListProduct({ title }) {
   const scrollableRef = useRef(null);
   const [isLeftVisible, setIsLeftVisible] = useState(false);
-  const [isRightVisible, setIsRightVisible] = useState(true);
-  const [favoritedItems, setFavoritedItems] = useState(Array(6).fill(false)); // Store individual favorite state for each product
+  const [isRightVisible, setIsRightVisible] = useState(false);
+  const [favoritedItems, setFavoritedItems] = useState([]);
+  const [listProducts, setListProducts] = useState([]);
 
-  // Handle click event to toggle icon for a specific product
-  const handleClickTym = (index) => {
-    setFavoritedItems(
-      (prev) => prev.map((item, idx) => (idx === index ? !item : item)) // Toggle the clicked product's favorite state
-    );
-  };
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await getAllProducts();
+        if (response) {
+          const productsWithBrand = await Promise.all(
+            response.map(async (product) => ({
+              ...product,
+              nameBrand: await getNameBrand(product.brand_id),
+              nameCategory: await getNameCategory(product.category_id),
+              newPrice:
+                product.price -
+                (product.price * product.discountPercentage) / 100,
+            }))
+          );
+          setListProducts(productsWithBrand);
+          setFavoritedItems(Array(productsWithBrand.length).fill(false));
+        }
+      } catch (error) {
+        console.error("Error fetching products:", error);
+      }
+    };
 
-  // Scroll left by a fixed distance
-  const scrollLeft = () => {
-    if (scrollableRef.current) {
-      scrollableRef.current.scrollBy({
-        left: -scrollableRef.current.offsetWidth,
-        behavior: "smooth",
-      });
-    }
-  };
+    fetchProducts();
+  }, []); // Thêm [] để tránh gọi API liên tục
 
-  // Scroll right by a fixed distance
-  const scrollRight = () => {
-    if (scrollableRef.current) {
-      scrollableRef.current.scrollBy({
-        left: scrollableRef.current.offsetWidth,
-        behavior: "smooth",
-      });
-    }
-  };
-
-  // Handle scroll event to update button visibility
   const handleScroll = () => {
     const container = scrollableRef.current;
     if (container) {
@@ -65,17 +66,39 @@ function ListProduct({ title }) {
   useEffect(() => {
     const container = scrollableRef.current;
     if (container) {
+      handleScroll(); // Gọi ngay để cập nhật trạng thái nút
       container.addEventListener("scroll", handleScroll);
-      handleScroll(); // Check initial scroll state
     }
     return () => {
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      const container = scrollableRef.current;
       if (container) {
         container.removeEventListener("scroll", handleScroll);
       }
     };
-  }, []);
+  }, [listProducts]); // Gọi lại khi danh sách sản phẩm thay đổi
+
+  const scrollLeft = () => {
+    if (scrollableRef.current) {
+      scrollableRef.current.scrollBy({
+        left: -scrollableRef.current.offsetWidth,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollableRef.current) {
+      scrollableRef.current.scrollBy({
+        left: scrollableRef.current.offsetWidth,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  const handleClickTym = (index) => {
+    setFavoritedItems((prev) =>
+      prev.map((item, idx) => (idx === index ? !item : item))
+    );
+  };
 
   return (
     <div className={cx("list")}>
@@ -87,49 +110,51 @@ function ListProduct({ title }) {
           </button>
         )}
         <div className={cx("list_product")} ref={scrollableRef}>
-          {Array(6)
-            .fill(0)
-            .map((_, index) => (
-              <div key={index} className={cx("product")}>
-                <div
-                  className={cx("tym")}
-                  onClick={() => handleClickTym(index)}
-                >
-                  {favoritedItems[index] ? (
-                    <FavoriteIcon style={{ color: "red" }} />
-                  ) : (
-                    <FavoriteBorderIcon />
-                  )}
-                </div>
-                <div className={cx("productList-img")}>
-                  <img src={product} alt="Product" />
-                </div>
-                <div className={cx("product_info")}>
-                  <a href="/">GOODAL</a>
-                  <div className={cx("description")}>
-                    Tinh Chất Goodal Hỗ Trợ Làm Sáng Da, Mờ Đốm Nâu Green
-                    Tangerine Vita C Dark Spot Care Serum 40ml
+          {listProducts.map((product, index) => (
+            <div key={product._id} className={cx("product")}>
+              <div className={cx("tym")} onClick={() => handleClickTym(index)}>
+                {favoritedItems[index] ? (
+                  <FavoriteIcon style={{ color: "red" }} />
+                ) : (
+                  <FavoriteBorderIcon />
+                )}
+              </div>
+              <div className={cx("productList-img")}>
+                <img src={product.thumbnail} alt="Product" />
+              </div>
+              <div className={cx("product_info")}>
+                <a href="/">{product.nameBrand}</a>
+                <div className={cx("description")}>{product.title}</div>
+                <div className={cx("price_product")}>
+                  <div className={cx("new_price")}>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(product.newPrice)}
                   </div>
-                  <div className={cx("price_product")}>
-                    <div className={cx("new_price")}>711.000đ</div>
-                    <div className={cx("price")}>749.000đ</div>
-                    <span className={cx("discount-tag")}>
-                      <div className={cx("tag")}>-50%</div>
-                    </span>
+                  <div className={cx("price")}>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(product.price)}
                   </div>
-                  <div className={cx("review")}>
-                    <div className={cx("rate")}>
-                      <StarIcon fontSize="inherit" />
-                      <StarIcon fontSize="inherit" />
-                      <StarIcon fontSize="inherit" />
-                      <StarIcon fontSize="inherit" />
-                      <StarIcon fontSize="inherit" />
+                  <span className={cx("discount-tag")}>
+                    <div className={cx("tag")}>
+                      -{product.discountPercentage}%
                     </div>
-                    <div className={cx("amount")}>(0)</div>
+                  </span>
+                </div>
+                <div className={cx("review")}>
+                  <div className={cx("rate")}>
+                    {[...Array(5)].map((_, i) => (
+                      <StarIcon key={i} fontSize="inherit" />
+                    ))}
                   </div>
+                  <div className={cx("amount")}>(0)</div>
                 </div>
               </div>
-            ))}
+            </div>
+          ))}
         </div>
         {isRightVisible && (
           <button

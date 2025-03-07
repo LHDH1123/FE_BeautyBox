@@ -17,6 +17,7 @@ const TableHeader = ({
   selectedProducts,
   fetchProducts,
   handleSearchChangeProduct,
+  title,
 }) => {
   const handleSearch = (event) => {
     if (handleSearchChange) handleSearchChange(event);
@@ -33,27 +34,30 @@ const TableHeader = ({
           </div>
         </div>
 
-        <Apply
-          selectedBrands={selectedBrands}
-          fetchBrands={fetchBrands}
-          selectedCategorys={selectedCategorys}
-          fetchCategorys={fetchCategorys}
-          selectedProducts={selectedProducts}
-          fetchProducts={fetchProducts}
-        />
-
-        <div className={cx("filter")}>
-          <div className={cx("form-sort")}>
-            <TuneIcon />
-            <select className={cx("select")}>
-              <option>Sắp xếp</option>
-              <option>Mới nhất</option>
-              <option>Cũ nhất</option>
-              <option>A - Z</option>
-              <option>Z - A</option>
-            </select>
+        {title !== "Vai Trò & Quyền" && (
+          <Apply
+            selectedBrands={selectedBrands}
+            fetchBrands={fetchBrands}
+            selectedCategorys={selectedCategorys}
+            fetchCategorys={fetchCategorys}
+            selectedProducts={selectedProducts}
+            fetchProducts={fetchProducts}
+          />
+        )}
+        {title !== "Vai Trò & Quyền" && (
+          <div className={cx("filter")}>
+            <div className={cx("form-sort")}>
+              <TuneIcon />
+              <select className={cx("select")}>
+                <option>Sắp xếp</option>
+                <option>Mới nhất</option>
+                <option>Cũ nhất</option>
+                <option>A - Z</option>
+                <option>Z - A</option>
+              </select>
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

@@ -16,9 +16,10 @@ import UserAdmin from "../Admin/pages/User";
 import RoleAdmin from "../Admin/pages/Role";
 import Dashboard from "../Admin/pages/Dashboard";
 import FlashSale from "../Admin/pages/FlashSale";
-import CreateProduct from "../Admin/pages/CreateProduct";
+import CreateProduct from "../Admin/pages/Product/CreateProduct";
 import DetailProduct from "../Admin/pages/DetailProduct";
-import EditProduct from "../Admin/pages/EditProduct";
+import EditProduct from "../Admin/pages/Product/EditProduct";
+import PermissionRole from "../Admin/pages/Role/Permissions";
 
 export default function Router() {
   return (
@@ -45,6 +46,7 @@ export default function Router() {
         <Route path="create-product" element={<CreateProduct />} />
         <Route path="detail-product/:id" element={<DetailProduct />} />
         <Route path="edit-product/:id" element={<EditProduct />} />
+        <Route path="role/permissions/:id" element={<PermissionRole />} />
         <Route path="*" element={<Error404 />} />
       </Route>
     </Routes>

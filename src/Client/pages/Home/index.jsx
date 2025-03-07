@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Home.module.scss";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
@@ -15,6 +15,7 @@ import logoSale from "../../../assets/images/logo_sale.webp";
 import ListProduct from "../../components/ListProduct";
 import ButtonAll from "../../components/ButtonAll";
 import Trademark from "../../components/Trademark";
+import { getAllProducts } from "../../../services/product.service";
 
 const cx = classNames.bind(styles);
 

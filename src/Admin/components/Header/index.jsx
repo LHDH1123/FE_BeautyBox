@@ -8,10 +8,11 @@ import { useNavigate } from "react-router-dom";
 import { addBrand } from "../../../services/brand.service";
 import { addCategory, getCategorys } from "../../../services/category.service";
 import { createCategorySelect } from "../../../helper/select-tree";
+import { addRole } from "../../../services/role.service";
 
 const cx = classNames.bind(styles);
 
-const Header = ({ title, fetchCategorys, fetchBrands }) => {
+const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
   const [isModalAdd, setIsModalAdd] = useState(false);
   const [isModalAddBrand, setIsModalAddBrand] = useState(false);
   const [isModalAddRole, setIsModalAddRole] = useState(false);
@@ -24,6 +25,10 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
   const [category, setCategory] = useState({
     title: "",
     parent_id: "",
+    status: true,
+  });
+  const [role, setRole] = useState({
+    title: "",
     status: true,
   });
   const [getAllCategory, setGetAllCategory] = useState([]);
@@ -56,6 +61,14 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
   const handleChangeCategory = (e) => {
     const { name, value, type, checked } = e.target;
     setCategory((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleChangeRole = (e) => {
+    const { name, value, type, checked } = e.target;
+    setRole((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
@@ -130,11 +143,33 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
       if (response) {
         console.log("Thêm danh mục thành công:", response);
       }
-      setIsModalAdd(false);
-      setCategory([]);
+      setGetAllCategory(false);
+      setCategory({
+        title: "",
+        parent_id: "",
+        status: true,
+      });
     } catch (error) {
       console.error("Lỗi khi thêm thương hiệu:", error);
       alert("Đã xảy ra lỗi! Vui lòng thử lại.");
+    }
+  };
+
+  const handleAddRole = async () => {
+    if (!role.title) {
+      alert("Vui lòng nhập vai trò!");
+      return;
+    }
+    try {
+      const response = await addRole(role);
+      if (response) {
+        console.log("Thêm vai trò thành công:", response);
+        fetchRoles();
+        setIsModalAddRole(false);
+        setRole({ title: "", status: true });
+      }
+    } catch (error) {
+      console.error("Lỗi khi thêm vai trò:", error);
     }
   };
 
@@ -179,7 +214,7 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
         </div>
       </div>
 
-      {title !== "Chi tiết sản phẩm" && (
+      {title !== "Chi tiết sản phẩm" && title !== "Quyền hạn" && (
         <div className={cx("btn-add")} onClick={handleCloseModalAdd}>
           <AddCircleOutlineIcon />
           <button>
@@ -376,7 +411,7 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
           style: {
             marginTop: "-30px",
             borderRadius: "16px",
-            height: "270px",
+            height: "300px",
             width: "500px",
           },
         }}
@@ -393,7 +428,24 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
             <div className={cx("title")}>Tạo vai trò</div>
             <div className={cx("formGroup")}>
               <div className={cx("label")}>Tên vai trò</div>
-              <input type="text" className={cx("input")} />
+              <input
+                type="text"
+                name="title"
+                className={cx("input")}
+                value={role.title}
+                onChange={handleChangeRole}
+              />
+              <div className={cx("status")}>
+                <div className={cx("label")}>Trạng thái</div>
+                <div className={cx("switch")}>
+                  <Switch
+                    {...label}
+                    name="status"
+                    checked={role.status}
+                    onChange={handleChangeRole}
+                  />
+                </div>
+              </div>
             </div>
             <div className={cx("buttons")}>
               <button
@@ -403,7 +455,11 @@ const Header = ({ title, fetchCategorys, fetchBrands }) => {
               >
                 Hủy
               </button>
-              <button type="submit" className={cx("btn-submit")}>
+              <button
+                type="submit"
+                className={cx("btn-submit")}
+                onClick={handleAddRole}
+              >
                 Tạo mới
               </button>
             </div>
