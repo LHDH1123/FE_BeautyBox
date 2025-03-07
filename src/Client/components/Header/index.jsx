@@ -19,6 +19,7 @@ import CartFav from "../CartFav";
 import { useNavigate } from "react-router-dom";
 import Collection from "../Collection";
 import CategoryHeader from "../CategoryHeader";
+import { getCategorys } from "../../../services/category.service";
 
 const cx = classNames.bind(styles);
 
@@ -41,23 +42,27 @@ const Header = () => {
     { id: 1, label: "Thương hiệu", title: "collection" },
     { id: 2, label: "Khuyến mãi hot", title: "collection" },
     { id: 3, label: "Sản phẩm cao cấp", title: "collection" },
-    { id: 4, label: "Trang điểm", title: "category" },
-    { id: 5, label: "Chăm sóc da", title: "category" },
-    { id: 6, label: "Chăm sóc cá nhân", title: "category" },
-    { id: 7, label: "Sản phẩm cao cấp", title: "category" },
-    { id: 8, label: "Trang điểm", title: "category" },
-    { id: 9, label: "Chăm sóc da", title: "category" },
-    { id: 10, label: "Chăm sóc cá nhân", title: "category" },
-    { id: 11, label: "Sản phẩm cao cấp", title: "category" },
-    { id: 12, label: "Trang điểm", title: "category" },
-    { id: 13, label: "Chăm sóc da", title: "category" },
-    { id: 14, label: "Chăm sóc cá nhân", title: "category" },
-    { id: 15, label: "Chăm sóc cá nhân", title: "category" },
-    { id: 16, label: "Sản phẩm cao cấp", title: "category" },
-    { id: 17, label: "Trang điểm", title: "category" },
-    { id: 18, label: "Chăm sóc da", title: "category" },
-    { id: 19, label: "Chăm sóc cá nhân", title: "category" },
   ];
+  const [listCategorys, setListCategorys] = useState([]);
+
+  useEffect(() => {
+    const fetchCategorys = async () => {
+      try {
+        const response = await getCategorys();
+        if (response) {
+          const filteredCategories = response.filter(
+            (category) => category.parent_id === ""
+          );
+          setListCategorys(filteredCategories);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategorys();
+  }, []);
+
   const handleNavigate = (label) => {
     if (label === "Thương hiệu") {
       navigate("/brands");
@@ -93,7 +98,6 @@ const Header = () => {
   const scrollLeft = () => {
     if (scrollableRef.current) {
       scrollableRef.current.scrollBy({ left: -1000, behavior: "smooth" });
-      console.log("Sdsds");
     }
   };
 
@@ -115,15 +119,15 @@ const Header = () => {
   useEffect(() => {
     const container = scrollableRef.current;
     if (container) {
-      container.addEventListener("scroll", handleScroll);
       handleScroll();
+      container.addEventListener("scroll", handleScroll);
     }
     return () => {
       if (container) {
         container.removeEventListener("scroll", handleScroll);
       }
     };
-  }, []);
+  }, [listCategorys]);
 
   const handleOpenModal = () => {
     setIsModalUpload(true);
@@ -438,6 +442,33 @@ const Header = () => {
                     <Collection props={menu.label} />
                   ) : (
                     <CategoryHeader props={menu.label} />
+                  )}
+                </div>
+              )}
+            </div>
+          ))}
+          {listCategorys.map((menu) => (
+            <div
+              key={menu.id}
+              className={cx("menu-header")}
+              onClick={() => handleNavigate("category")}
+              onMouseEnter={() => setHoveredMenu(menu.id)}
+              onMouseLeave={() => {
+                setHoveredMenu(null);
+              }}
+            >
+              {menu.title}
+              {hoveredMenu === menu.id && (
+                <div
+                  className={cx("menu-dropdown")}
+                  onClick={(event) => {
+                    event.stopPropagation(); // Ngăn sự kiện click truyền lên menu-header
+                  }}
+                >
+                  {menu.title === "collection" ? (
+                    <Collection props="collection" />
+                  ) : (
+                    <CategoryHeader props="category" />
                   )}
                 </div>
               )}

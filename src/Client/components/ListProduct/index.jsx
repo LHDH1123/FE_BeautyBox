@@ -120,7 +120,7 @@ function ListProduct({ title }) {
                 )}
               </div>
               <div className={cx("productList-img")}>
-                <img src={product.thumbnail} alt="Product" />
+                <img src={product.thumbnail[0]} alt="Product" />
               </div>
               <div className={cx("product_info")}>
                 <a href="/">{product.nameBrand}</a>

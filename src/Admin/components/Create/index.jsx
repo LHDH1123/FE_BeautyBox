@@ -45,6 +45,8 @@ const Create = ({ title, productId }) => {
   });
   const [images, setImages] = useState([]);
   const [divImages, setDivImages] = useState([]);
+  const [divEditImages, setDivEditImages] = useState([]);
+
   const [editProduct, setEditProduct] = useState({
     title: "",
     SKU: "",
@@ -151,11 +153,24 @@ const Create = ({ title, productId }) => {
 
   const handleAdd = async () => {
     if (title === "Chỉnh sửa sản phẩm") {
-      editProduct.thumbnail = divImages;
-      editProduct.status = isActive;
+      const formData = new FormData();
+      formData.append("title", editProduct.title);
+      formData.append("category_id", editProduct.category_id);
+      formData.append("brand_id", editProduct.brand_id);
+      formData.append("status", editProduct.status);
+      formData.append("description", editProduct.description);
+      formData.append("price", editProduct.price);
+      formData.append("discountPercentage", editProduct.discountPercentage);
+      formData.append("stock", editProduct.stock);
+      formData.append("position", editProduct.position);
+
+      // Thêm ảnh mới (File)
+      divEditImages.forEach((file) => {
+        formData.append("thumbnail", file);
+      });
 
       try {
-        const response = await updateProduct(editProduct._id, editProduct);
+        const response = await updateProduct(editProduct._id, formData);
         if (response) {
           console.log("Chỉnh sửa sản phẩm thành công!", response);
           navigate("/adminbb/product-list");
@@ -226,11 +241,13 @@ const Create = ({ title, productId }) => {
     setImages(selectedFiles);
     const fileURLs = selectedFiles.map((file) => URL.createObjectURL(file)); // Tạo URL tạm
     setDivImages((prev) => [...prev, ...fileURLs]);
+    setDivEditImages((prev) => [...prev, ...selectedFiles]);
   };
 
   // Xoá ảnh khỏi danh sách
   const handleRemoveImage = (index) => {
     setDivImages((prev) => prev.filter((_, i) => i !== index));
+    setDivEditImages((prev) => prev.filter((_, i) => i !== index));
   };
 
   const fetchProducts = async () => {
@@ -238,6 +255,7 @@ const Create = ({ title, productId }) => {
     if (response) {
       setEditProduct(response[0]);
       setDivImages(response[0].thumbnail);
+      setDivEditImages(response[0].thumbnail);
     }
   };
 
