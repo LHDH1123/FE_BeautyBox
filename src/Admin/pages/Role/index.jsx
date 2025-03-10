@@ -10,7 +10,7 @@ import {
   changeStatusRole,
   deleteRoles,
   getAllRoles,
-  updateRole,
+  updateDataRole,
 } from "../../../services/role.service";
 import { Box, Dialog, DialogActions, Switch } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -64,10 +64,13 @@ const Role = () => {
 
   const handleInputChange = (event) => {
     const { name, value, type, checked } = event.target;
-    setGetRole((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setGetRole((prev) => {
+      const newState = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+      return newState;
+    });
   };
 
   const handleUpdate = async () => {
@@ -75,9 +78,9 @@ const Role = () => {
       title: getRole.title,
       status: getRole.status,
     };
-
+    // console.log(getRole);
     try {
-      const response = await updateRole(getRole.id, data);
+      const response = await updateDataRole(getRole._id, data);
       if (response) {
         setIsModalAddRole(false);
         fetchRoles();
@@ -103,6 +106,7 @@ const Role = () => {
   const handlePermission = (id) => {
     navigate(`permissions/${id}`);
   };
+
   return (
     <div className={cx("table")}>
       <Header title="Vai Trò & Quyền" fetchRoles={fetchRoles} />

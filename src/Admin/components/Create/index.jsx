@@ -206,9 +206,15 @@ const Create = ({ title, productId }) => {
       formData.append("position", product.position);
 
       // **Thêm tất cả file ảnh vào FormData**
-      images.forEach((image) => {
-        formData.append("thumbnail", image);
-      });
+      if (images.length === 1) {
+        formData.append("thumbnail", images[0]); // Nếu chỉ có 1 ảnh, upload trực tiếp
+      } else {
+        images.forEach((file) => {
+          formData.append("thumbnail", file); // Nếu có nhiều ảnh, duyệt và thêm từng ảnh vào
+        });
+      }
+
+      console.log(images[0]);
 
       try {
         const response = await addProduct(formData);

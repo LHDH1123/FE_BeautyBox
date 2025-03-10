@@ -24,6 +24,8 @@ const Brand = () => {
   const [selectedBrands, setSelectedBrands] = useState([]);
   const [isModalEditBrand, setIsModalEditBrand] = useState(false);
   const [getBrand, setGetBrand] = useState([]);
+  const [getImage, setGetImage] = useState([]);
+
   const [editBrand, setEditBrand] = useState({
     name: "",
     status: false,
@@ -141,7 +143,7 @@ const Brand = () => {
         setGetBrand({ ...getBrand, thumbnail: reader.result }); // Lưu URL của ảnh vào state
       };
       reader.readAsDataURL(file);
-      setEditBrand((prev) => ({ ...prev, thumbnail: file })); // Lưu file thật vào state để gửi lên server
+      setGetImage(file);
     }
   };
 
@@ -170,14 +172,26 @@ const Brand = () => {
   }, [getBrand]);
 
   const handleUpdate = async () => {
-    if (editBrand) {
-      try {
-        await updateBrand(getBrand._id, editBrand);
+    const formData = new FormData();
+
+    // Thêm các dữ liệu khác của thương hiệu vào formData
+    formData.append("name", editBrand.name);
+    formData.append("description", editBrand.description);
+
+    // Nếu có hình ảnh, thêm nó vào FormData
+    if (getImage) {
+      formData.append("thumbnail", getImage);
+    }
+
+    try {
+      const response = await updateBrand(getBrand._id, formData);
+      if (response) {
+        console.log(response);
         fetchBrands();
         setIsModalEditBrand(false);
-      } catch (error) {
-        console.error("Error updating brand:", error);
       }
+    } catch (error) {
+      console.error("Error updating brand:", error);
     }
   };
 

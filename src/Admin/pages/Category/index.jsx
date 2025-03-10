@@ -44,15 +44,36 @@ const Category = () => {
     fetchCategorys();
   }, []);
 
+  const updateCategoryStatus = (categories, id, newStatus) => {
+    return categories.map((category) => {
+      // Nếu đây là danh mục cần cập nhật, thay đổi trạng thái
+      if (category._id === id) {
+        return {
+          ...category,
+          status: newStatus,
+          children: category.children
+            ? updateCategoryStatus(category.children, id, newStatus)
+            : [],
+        };
+      }
+
+      // Nếu không, tìm trong danh mục con
+      return {
+        ...category,
+        children: category.children
+          ? updateCategoryStatus(category.children, id, newStatus)
+          : [],
+      };
+    });
+  };
+
   const handleChangeStatus = async (id, currentStatus) => {
     try {
       const newStatus = !currentStatus;
       const response = await changeStatus(id, newStatus);
       if (response) {
         setGetAllCategory((prevCategories) =>
-          prevCategories.map((category) =>
-            category._id === id ? { ...category, status: newStatus } : category
-          )
+          updateCategoryStatus(prevCategories, id, newStatus)
         );
       }
     } catch (error) {
@@ -106,10 +127,21 @@ const Category = () => {
   };
 
   const handleInputChange = (event) => {
-    const { name, value, type, checked } = event.target;
+    const { name, value } = event.target;
+
+    setEditCategory((prev) => {
+      const newState = {
+        ...prev,
+        [name]: value,
+      };
+      return newState;
+    });
+  };
+
+  const handleSwitchChange = () => {
     setEditCategory((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      status: !prev.status, // Đảo trạng thái thay vì lấy trực tiếp từ sự kiện
     }));
   };
 
@@ -240,60 +272,7 @@ const Category = () => {
                 <th className={cx("no-sort")}>Hành động</th>
               </tr>
             </thead>
-            <tbody>
-              {renderCategoryRows(filteredCategorys)}
-              {/* {filteredCategorys.map((category) => (
-                <tr key={category._id}>
-                  <td>
-                    <label className={cx("checkboxs")}>
-                      <input
-                        type="checkbox"
-                        checked={selectedCategorys.includes(category._id)}
-                        onChange={() => handleSelectOne(category._id)}
-                      />
-                      <span className={cx("checkmarks")}></span>
-                    </label>
-                  </td>
-                  <td style={{ fontWeight: "600", color: "#333" }}>
-                    {category.title}
-                  </td>
-                  <td>
-                    {new Date(category.createdAt).toLocaleDateString("vi-VN")}
-                  </td>
-                  <td>
-                    <span
-                      className={cx(
-                        "badge",
-                        category.status ? "badge-linesuccess" : "badge-linered"
-                      )}
-                      onClick={() =>
-                        handleChangeStatus(category._id, category.status)
-                      }
-                    >
-                      {category.status ? "Hoạt động" : "Không hoạt động"}
-                    </span>
-                  </td>
-                  <td className={cx("action-table-data")}>
-                    <div className={cx("edit-delete-action")}>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleOpenModal(category._id)}
-                      >
-                        <ModeEditOutlineOutlinedIcon
-                          style={{ color: "#3577f1" }}
-                        />
-                      </div>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleDeleteCategory(category._id)}
-                      >
-                        <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              ))} */}
-            </tbody>
+            <tbody>{renderCategoryRows(filteredCategorys)}</tbody>
           </table>
         </div>
       </div>
@@ -348,8 +327,9 @@ const Category = () => {
               <div className={cx("switch")}>
                 <Switch
                   name="status"
+                  color="warning"
                   checked={editCategory.status}
-                  onChange={handleInputChange}
+                  onChange={handleSwitchChange}
                 />
               </div>
             </div>

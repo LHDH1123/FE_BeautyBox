@@ -1,9 +1,9 @@
 import React from "react";
 import classNames from "classnames/bind";
-import styles from "./User.module.scss";
+import styles from "./Account.module.scss";
 import ModeEditOutlineOutlinedIcon from "@mui/icons-material/ModeEditOutlineOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
-import Header from "../../../Admin/components/Header";
+import Header from "../../components/Header";
 import TableHeader from "../../components/TableHeader";
 
 const cx = classNames.bind(styles);

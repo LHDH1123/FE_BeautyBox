@@ -12,7 +12,7 @@ import Detail from "../Client/pages/Detail";
 import ProductAdmin from "../Admin/pages/Product";
 import BrandAdmin from "../Admin/pages/Brand";
 import CategoryAdmin from "../Admin/pages/Category";
-import UserAdmin from "../Admin/pages/User";
+import AccountAdmin from "../Admin/pages/Account";
 import RoleAdmin from "../Admin/pages/Role";
 import Dashboard from "../Admin/pages/Dashboard";
 import FlashSale from "../Admin/pages/FlashSale";
@@ -40,7 +40,7 @@ export default function Router() {
         <Route path="product-list" element={<ProductAdmin />} />
         <Route path="brand-list" element={<BrandAdmin />} />
         <Route path="category" element={<CategoryAdmin />} />
-        <Route path="user" element={<UserAdmin />} />
+        <Route path="user" element={<AccountAdmin />} />
         <Route path="role" element={<RoleAdmin />} />
         <Route path="flashsale" element={<FlashSale />} />
         <Route path="create-product" element={<CreateProduct />} />

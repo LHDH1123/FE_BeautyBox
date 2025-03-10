@@ -1,10 +1,11 @@
 export function createCategorySelect(categories, parentId = "", level = 0) {
+  if (!categories || categories.length === 0) return []; // Kiểm tra dữ liệu
+
   const options = [];
 
   categories.forEach((category) => {
-    // Nếu category là con của parentId
-    if (category.parent_id === parentId) {
-      const paddingLeft = level * 20; // Mỗi cấp sẽ thụt vào thêm 20px
+    if (category.parent_id === parentId || (!category.parent_id && !parentId)) {
+      const paddingLeft = level * 20;
 
       options.push(
         <option
@@ -16,10 +17,14 @@ export function createCategorySelect(categories, parentId = "", level = 0) {
         </option>
       );
 
-      // Tạo các tùy chọn cho danh mục con (đệ quy)
-      options.push(
-        ...createCategorySelect(categories, category._id, level + 1)
+      const childOptions = createCategorySelect(
+        categories,
+        category._id,
+        level + 1
       );
+      if (childOptions.length > 0) {
+        options.push(...childOptions);
+      }
     }
   });
 

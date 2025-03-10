@@ -42,6 +42,19 @@ export async function deleteRoles(id) {
 
 export async function updateRole(id, data) {
   try {
+    const response = await AxiosInstance.patch(
+      `/role/editPermission/${id}`,
+      data
+    );
+    return response;
+  } catch (error) {
+    console.error("Error editing roles:", error);
+    return null;
+  }
+}
+
+export async function updateDataRole(id, data) {
+  try {
     const response = await AxiosInstance.patch(`/role/edit/${id}`, data);
     return response;
   } catch (error) {

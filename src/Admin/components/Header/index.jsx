@@ -50,28 +50,54 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
     fetchAllCategorys();
   }, []);
 
+  // const handleChange = (e) => {
+  //   const { name, value, type, checked, files } = e.target;
+  //   setBrand((prev) => ({
+  //     ...prev,
+  //     [name]: type === "checkbox" ? checked : files ? files[0] : value,
+  //   }));
+  // };
+
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    setBrand((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : files ? files[0] : value,
-    }));
+
+    if (files && files.length > 0) {
+      setBrand((prev) => ({
+        ...prev,
+        [name]: files[0], // Đảm bảo lấy file đầu tiên trong danh sách
+      }));
+    } else {
+      setBrand((prev) => {
+        const newState = {
+          ...prev,
+          [name]: type === "checkbox" ? checked : value,
+        };
+        return newState;
+      });
+    }
   };
 
   const handleChangeCategory = (e) => {
     const { name, value, type, checked } = e.target;
-    setCategory((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+
+    setCategory((prev) => {
+      const newState = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+      return newState;
+    });
   };
 
   const handleChangeRole = (e) => {
     const { name, value, type, checked } = e.target;
-    setRole((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    setRole((prev) => {
+      const newState = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+      return newState;
+    });
   };
 
   const handleCloseModalAdd = () => {
@@ -93,7 +119,6 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
   };
 
   const handleAddBrand = async () => {
-    brand.thumbnail = getBrand;
     if (!brand.name || !brand.thumbnail) {
       alert("Vui lòng nhập tên thương hiệu và tải lên ảnh thương hiệu!");
       return;
@@ -103,7 +128,7 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
       const formData = new FormData();
       formData.append("name", brand.name);
       formData.append("status", brand.status ?? true);
-      formData.append("thumbnail", brand.thumbnail.thumbnail);
+      formData.append("thumbnail", brand.thumbnail);
 
       const response = await addBrand(formData);
       if (response) {
@@ -131,11 +156,12 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
       alert("Vui lòng nhập tên danh mục!");
       return;
     }
+
     try {
       const formData = new FormData();
       formData.append("title", category.title);
-      formData.append("status", category.status ?? true);
       formData.append("parent_id", category.parent_id);
+      formData.append("status", category.status); // Đảm bảo chỉ gửi file hợp lệ
 
       const response = await addCategory(formData);
       fetchCategorys();
@@ -184,14 +210,6 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
       setBrand((prev) => ({ ...prev, thumbnail: file })); // Lưu file thật vào state để gửi lên server
     }
   };
-
-  useEffect(() => {
-    return () => {
-      if (getBrand.thumbnail) {
-        URL.revokeObjectURL(getBrand.thumbnail);
-      }
-    };
-  }, [getBrand.thumbnail]);
 
   const handleClickChangeImage = () => {
     if (fileInputRef.current) {
@@ -275,8 +293,14 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
                 <Switch
                   {...label}
                   name="status"
+                  color="warning"
                   checked={category.status}
-                  onChange={handleChangeCategory}
+                  onChange={(e) =>
+                    setCategory((prev) => ({
+                      ...prev,
+                      status: e.target.checked, // Switch luôn gửi boolean
+                    }))
+                  }
                 />
               </div>
             </div>
@@ -348,6 +372,7 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
                     ref={fileInputRef}
                     onChange={handleImageChange}
                   />
+
                   {getBrand.thumbnail ? (
                     <img
                       src={getBrand.thumbnail}
@@ -378,6 +403,7 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
               <div className={cx("switch")}>
                 <Switch
                   name="status"
+                  color="warning"
                   checked={brand.status}
                   onChange={handleChange}
                 />
@@ -441,6 +467,7 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
                   <Switch
                     {...label}
                     name="status"
+                    color="warning"
                     checked={role.status}
                     onChange={handleChangeRole}
                   />
