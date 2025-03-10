@@ -8,11 +8,18 @@ import { useNavigate } from "react-router-dom";
 import { addBrand } from "../../../services/brand.service";
 import { addCategory, getCategorys } from "../../../services/category.service";
 import { createCategorySelect } from "../../../helper/select-tree";
-import { addRole } from "../../../services/role.service";
+import { addRole, getAllRoles } from "../../../services/role.service";
+import { addAccount } from "../../../services/account.service";
 
 const cx = classNames.bind(styles);
 
-const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
+const Header = ({
+  title,
+  fetchCategorys,
+  fetchBrands,
+  fetchRoles,
+  fetchAccount,
+}) => {
   const [isModalAdd, setIsModalAdd] = useState(false);
   const [isModalAddBrand, setIsModalAddBrand] = useState(false);
   const [isModalAddRole, setIsModalAddRole] = useState(false);
@@ -31,8 +38,20 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
     title: "",
     status: true,
   });
+  const [account, setAccount] = useState({
+    thumbnail: "",
+    fullName: "",
+    email: "",
+    password: "",
+    phone: "",
+    role_id: "",
+    confirmPassword: "",
+    status: true,
+  });
   const [getAllCategory, setGetAllCategory] = useState([]);
+  const [getAllRole, setGetAllRole] = useState([]);
   const fileInputRef = useRef(null);
+  const fileInputRefAccount = useRef(null);
   const [getBrand, setGetBrand] = useState([]);
 
   const navigate = useNavigate();
@@ -46,17 +65,17 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
     }
   };
 
+  const fetchAllRoles = async () => {
+    const response = await getAllRoles();
+    if (response) {
+      setGetAllRole(response);
+    }
+  };
+
   useEffect(() => {
     fetchAllCategorys();
+    fetchAllRoles();
   }, []);
-
-  // const handleChange = (e) => {
-  //   const { name, value, type, checked, files } = e.target;
-  //   setBrand((prev) => ({
-  //     ...prev,
-  //     [name]: type === "checkbox" ? checked : files ? files[0] : value,
-  //   }));
-  // };
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -98,6 +117,15 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
       };
       return newState;
     });
+  };
+
+  const handleChangeAccount = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setAccount((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
   };
 
   const handleCloseModalAdd = () => {
@@ -208,12 +236,68 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
       };
       reader.readAsDataURL(file);
       setBrand((prev) => ({ ...prev, thumbnail: file })); // Lưu file thật vào state để gửi lên server
+      setAccount((prev) => ({ ...prev, thumbnail: file }));
     }
   };
 
   const handleClickChangeImage = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click(); // Open file picker for image
+    }
+    if (fileInputRefAccount.current) {
+      fileInputRefAccount.current.click(); // Open file picker for image
+    }
+  };
+
+  const handleAddAccount = async () => {
+    if (!account.fullName || !account.email || !account.password) {
+      alert("Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
+
+    if (account.password !== account.confirmPassword) {
+      alert("Mật khẩu xác nhận không khớp!");
+      return;
+    }
+    if (!account.role_id) {
+      alert("Vui lòng chọn vai trò!");
+    }
+    
+    try {
+      const formData = new FormData();
+      formData.append("fullName", account.fullName);
+      formData.append("phone", account.phone);
+      formData.append("email", account.email);
+      formData.append("role_id", account.role_id);
+      formData.append("password", account.password);
+      formData.append("confirmPassword", account.confirmPassword);
+      formData.append("status", account.status);
+
+      if (account.thumbnail) {
+        formData.append("thumnail", account.thumbnail);
+      }
+
+      const response = await addAccount(formData);
+
+      if (response) {
+        console.log(response);
+        setIsModalAddUser(false);
+        fetchAccount();
+        setAccount({
+          fullName: "",
+          phone: "",
+          email: "",
+          role_id: "",
+          password: "",
+          confirmPassword: "",
+          status: true,
+          avatar: "",
+        });
+      } else {
+        alert("Lỗi khi thêm tài khoản!");
+      }
+    } catch (error) {
+      console.error("Lỗi khi thêm tài khoản:", error);
     }
   };
 
@@ -363,7 +447,7 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
             >
               <div>
                 <div className={cx("label")}>Logo</div>
-                <label className={cx("input-blocks")}>
+                <div className={cx("input-blocks")}>
                   <input
                     type="file"
                     name="thumbnail"
@@ -388,7 +472,7 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
                       <div className={cx("title-img")}>Thêm hình ảnh</div>
                     </>
                   )}
-                </label>
+                </div>
               </div>
               <button
                 type="button"
@@ -494,7 +578,7 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
         </Box>
       </Dialog>
 
-      {/* Add User Modal */}
+      {/* Add Account Modal */}
       <Dialog
         open={isModalAddUser}
         onClose={handleCloseModalAdd}
@@ -510,7 +594,7 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
               </button>
             </div>
           </DialogActions>
-          <div className={cx("modalContent")} style={{ marginLeft: "15px" }}>
+          <div className={cx("modalContent")} style={{ marginLeft: "20px" }}>
             <div className={cx("title")}>Tạo người dùng</div>
             <div
               className={cx("formGroup")}
@@ -518,54 +602,124 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
             >
               <div>
                 <div className={cx("label")}>Ảnh đại diện</div>
-                <div className={cx("input-blocks")}>
-                  <AddCircleOutlineIcon
-                    fontSize="inherit"
-                    style={{ color: "#ff9f43" }}
+                <div
+                  className={cx("input-blocks")}
+                  onClick={handleClickChangeImage}
+                >
+                  <input
+                    type="file"
+                    name="thumbnail"
+                    accept="image/*"
+                    style={{ display: "none" }}
+                    ref={fileInputRefAccount}
+                    onChange={handleImageChange}
                   />
-                  <div className={cx("title-img")}>Thêm hình ảnh</div>
+                  {getBrand.thumbnail ? (
+                    <img
+                      src={getBrand.thumbnail}
+                      alt="Logo"
+                      className={cx("preview-img")}
+                    />
+                  ) : (
+                    <>
+                      <AddCircleOutlineIcon
+                        fontSize="inherit"
+                        style={{ color: "#ff9f43" }}
+                      />
+                      <div className={cx("title-img")}>Thêm hình ảnh</div>
+                    </>
+                  )}
                 </div>
               </div>
-              <button type="submit" className={cx("btn-change")}>
+              <button
+                type="submit"
+                className={cx("btn-change")}
+                onClick={handleClickChangeImage}
+              >
                 Thay đổi ảnh
               </button>
             </div>
             <div className={cx("info")}>
               <div className={cx("formGroup")}>
                 <div className={cx("label")}>Tên</div>
-                <input type="text" className={cx("input")} />
+                <input
+                  type="text"
+                  name="fullName"
+                  className={cx("input")}
+                  onChange={handleChangeAccount}
+                />
               </div>
               <div className={cx("formGroup")}>
                 <div className={cx("label")}>SĐT</div>
-                <input type="text" className={cx("input")} />
+                <input
+                  type="text"
+                  name="phone"
+                  className={cx("input")}
+                  onChange={handleChangeAccount}
+                />
               </div>
             </div>
             <div className={cx("info")}>
               <div className={cx("formGroup")}>
                 <div className={cx("label")}>Email</div>
-                <input type="text" className={cx("input")} />
+                <input
+                  type="text"
+                  name="email"
+                  className={cx("input")}
+                  onChange={handleChangeAccount}
+                />
               </div>
               <div className={cx("formGroup")}>
                 <div className={cx("label")}>Vai trò</div>
-                <select className={cx("select-role")}>
+                <select
+                  name="role_id"
+                  className={cx("select-role")}
+                  onChange={handleChangeAccount}
+                >
                   <option value="">Chọn vai trò</option>
-                  <option value="">Admin</option>
-                  <option value="">Quản lý nội dung</option>
+                  {getAllRole.map((role) => (
+                    <option key={role._id} value={role._id}>
+                      {role.title}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
             <div className={cx("info")}>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>Mật khẩu</div>
-                <input type="text" className={cx("input")} />
+                <div className={cx("label")}>Mật khẩu </div>
+                <input
+                  type="text"
+                  name="password"
+                  className={cx("input")}
+                  onChange={handleChangeAccount}
+                />
               </div>
               <div className={cx("formGroup")}>
                 <div className={cx("label")}>Xác nhận lại mật khẩu</div>
-                <input type="text" className={cx("input")} />
+                <input
+                  name="confirmPassword"
+                  type="text"
+                  className={cx("input")}
+                  onChange={handleChangeAccount}
+                />
+              </div>
+            </div>
+            <div className={cx("info")} style={{ marginBottom: "10px" }}>
+              <div className={cx("label")}>Trạng thái</div>
+              <div className={cx("switch")}>
+                <Switch
+                  name="status"
+                  color="warning"
+                  checked={account.status ?? false} // Đảm bảo giá trị không bị undefined
+                  onChange={(event, checked) => {
+                    setAccount((prev) => ({ ...prev, status: checked }));
+                  }}
+                />
               </div>
             </div>
 
-            <div className={cx("buttons")} style={{ marginRight: "12px" }}>
+            <div className={cx("buttons")} style={{ marginRight: "20px" }}>
               <button
                 type="button"
                 className={cx("btn-cancel")}
@@ -573,7 +727,11 @@ const Header = ({ title, fetchCategorys, fetchBrands, fetchRoles }) => {
               >
                 Hủy
               </button>
-              <button type="submit" className={cx("btn-submit")}>
+              <button
+                type="submit"
+                className={cx("btn-submit")}
+                onClick={handleAddAccount}
+              >
                 Tạo mới
               </button>
             </div>

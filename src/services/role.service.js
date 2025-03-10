@@ -20,6 +20,16 @@ export async function getRole(id) {
   }
 }
 
+export async function getNameRole(id) {
+  try {
+    const response = await AxiosInstance.get(`/role/${id}`);
+    return response.title;
+  } catch (error) {
+    console.error("Error fetching roles:", error);
+    return null;
+  }
+}
+
 export async function addRole(data) {
   try {
     const response = await AxiosInstance.post("/role/create", data);

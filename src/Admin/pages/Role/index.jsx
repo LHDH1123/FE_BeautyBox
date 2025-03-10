@@ -118,9 +118,9 @@ const Role = () => {
           <table className={cx("table", "datanew")}>
             <thead>
               <tr>
-                <th className={cx("no-sort")}>
+                {/* <th className={cx("no-sort")}>
                   <input type="checkbox" name="" id="" />
-                </th>
+                </th> */}
                 <th>Vai trò</th>
                 <th>Ngày tạo</th>
                 <th>Trạng thái</th>
@@ -130,12 +130,12 @@ const Role = () => {
             <tbody>
               {listRoles.map((role) => (
                 <tr key={role._id}>
-                  <td>
+                  {/* <td>
                     <label className={cx("checkboxs")}>
                       <input type="checkbox" />
                       <span className={cx("checkmarks")}></span>
                     </label>
-                  </td>
+                  </td> */}
                   <td>{role.title}</td>
                   <td>
                     {new Date(role.createdAt).toLocaleDateString("vi-VN")}
