@@ -10,6 +10,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { getAllProducts } from "../../../services/product.service";
 import { getNameBrand } from "../../../services/brand.service";
 import { getNameCategory } from "../../../services/category.service";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
@@ -27,6 +28,7 @@ function ListProduct({ title }) {
   const [isRightVisible, setIsRightVisible] = useState(false);
   const [favoritedItems, setFavoritedItems] = useState([]);
   const [listProducts, setListProducts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -100,6 +102,11 @@ function ListProduct({ title }) {
     );
   };
 
+  const handleDetail = (slug, id) => {
+    navigate(`/detailProduct/${slug}`, { state: { id } });
+    // console.log(id, slug);
+  };
+
   return (
     <div className={cx("list")}>
       <h2>{title}</h2>
@@ -111,7 +118,11 @@ function ListProduct({ title }) {
         )}
         <div className={cx("list_product")} ref={scrollableRef}>
           {listProducts.map((product, index) => (
-            <div key={product._id} className={cx("product")}>
+            <div
+              key={product._id}
+              className={cx("product")}
+              onClick={() => handleDetail(product.slug, product._id)}
+            >
               <div className={cx("tym")} onClick={() => handleClickTym(index)}>
                 {favoritedItems[index] ? (
                   <FavoriteIcon style={{ color: "red" }} />

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Dashboard.module.scss";
 import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
@@ -7,7 +7,6 @@ import iconOder from "../../../assets/images/file-text-icon-01.svg";
 import iconSale from "../../../assets/images/weekly-earning.svg";
 import iconUser from "../../../assets/images/user-svgrepo-com.svg";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import imgProduct from "../../../assets/images/product.webp";
 import { Box, Typography } from "@mui/material";
 import {
   BarChart,
@@ -18,6 +17,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { getAllProducts } from "../../../services/product.service";
 const data = [
   { name: "Jan", Sales: 300 },
   { name: "Feb", Sales: 200 },
@@ -35,6 +35,18 @@ const data = [
 const cx = classNames.bind(styles);
 
 const Dashboard = () => {
+  const [listProduct, setListProduct] = useState([]);
+
+  const fetchProduct = async () => {
+    const response = await getAllProducts();
+    if (response) {
+      setListProduct(response);
+    }
+  };
+  useEffect(() => {
+    fetchProduct();
+  }, []);
+
   return (
     <div className={cx("dashboard")}>
       <div className={cx("welcome")}>
@@ -147,7 +159,7 @@ const Dashboard = () => {
           <div className={cx("card-header")}>
             <div className={cx("card-title")}>Sản phẩm gần đây</div>
             <div className={cx("view-all-link")}>
-              <a href="/" className={cx("view-all")}>
+              <a href="/adminbb/product-list" className={cx("view-all")}>
                 View All
               </a>
               <ArrowForwardIcon className={cx("icon")} fontSize="inherit" />
@@ -164,56 +176,31 @@ const Dashboard = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td className={cx("productimgname")}>
-                      <a href="product-list.html" className={cx("product-img")}>
-                        <img src={imgProduct} alt="product" />
-                      </a>
-                      <a href="product-list.html">Lenevo 3rd Generation</a>
-                    </td>
-                    <td>12500VNĐ</td>
-                  </tr>
-                  <tr>
-                    <td>2</td>
-                    <td className={cx("productimgname")}>
-                      <a href="product-list.html" className={cx("product-img")}>
-                        <img src={imgProduct} alt="product" />
-                      </a>
-                      <a href="product-list.html">Bold V3.2</a>
-                    </td>
-                    <td>1600VNĐ</td>
-                  </tr>
-                  <tr>
-                    <td>3</td>
-                    <td className={cx("productimgname")}>
-                      <a href="product-list.html" className={cx("product-img")}>
-                        <img src={imgProduct} alt="product" />
-                      </a>
-                      <a href="product-list.html">Nike Jordan</a>
-                    </td>
-                    <td>2000VNĐ</td>
-                  </tr>
-                  <tr>
-                    <td>4</td>
-                    <td className={cx("productimgname")}>
-                      <a href="product-list.html" className={cx("product-img")}>
-                        <img src={imgProduct} alt="product" />
-                      </a>
-                      <a href="product-list.html">Apple Series 5 Watch</a>
-                    </td>
-                    <td>800VNĐ</td>
-                  </tr>
-                  <tr>
-                    <td>5</td>
-                    <td className={cx("productimgname")}>
-                      <a href="product-list.html" className={cx("product-img")}>
-                        <img src={imgProduct} alt="product" />
-                      </a>
-                      <a href="product-list.html">Apple Series 5 Watch</a>
-                    </td>
-                    <td>800VNĐ</td>
-                  </tr>
+                  {listProduct.map((product, index) => (
+                    <tr key={product._id}>
+                      <td>{index + 1}</td>
+                      <td className={cx("productimgname")}>
+                        <a
+                          href="/adminbb/product-list"
+                          className={cx("product-img")}
+                        >
+                          <img src={product.thumbnail} alt="product" />
+                        </a>
+                        <a
+                          href="/adminbb/product-list"
+                          className={cx("product-title")}
+                        >
+                          {product.title}
+                        </a>
+                      </td>
+                      <td>
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(product.price)}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>

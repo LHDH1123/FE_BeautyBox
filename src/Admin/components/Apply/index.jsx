@@ -5,6 +5,7 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { changeMulti } from "../../../services/brand.service";
 import { changeMultiCategory } from "../../../services/category.service";
 import { changeMultiProduct } from "../../../services/product.service";
+import { changeMultiAccount } from "../../../services/account.service";
 
 const cx = classNames.bind(styles);
 
@@ -15,6 +16,8 @@ const Apply = ({
   selectedCategorys,
   selectedProducts,
   fetchProducts,
+  selectedAccounts,
+  fetchAccount,
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState("Tất cả");
@@ -52,22 +55,26 @@ const Apply = ({
     let data = {};
     let dataCategory = {};
     let dataProduct = {};
+    let dataAccount = {};
 
     switch (selectedTag) {
       case "Xóa tất cả":
         data = { ids: selectedBrands, key: "deleted", value: true };
         dataCategory = { ids: selectedCategorys, key: "delete", value: true };
         dataProduct = { ids: selectedProducts, key: "delete", value: true };
+        dataAccount = { ids: selectedAccounts, key: "delete", value: true };
         break;
       case "Hoạt động":
         data = { ids: selectedBrands, key: "status", value: true };
         dataCategory = { ids: selectedCategorys, key: "status", value: true };
         dataProduct = { ids: selectedProducts, key: "status", value: true };
+        dataAccount = { ids: selectedAccounts, key: "status", value: true };
         break;
       case "Không hoạt động":
         data = { ids: selectedBrands, key: "status", value: false };
         dataCategory = { ids: selectedCategorys, key: "status", value: false };
         dataProduct = { ids: selectedProducts, key: "status", value: false };
+        dataAccount = { ids: selectedAccounts, key: "status", value: false };
         break;
       default:
         return;
@@ -99,6 +106,16 @@ const Apply = ({
         }
         await changeMultiProduct(dataProduct);
         await fetchProducts();
+      }
+
+      if (selectedAccounts !== undefined) {
+        if (selectedTag === "Xóa tất cả") {
+          if (!window.confirm("Bạn có chắc muốn xóa thương hiệu này không?"))
+            return;
+        }
+        console.log(dataAccount);
+        await changeMultiAccount(dataAccount);
+        await fetchAccount();
       }
     } catch (error) {
       console.error("Lỗi khi cập nhật:", error);

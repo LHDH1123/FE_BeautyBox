@@ -262,7 +262,7 @@ const Header = ({
     if (!account.role_id) {
       alert("Vui lòng chọn vai trò!");
     }
-    
+
     try {
       const formData = new FormData();
       formData.append("fullName", account.fullName);
@@ -379,7 +379,7 @@ const Header = ({
                   name="status"
                   color="warning"
                   checked={category.status}
-                  onChange={(e) =>
+                  onClick={(e) =>
                     setCategory((prev) => ({
                       ...prev,
                       status: e.target.checked, // Switch luôn gửi boolean
@@ -489,7 +489,7 @@ const Header = ({
                   name="status"
                   color="warning"
                   checked={brand.status}
-                  onChange={handleChange}
+                  onClick={handleChange}
                 />
               </div>
             </div>
@@ -553,7 +553,7 @@ const Header = ({
                     name="status"
                     color="warning"
                     checked={role.status}
-                    onChange={handleChangeRole}
+                    onClick={handleChangeRole}
                   />
                 </div>
               </div>
@@ -712,7 +712,7 @@ const Header = ({
                   name="status"
                   color="warning"
                   checked={account.status ?? false} // Đảm bảo giá trị không bị undefined
-                  onChange={(event, checked) => {
+                  onClick={(event, checked) => {
                     setAccount((prev) => ({ ...prev, status: checked }));
                   }}
                 />

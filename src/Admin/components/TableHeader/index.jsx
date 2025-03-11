@@ -18,11 +18,15 @@ const TableHeader = ({
   fetchProducts,
   handleSearchChangeProduct,
   title,
+  selectedAccounts,
+  fetchAccount,
+  handleSearchAccount,
 }) => {
   const handleSearch = (event) => {
     if (handleSearchChange) handleSearchChange(event);
     if (handleSearchCategory) handleSearchCategory(event);
     if (handleSearchChangeProduct) handleSearchChangeProduct(event);
+    if (handleSearchAccount) handleSearchAccount(event);
   };
   return (
     <div className={cx("tableHeader")}>
@@ -42,6 +46,8 @@ const TableHeader = ({
             fetchCategorys={fetchCategorys}
             selectedProducts={selectedProducts}
             fetchProducts={fetchProducts}
+            selectedAccounts={selectedAccounts}
+            fetchAccount={fetchAccount}
           />
         )}
         {title !== "Vai Trò & Quyền" && (

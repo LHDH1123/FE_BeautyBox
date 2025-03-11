@@ -329,7 +329,7 @@ const Category = () => {
                   name="status"
                   color="warning"
                   checked={editCategory.status}
-                  onChange={handleSwitchChange}
+                  onClick={handleSwitchChange}
                 />
               </div>
             </div>

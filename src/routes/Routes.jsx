@@ -31,7 +31,7 @@ export default function Router() {
         <Route path="profile" element={<Profile />} />
         <Route path="brands" element={<Brand />} />
         <Route path="product" element={<Product />} />
-        <Route path="detail" element={<Detail />} />
+        <Route path="detailProduct/:slug" element={<Detail />} />
         <Route path="*" element={<Error404 />} />
       </Route>
 

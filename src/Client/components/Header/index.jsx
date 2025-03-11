@@ -422,7 +422,7 @@ const Header = () => {
         <div className={cx("main_header", "scrollable")} ref={scrollableRef}>
           {menuHeaders.map((menu) => (
             <div
-              key={menu.id}
+              key={menu.label}
               className={cx("menu-header")}
               onClick={() => handleNavigate(menu.label)}
               onMouseEnter={() => setHoveredMenu(menu.id)}

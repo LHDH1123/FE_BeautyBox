@@ -220,7 +220,7 @@ const Role = () => {
                     {...label}
                     name="status"
                     checked={getRole.status}
-                    onChange={handleInputChange}
+                    onClick={handleInputChange}
                   />
                 </div>
               </div>

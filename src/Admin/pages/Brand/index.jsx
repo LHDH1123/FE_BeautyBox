@@ -390,7 +390,7 @@ const Brand = () => {
                 <Switch
                   name="status"
                   checked={editBrand.status}
-                  onChange={handleInputChange}
+                  onClick={handleInputChange}
                 />
               </div>
             </div>

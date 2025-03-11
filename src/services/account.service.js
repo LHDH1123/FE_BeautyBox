@@ -62,9 +62,9 @@ export async function changeStatusAccount(id, status) {
   }
 }
 
-export async function changeMultiAccount() {
+export async function changeMultiAccount(data) {
   try {
-    const response = await AxiosInstance.patch(`/accounts/change-multi`);
+    const response = await AxiosInstance.patch(`/accounts/change-multi`, data);
     return response;
   } catch (error) {
     console.error("Error change status Account:", error);

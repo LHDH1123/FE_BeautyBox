@@ -34,6 +34,9 @@ const User = () => {
   const [isModalAddUser, setIsModalAddUser] = useState(false);
   const fileInputRef = useRef(null);
   const [getAccount, setGetAccount] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedAccounts, setSelectedAccounts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const fetchAccount = async () => {
     try {
@@ -183,19 +186,65 @@ const User = () => {
     }
   };
 
+  const handleSelectAll = () => {
+    if (selectedAccounts.length === allAccount.length) {
+      setSelectedAccounts([]);
+      setSelectAll(false);
+    } else {
+      setSelectedAccounts(allAccount.map((account) => account._id));
+      setSelectAll(true);
+    }
+  };
+
+  const handleSelectAccount = (id) => {
+    let updatedSelection;
+    if (selectedAccounts.includes(id)) {
+      updatedSelection = selectedAccounts.filter(
+        (accountId) => accountId !== id
+      );
+    } else {
+      updatedSelection = [...selectedAccounts, id];
+    }
+
+    setSelectedAccounts(updatedSelection);
+    setSelectAll(updatedSelection.length === allAccount.length);
+  };
+
+  useEffect(() => {
+    setSelectAll(
+      selectedAccounts.length === allAccount.length && allAccount.length > 0
+    );
+  }, [selectedAccounts, allAccount]);
+
+  const filteredAccounts = allAccount.filter((account) =>
+    account.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const handleSearchAccount = (event) => {
+    setSearchQuery(event.target.value);
+  };
+
   return (
     <div className={cx("table")}>
       <Header title="Người Dùng" fetchAccount={fetchAccount} />
 
       <div className={cx("table-list")}>
-        <TableHeader />
+        <TableHeader
+          selectedAccounts={selectedAccounts}
+          fetchAccount={fetchAccount}
+          handleSearchAccount={handleSearchAccount}
+        />
 
         <div className={cx("brand-list")}>
           <table className={cx("table", "datanew")}>
             <thead>
               <tr>
                 <th className={cx("no-sort")}>
-                  <input type="checkbox" name="" id="" />
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                  />
                 </th>
                 <th>Người dùng</th>
                 <th>SĐT</th>
@@ -207,11 +256,15 @@ const User = () => {
               </tr>
             </thead>
             <tbody>
-              {allAccount.map((account) => (
+              {filteredAccounts.map((account) => (
                 <tr key={account._id}>
                   <td>
                     <label className={cx("checkboxs")}>
-                      <input type="checkbox" />
+                      <input
+                        type="checkbox"
+                        checked={selectedAccounts.includes(account._id)}
+                        onChange={() => handleSelectAccount(account._id)}
+                      />
                       <span className={cx("checkmarks")}></span>
                     </label>
                   </td>
@@ -394,7 +447,6 @@ const User = () => {
                       ...prev,
                       status: !prev.status, // Đảo trạng thái
                     }));
-                    console.log(editAccount);
                   }}
                 />
               </div>

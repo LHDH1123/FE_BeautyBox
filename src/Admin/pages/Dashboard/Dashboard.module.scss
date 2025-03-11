@@ -233,11 +233,19 @@
   width: 500px;
 }
 
-  // .select-cal {
-  //   position: fixed;
-  //   border: solid 1px #ddd;
-  //   top: 0;
-  //   right: 0;
-  //   z-index: 10;
-  // }
+// .select-cal {
+//   position: fixed;
+//   border: solid 1px #ddd;
+//   top: 0;
+//   right: 0;
+//   z-index: 10;
+// }
 
+.product-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2; /* Giới hạn tối đa 2 dòng */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px; /* Điều chỉnh độ rộng tối đa nếu cần */
+}
