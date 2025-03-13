@@ -184,7 +184,14 @@ const Dashboard = () => {
                           href="/adminbb/product-list"
                           className={cx("product-img")}
                         >
-                          <img src={product.thumbnail} alt="product" />
+                          <img
+                            src={
+                              Array.isArray(product.thumbnail)
+                                ? product.thumbnail[0]
+                                : product.thumbnail
+                            }
+                            alt="product"
+                          />
                         </a>
                         <a
                           href="/adminbb/product-list"

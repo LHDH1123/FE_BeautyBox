@@ -32,6 +32,10 @@ function Collection({ props }) {
     fetchBrand();
   }, []);
 
+  const handleListProduct = (name, brandId) => {
+    navigate(`/products/${name}`, { state: { brandId } });
+  };
+
   return (
     <div className={cx("collection")}>
       <div className={cx("collection-info")}>
@@ -50,7 +54,13 @@ function Collection({ props }) {
         </div>
         <div className={cx("infos")}>
           {listBrand.slice(0, 10).map((brand) => (
-            <div key={brand._id} className={cx("title-info")}>
+            <div
+              key={brand._id}
+              className={cx("title-info")}
+              onClick={() => {
+                handleListProduct(brand.name, brand._id);
+              }}
+            >
               {brand.name}
             </div>
           ))}

@@ -178,6 +178,11 @@ const Header = () => {
     setSelectedCart(buttonId);
   };
 
+  const handleListProduct = (slug, id, title) => {
+    navigate(`/products/${slug}`, { state: { id, title } });
+    // console.log(id, slug);
+  };
+
   return (
     <header className={cx("header")}>
       <div className={cx("header_container")}>
@@ -438,27 +443,23 @@ const Header = () => {
                     event.stopPropagation(); // Ngăn sự kiện click truyền lên menu-header
                   }}
                 >
-                  {menu.title === "collection" ? (
-                    <Collection props={menu.label} />
-                  ) : (
-                    <CategoryHeader props={menu.label} />
-                  )}
+                  <Collection props={menu.label} />
                 </div>
               )}
             </div>
           ))}
           {listCategorys.map((menu) => (
             <div
-              key={menu.id}
+              key={menu._id}
               className={cx("menu-header")}
-              onClick={() => handleNavigate("category")}
-              onMouseEnter={() => setHoveredMenu(menu.id)}
+              onClick={() => handleListProduct(menu.slug, menu._id, menu.title)}
+              onMouseEnter={() => setHoveredMenu(menu._id)}
               onMouseLeave={() => {
                 setHoveredMenu(null);
               }}
             >
               {menu.title}
-              {hoveredMenu === menu.id && (
+              {hoveredMenu === menu._id && (
                 <div
                   className={cx("menu-dropdown")}
                   onClick={(event) => {
@@ -468,7 +469,9 @@ const Header = () => {
                   {menu.title === "collection" ? (
                     <Collection props="collection" />
                   ) : (
-                    <CategoryHeader props="category" />
+                    <CategoryHeader
+                      props={hoveredMenu === menu._id ? menu._id : ""}
+                    />
                   )}
                 </div>
               )}
