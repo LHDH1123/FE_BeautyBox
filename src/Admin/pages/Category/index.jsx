@@ -42,6 +42,7 @@ const Category = () => {
 
   useEffect(() => {
     fetchCategorys();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateCategoryStatus = (categories, id, newStatus) => {

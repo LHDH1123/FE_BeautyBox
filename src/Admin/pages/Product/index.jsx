@@ -191,9 +191,6 @@ const Product = () => {
   };
 
   const handleSearchFilter = () => {
-    console.log(selectBrand);
-    console.log(selectCategory);
-
     // Nếu chọn tất cả cả hai, lấy lại danh sách sản phẩm gốc
     if (
       (selectBrand === "Tất cả" && selectCategory === "Tất cả") ||
@@ -330,7 +327,6 @@ const Product = () => {
                 <th>Danh mục</th>
                 <th>Giá</th>
                 <th>Số lượng</th>
-                <th>Người tạo</th>
                 <th>Trạng thái</th>
                 <th className={cx("no-sort")}>Hành động</th>
               </tr>
@@ -370,7 +366,6 @@ const Product = () => {
                     }).format(product.price)}
                   </td>
                   <td>{product.stock}</td>
-                  <td>Đức Huy</td>
                   <td>
                     <span
                       className={cx(

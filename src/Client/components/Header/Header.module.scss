@@ -311,9 +311,26 @@
   font-weight: bold;
   color: #fff; /* Màu chữ */
   cursor: pointer;
-  margin-bottom: 35px;
+  margin-top: 20px;
+  margin-bottom: 15px;
   font-family: system-ui;
   text-transform: uppercase;
+}
+
+.text-register {
+  text-align: center;
+  font-size: 13px;
+  font-family: "SVNMont", sans-serif;
+  margin-bottom: 20px;
+}
+
+.text-register span {
+  font-weight: 600;
+}
+
+.text-register span:hover {
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .text-login {
@@ -343,9 +360,19 @@
 }
 
 .input-login {
-  margin-top: 10px;
-  margin-bottom: 20px;
+  // display: flex;
+  // margin-top: 10px;
+  margin-bottom: 5px;
   border-radius: 5px;
+}
+
+.label-login {
+  display: flex;
+  align-items: left;
+  margin: 0px 95px;
+  margin-bottom: 5px;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .input-login input {

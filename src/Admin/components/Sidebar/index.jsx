@@ -11,6 +11,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import ShieldIcon from "@mui/icons-material/Shield";
 import FlashOnIcon from "@mui/icons-material/FlashOn";
 import LogoutIcon from "@mui/icons-material/Logout";
+import { logout } from "../../../services/auth.service";
 
 const cx = classNames.bind(styles);
 
@@ -21,6 +22,11 @@ const Sidebar = () => {
   // Hàm để thay đổi trạng thái active
   const handleActive = (path) => {
     setActivePath(path);
+  };
+
+  const logOut = async () => {
+    await logout();
+    handleActive("adminbb/login");
   };
 
   return (
@@ -148,13 +154,10 @@ const Sidebar = () => {
           <ul>
             <li
               className={cx("submenu", {
-                active: activePath === "/adminbb/logout",
+                active: activePath === "/adminbb/login",
               })}
             >
-              <Link
-                to="/adminbb/logout"
-                onClick={() => handleActive("/adminbb/logout")}
-              >
+              <Link to="/adminbb/login" onClick={() => logOut()}>
                 <LogoutIcon fontSize="small" />
                 <span>Đăng xuất</span>
               </Link>

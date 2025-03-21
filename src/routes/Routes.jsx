@@ -1,4 +1,5 @@
 import { Route, Routes } from "react-router-dom";
+import PrivateRoute from "./privateRoute"; // Import PrivateRoute
 import Home from "../Client/pages/Home";
 import LayoutDefault from "../Client/Layouts/LayoutDefault";
 import LayoutDefaultAdmin from "../Admin/layouts/LayoutDefault";
@@ -13,6 +14,7 @@ import ProductAdmin from "../Admin/pages/Product";
 import BrandAdmin from "../Admin/pages/Brand";
 import CategoryAdmin from "../Admin/pages/Category";
 import AccountAdmin from "../Admin/pages/Account";
+import LoginAdmin from "../Admin/pages/Login";
 import RoleAdmin from "../Admin/pages/Role";
 import Dashboard from "../Admin/pages/Dashboard";
 import FlashSale from "../Admin/pages/FlashSale";
@@ -24,6 +26,7 @@ import PermissionRole from "../Admin/pages/Role/Permissions";
 export default function Router() {
   return (
     <Routes>
+      {/* Client Routes */}
       <Route path="/" element={<LayoutDefault />}>
         <Route index element={<Home />} />
         <Route path="stores" element={<Store />} />
@@ -35,7 +38,18 @@ export default function Router() {
         <Route path="*" element={<Error404 />} />
       </Route>
 
-      <Route path="/adminbb" element={<LayoutDefaultAdmin />}>
+      {/* Admin Login */}
+      <Route path="/adminbb/login" element={<LoginAdmin />} />
+
+      {/* Admin Routes (Protected by PrivateRoute) */}
+      <Route
+        path="/adminbb"
+        element={
+          <PrivateRoute>
+            <LayoutDefaultAdmin />
+          </PrivateRoute>
+        }
+      >
         <Route index element={<Dashboard />} />
         <Route path="product-list" element={<ProductAdmin />} />
         <Route path="brand-list" element={<BrandAdmin />} />

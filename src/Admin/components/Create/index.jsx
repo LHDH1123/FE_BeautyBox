@@ -119,6 +119,7 @@ const Create = ({ title, productId }) => {
     if (title === "Chỉnh sửa sản phẩm") {
       fetchProducts();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e) => {

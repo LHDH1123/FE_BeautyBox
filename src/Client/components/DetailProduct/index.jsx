@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import classNames from "classnames/bind";
 import styles from "./DetailProduct.module.scss";
-import detail1 from "../../../assets/images/detail1.webp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import RemoveIcon from "@mui/icons-material/Remove";

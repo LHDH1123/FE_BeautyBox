@@ -37,6 +37,7 @@ const Header = () => {
   const [selectedCart, setSelectedCart] = useState("delivery");
   const navigate = useNavigate();
   const [hoveredMenu, setHoveredMenu] = useState(null);
+  const [isRegister, setIsRegister] = useState(false);
 
   const menuHeaders = [
     { id: 1, label: "Thương hiệu", title: "collection" },
@@ -610,12 +611,13 @@ const Header = () => {
         onClose={handleCloseModalLogin}
         PaperProps={{
           style: {
-            marginTop: "-30px", // Dịch lên trên 40px
+            marginTop: "-30px", // Dịch lên trên 30px
             borderRadius: "16px", // Bo góc 16px
           },
         }}
       >
         <Box>
+          {/* Close Button */}
           <DialogActions>
             <div className={cx("btn_exit")}>
               <button onClick={handleCloseModalLogin}>
@@ -623,32 +625,103 @@ const Header = () => {
               </button>
             </div>
           </DialogActions>
+
+          {/* Content */}
           <div className={cx("content-login")}>
+            {/* Header */}
             <div className={cx("search-image")}>
-              <div className={cx("title")}>Đăng nhập</div>
-              <div
-                className={cx("title-description")}
-                style={{ padding: "0px 62px" }}
-              >
-                Bạn chưa có tài khoản? Không cần đăng ký. Đăng nhập nhanh với
-                Beauty Box bằng số điện thoại.
+              <div className={cx("title")}>
+                {isRegister ? "Đăng ký" : "Đăng nhập"}
               </div>
             </div>
 
+            {/* Authentication Form */}
             <div className={cx("auth")}>
-              <div className={cx("input-login")}>
-                <input type="text" name="" id="" />
+              {/* Đăng ký: Họ và Tên */}
+              {isRegister && (
+                <div className={cx("input-login")}>
+                  <div className={cx("fullName")}>
+                    <div className={cx("label-login")}>Họ</div>
+                    <input type="text" />
+                  </div>
+                  <div className={cx("fullName")}>
+                    <div className={cx("label-login")}>Tên</div>
+                    <input type="text" />
+                  </div>
+                </div>
+              )}
+
+              {!isRegister && (
+                <div className={cx("input-login")}>
+                  <div className={cx("label-login")}>Tên đăng nhập</div>
+                  <input type="text" />
+                </div>
+              )}
+
+              {!isRegister && (
+                <div className={cx("input-login")}>
+                  <div className={cx("label-login")}>Mật khẩu</div>
+                  <input type="password" />
+                </div>
+              )}
+              {/* Đăng kí */}
+              {isRegister && (
+                <div className={cx("input-login")}>
+                  <div className={cx("label-login")}>Tên đăng nhập</div>
+                  <input type="text" />
+                </div>
+              )}
+              {/* Đăng kí */}
+              {isRegister && (
+                <div className={cx("input-login")}>
+                  <div className={cx("label-login")}>Mật khẩu</div>
+                  <input type="password" />
+                </div>
+              )}
+
+              {/* Xác nhận mật khẩu (chỉ khi đăng ký) */}
+              {isRegister && (
+                <div className={cx("input-login")}>
+                  <div className={cx("label-login")}>Xác nhận lại mật khẩu</div>
+                  <input type="password" />
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <button type="submit">
+                {isRegister ? "Đăng ký" : "Đăng nhập"}
+              </button>
+            </div>
+
+            {/* Chuyển đổi giữa Đăng nhập & Đăng ký */}
+            <div className={cx("text-register")}>
+              {isRegister ? (
+                <>
+                  Bạn đã có tài khoản?{" "}
+                  <span onClick={() => setIsRegister(false)}>Đăng nhập</span>
+                </>
+              ) : (
+                <>
+                  Bạn chưa có tài khoản?{" "}
+                  <span onClick={() => setIsRegister(true)}>Đăng ký</span>{" "}
+                  <span>Quên mật khẩu</span>
+                </>
+              )}
+            </div>
+
+            {/* Ghi chú khi đăng nhập */}
+            {!isRegister && (
+              <div>
+                <div className={cx("text-login")}>
+                  *Vui lòng không hủy đơn hàng khi đã thanh toán*
+                </div>
+                <div className={cx("note-login")}>
+                  Đăng nhập ngay để mua sắm dễ dàng hơn, sử dụng những tiện ích
+                  mới nhất và tận hưởng thêm nhiều ưu đãi độc quyền dành riêng
+                  cho thành viên Beauty Box.
+                </div>
               </div>
-              <button type="submit">Đăng nhập</button>
-            </div>
-            <div className={cx("text-login")}>
-              *Vui lòng không hủy đơn hàng khi đã thanh toán*
-            </div>
-            <div className={cx("note-login")}>
-              Đăng nhập ngay để mua sắm dễ dàng hơn, sử dụng những tiện ích mới
-              nhất và tận hưởng thêm nhiều ưu đãi độc quyền dành riêng cho thành
-              viên Beauty Box.
-            </div>
+            )}
           </div>
         </Box>
       </Dialog>
