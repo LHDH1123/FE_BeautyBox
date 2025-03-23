@@ -20,6 +20,14 @@ import { useNavigate } from "react-router-dom";
 import Collection from "../Collection";
 import CategoryHeader from "../CategoryHeader";
 import { getCategorys } from "../../../services/category.service";
+import {
+  getUser,
+  loginPost,
+  refreshTokenUser,
+  registerPost,
+} from "../../../services/user.service";
+import { jwtDecode } from "jwt-decode";
+import { AxiosInstance } from "../../../configs/axios";
 
 const cx = classNames.bind(styles);
 
@@ -38,6 +46,19 @@ const Header = () => {
   const navigate = useNavigate();
   const [hoveredMenu, setHoveredMenu] = useState(null);
   const [isRegister, setIsRegister] = useState(false);
+  const [login, setLogin] = useState({
+    email: "",
+    password: "",
+  });
+
+  const [register, setRegister] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    phone: "",
+    confirmPass: "",
+  });
+  const [user, setUser] = useState(null);
 
   const menuHeaders = [
     { id: 1, label: "Thương hiệu", title: "collection" },
@@ -184,6 +205,77 @@ const Header = () => {
     // console.log(id, slug);
   };
 
+  const handleChange = (e) => {
+    setLogin({ ...login, [e.target.name]: e.target.value });
+    setRegister({ ...register, [e.target.name]: e.target.value });
+  };
+
+  const handleLogin = async (isRegister) => {
+    try {
+      if (!isRegister) {
+        const response = await loginPost(login);
+        if (response?.accessToken) {
+          const decodedUser = jwtDecode(response.accessToken);
+          setUser(decodedUser);
+          setIsModalLogin(false);
+        }
+      } else {
+        if (register.password !== register.confirmPass) {
+          alert("Password and Confirm Password must be the same");
+          return;
+        }
+
+        const response = await registerPost({
+          fullName: register.fullName,
+          email: register.email,
+          password: register.password,
+          phone: register.phone,
+        });
+
+        if (response) {
+          console.log("🎉 Đăng ký thành công:", response);
+          setRegister({
+            fullName: "",
+            email: "",
+            password: "",
+            phone: "",
+            confirmPass: "",
+          });
+          setIsRegister(false);
+        }
+      }
+    } catch (error) {
+      console.error("❌ Lỗi đăng nhập / đăng ký:", error);
+    }
+  };
+
+  useEffect(() => {
+
+
+    const fetchUser = async () => {
+      const token = await refreshTokenUser(); // Thử lấy access token mới
+
+      if (token) {
+        try {
+          const decodedUser = jwtDecode(token);
+          const user = await getUser(decodedUser.userId);
+          setUser(user.user);
+          AxiosInstance.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${token}`;
+        } catch (error) {
+          console.error("❌ Lỗi giải mã token:", error);
+          setUser(null);
+        }
+      } else {
+        console.warn("🚪 Người dùng chưa đăng nhập hoặc token hết hạn");
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   return (
     <header className={cx("header")}>
       <div className={cx("header_container")}>
@@ -309,7 +401,8 @@ const Header = () => {
                 fontSize="medium"
                 style={{ color: "#4b4b4b", marginLeft: "16px" }}
               />
-              <p>Đăng nhập</p>
+              {user ? <p>{user.fullName}</p> : <p>Đăng nhập</p>}
+
               {/* {isLogin && (
                 <div className={cx("more")} style={{ right: "24px" }}>
                   <ul className={cx("list-more")}>
@@ -640,42 +733,50 @@ const Header = () => {
               {/* Đăng ký: Họ và Tên */}
               {isRegister && (
                 <div className={cx("input-login")}>
-                  <div className={cx("fullName")}>
-                    <div className={cx("label-login")}>Họ</div>
-                    <input type="text" />
-                  </div>
-                  <div className={cx("fullName")}>
-                    <div className={cx("label-login")}>Tên</div>
-                    <input type="text" />
-                  </div>
+                  <div className={cx("label-login")}>Họ Tên</div>
+                  <input type="text" name="fullName" onChange={handleChange} />
                 </div>
               )}
 
               {!isRegister && (
                 <div className={cx("input-login")}>
-                  <div className={cx("label-login")}>Tên đăng nhập</div>
-                  <input type="text" />
+                  <div className={cx("label-login")}>Email</div>
+                  <input type="text" name="email" onChange={handleChange} />
                 </div>
               )}
 
               {!isRegister && (
                 <div className={cx("input-login")}>
                   <div className={cx("label-login")}>Mật khẩu</div>
-                  <input type="password" />
+                  <input
+                    type="password"
+                    name="password"
+                    onChange={handleChange}
+                  />
                 </div>
               )}
               {/* Đăng kí */}
               {isRegister && (
                 <div className={cx("input-login")}>
-                  <div className={cx("label-login")}>Tên đăng nhập</div>
-                  <input type="text" />
+                  <div className={cx("label-login")}>SĐT</div>
+                  <input type="text" name="phone" onChange={handleChange} />
+                </div>
+              )}
+              {isRegister && (
+                <div className={cx("input-login")}>
+                  <div className={cx("label-login")}>Email</div>
+                  <input type="text" name="email" onChange={handleChange} />
                 </div>
               )}
               {/* Đăng kí */}
               {isRegister && (
                 <div className={cx("input-login")}>
                   <div className={cx("label-login")}>Mật khẩu</div>
-                  <input type="password" />
+                  <input
+                    type="password"
+                    name="password"
+                    onChange={handleChange}
+                  />
                 </div>
               )}
 
@@ -683,14 +784,24 @@ const Header = () => {
               {isRegister && (
                 <div className={cx("input-login")}>
                   <div className={cx("label-login")}>Xác nhận lại mật khẩu</div>
-                  <input type="password" />
+                  <input
+                    type="password"
+                    name="confirmPass"
+                    onChange={handleChange}
+                  />
                 </div>
               )}
 
               {/* Submit Button */}
-              <button type="submit">
-                {isRegister ? "Đăng ký" : "Đăng nhập"}
-              </button>
+              {isRegister ? (
+                <button type="submit" onClick={() => handleLogin(isRegister)}>
+                  Đăng ký
+                </button>
+              ) : (
+                <button type="submit" onClick={() => handleLogin(isRegister)}>
+                  Đăng nhập
+                </button>
+              )}
             </div>
 
             {/* Chuyển đổi giữa Đăng nhập & Đăng ký */}

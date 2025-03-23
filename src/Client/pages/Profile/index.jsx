@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Profile.module.scss";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -7,6 +7,13 @@ import SearchIcon from "@mui/icons-material/Search";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { Box, Dialog, DialogActions } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import {
+  editUser,
+  getUser,
+  refreshTokenUser,
+} from "../../../services/user.service";
+import { jwtDecode } from "jwt-decode";
+import { AxiosInstance } from "../../../configs/axios";
 
 const cx = classNames.bind(styles);
 
@@ -14,6 +21,13 @@ const Profile = () => {
   const [activeTab, setActiveTab] = useState("Tài khoản");
   const listTab = ["Tài khoản", "Đơn hàng", "Địa chỉ giao nhận"];
   const [isModalAddress, setIsModalAddress] = useState(false);
+  const [user, setUser] = useState({
+    id: "",
+    fullName: "",
+    email: "",
+    phone: "",
+  });
+  const [nameUser, setNameUser] = useState("");
 
   const handleFoward = (tab) => {
     setActiveTab(tab);
@@ -21,6 +35,68 @@ const Profile = () => {
 
   const handleModal = () => {
     setIsModalAddress((prev) => !prev);
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = await refreshTokenUser(); // Thử lấy access token mới
+
+      if (token) {
+        try {
+          const decodedUser = jwtDecode(token);
+
+          const user = await getUser(decodedUser.userId);
+          console.log(user);
+          setUser({
+            id: user.user._id || "",
+            fullName: user.user.fullName || "",
+            email: user.user.email || "",
+            phone: user.user.phone || "",
+          });
+          setNameUser(user.user.fullName);
+          AxiosInstance.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${token}`;
+        } catch (error) {
+          console.error("❌ Lỗi giải mã token:", error);
+          setUser(null);
+        }
+      } else {
+        console.warn("🚪 Người dùng chưa đăng nhập hoặc token hết hạn");
+        setUser(null);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+  };
+
+  const handleSave = async () => {
+    console.log("Thông tin đã lưu:", user);
+    try {
+      const response = await editUser(user.id, {
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+      });
+
+      if (response) {
+        console.log("Lưu thông tin thành công", response);
+        setUser((prevUser) => ({
+          ...prevUser,
+          fullName: response.fullName,
+          email: response.email,
+          phone: response.phone,
+        }));
+
+        setNameUser(response.user.fullName);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
@@ -41,7 +117,7 @@ const Profile = () => {
               ></path>
             </svg>
           </div>
-          <div className={cx("name")}>Huy Lê</div>
+          <div className={cx("name")}>{nameUser}</div>
 
           {/* <div className={cx("points-section")}>
             <div className={cx("tier")}>BRONZE | 0 HSVPoint</div>
@@ -85,23 +161,40 @@ const Profile = () => {
         {activeTab === "Tài khoản" && (
           <div className={cx("form-account")}>
             <div className={cx("form-group")}>
-              <label>Tên *</label>
-              <input type="text" value="Huy" />
+              <label>Họ Tên *</label>
+              <input
+                type="text"
+                name="fullName"
+                value={user.fullName}
+                onChange={handleChange}
+              />
             </div>
-            <div className={cx("form-group")}>
+            {/* <div className={cx("form-group")}>
               <label>Họ *</label>
               <input type="text" value="Lê" />
-            </div>
+            </div> */}
 
             <div className={cx("form-group")}>
               <label>Email *</label>
-              <input type="email" value="lehuuduchuy124@gmail.com" />
+              <input
+                type="email"
+                name="email"
+                value={user.email}
+                onChange={handleChange}
+              />
             </div>
             <div className={cx("form-group")}>
               <label>Số điện thoại *</label>
-              <input type="tel" value="+84932598727" />
+              <input
+                type="tel"
+                name="phone"
+                value={user.phone}
+                onChange={handleChange}
+              />
             </div>
-            <button className={cx("save-button")}>Lưu</button>
+            <button className={cx("save-button")} onClick={() => handleSave()}>
+              Lưu
+            </button>
           </div>
         )}
         {activeTab === "Địa chỉ giao nhận" && (
@@ -290,7 +383,7 @@ const Profile = () => {
 
             <div className={cx("formGroup")}>
               <select id="parent_id" name="parent_id" className={cx("input")}>
-                <option value="">Tỉnh/Thành phố</option>
+                {/* <option value="">Tỉnh/Thành phố</option> */}
                 <option value="">Chọn danh mục cha 1</option>
                 <option value="">Chọn danh mục cha 2</option>
               </select>
