@@ -5,7 +5,7 @@ export async function getCart(id) {
     const response = await AxiosInstance.get(`/cart/${id}`);
     return response;
   } catch (error) {
-    console.error("Lỗi lấy giỏ hàng:", error.response?.data || error.message);
+    console.error("Lỗi lấy giỏ hàng:", error);
     return null;
   }
 }
@@ -18,10 +18,7 @@ export async function addToCart(userId, productId, quantity) {
     });
     return response;
   } catch (error) {
-    console.error(
-      "Lỗi thêm vào giỏ hàng:",
-      error.response?.data || error.message
-    );
+    console.error("Lỗi thêm vào giỏ hàng:", error);
     return null;
   }
 }
@@ -33,26 +30,23 @@ export async function removeFromCart(userId, productId) {
     );
     return response;
   } catch (error) {
-    console.error(
-      "Lỗi xóa sản phẩm khỏi giỏ hàng:",
-      error.response?.data || error.message
-    );
+    console.error("Lỗi xóa sản phẩm khỏi giỏ hàng:", error);
     return null;
   }
 }
 
 export async function updateCartQuantity(userId, productId, quantity) {
   try {
-    const response = await AxiosInstance.patch(`/cart/update/${userId}`, {
-      productId,
-      quantity,
-    });
+    const response = await AxiosInstance.patch(
+      `/cart/update/${userId}/${productId}/${quantity}`,
+      {
+        productId,
+        quantity,
+      }
+    );
     return response;
   } catch (error) {
-    console.error(
-      "Lỗi cập nhật số lượng:",
-      error.response?.data || error.message
-    );
+    console.error("Lỗi cập nhật số lượng:", error);
     return null;
   }
 }

@@ -12,6 +12,10 @@ import Rating from "@mui/material/Rating";
 import { useLocation } from "react-router-dom";
 import { getDetailProduct } from "../../../services/product.service";
 import { getNameBrand } from "../../../services/brand.service";
+import { refreshTokenUser } from "../../../services/user.service";
+import { jwtDecode } from "jwt-decode";
+import { AxiosInstance } from "../../../configs/axios";
+import { addToCart } from "../../../services/cart.service";
 
 const cx = classNames.bind(styles);
 
@@ -23,6 +27,7 @@ const DetailProduct = () => {
   const [quantity, setQuantity] = useState(1);
   const location = useLocation();
   const { id } = location.state;
+  const [userId, setUserId] = useState(1);
 
   const [product, setProduct] = useState([]);
 
@@ -85,6 +90,48 @@ const DetailProduct = () => {
   const handleThumbnailClick = (img) => {
     setMainImage(img); // Update the main image when a thumbnail is clicked
     setSelectedImage(img); // Update the selected image
+  };
+
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const token = await refreshTokenUser();
+      if (token) {
+        try {
+          const decodedUser = jwtDecode(token);
+          setUserId(decodedUser.userId);
+
+          AxiosInstance.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${token}`;
+        } catch (error) {
+          console.error("❌ Lỗi giải mã token:", error);
+        }
+      } else {
+        console.warn("🚪 Người dùng chưa đăng nhập hoặc token hết hạn");
+      }
+    };
+
+    fetchUserId();
+  }, []);
+
+  const handleAddCart = async () => {
+    if (!userId || !product._id) {
+      console.warn("⚠️ Không thể thêm vào giỏ hàng vì thiếu thông tin!");
+      return;
+    }
+
+    try {
+      const response = await addToCart(userId, product._id, quantity);
+
+      if (response) {
+        console.log(response);
+      }
+    } catch (error) {
+      console.error(
+        "❌ Lỗi khi gọi API:",
+        error.response?.data || error.message
+      );
+    }
   };
 
   return (
@@ -200,7 +247,11 @@ const DetailProduct = () => {
             </button>
           </div>
           <div className={cx("add-cart")}>
-            <button>
+            <button
+              onClick={() => {
+                handleAddCart();
+              }}
+            >
               <AddShoppingCartIcon />
               <span>Thêm vào giỏ hàng</span>
             </button>

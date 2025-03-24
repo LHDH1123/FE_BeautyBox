@@ -60,6 +60,7 @@ const Header = () => {
     confirmPass: "",
   });
   const [user, setUser] = useState(null);
+
   const [cart, setCart] = useState(null);
 
   const menuHeaders = [

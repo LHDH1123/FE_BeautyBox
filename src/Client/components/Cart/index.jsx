@@ -4,13 +4,17 @@ import styles from "./Cart.module.scss";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
 import { getDetailProduct } from "../../../services/product.service";
+import {
+  removeFromCart,
+  updateCartQuantity,
+} from "../../../services/cart.service";
 
 const cx = classNames.bind(styles);
 
 function Cart({ cart }) {
   const [products, setProducts] = useState([]);
 
-  // Hàm lấy chi tiết sản phẩm từ API
+  // Lấy thông tin sản phẩm từ API
   useEffect(() => {
     const fetchProductDetails = async () => {
       if (!cart || !cart.products) return;
@@ -19,11 +23,10 @@ function Cart({ cart }) {
         const productDetails = await Promise.all(
           cart.products.map(async (item) => {
             const product = await getDetailProduct(item.product_id);
-            console.log(product[0]);
             return {
               id: product[0]._id,
               thumbnail: Array.isArray(product[0].thumbnail)
-                ? product[0].thumbnail[0] // Nếu là mảng, lấy ảnh đầu tiên
+                ? product[0].thumbnail[0]
                 : product[0].thumbnail,
               SKU: product[0].SKU,
               title: product[0].title,
@@ -41,9 +44,33 @@ function Cart({ cart }) {
     };
 
     fetchProductDetails();
-  }, [cart]); // Chạy lại khi `cart` thay đổi
+  }, [cart]);
 
-  console.log(products);
+  const handleUpdateQuantity = async (id, newQuantity) => {
+    if (newQuantity < 1) return; // Không cho giảm số lượng dưới 1
+
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === id ? { ...product, quantity: newQuantity } : product
+      )
+    );
+
+    console.log(cart.user_id, id, newQuantity);
+    const response = await updateCartQuantity(cart.user_id, id, newQuantity);
+    if (!response) {
+      console.error("❌ Cập nhật số lượng thất bại");
+    }
+  };
+
+  const handleRemoveCart = async (id) => {
+    const response = await removeFromCart(cart.user_id, id);
+    if (response) {
+      console.log("Xóa sản phẩm thành công", response);
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product.id !== id)
+      );
+    }
+  };
 
   return (
     <div className={cx("div-cart")}>
@@ -55,42 +82,54 @@ function Cart({ cart }) {
 
       <div className={cx("body")}>
         {products.map((product) => (
-          <div className={cx("product")}>
+          <div className={cx("product")} key={product.id}>
             <input type="checkbox" />
             <div className={cx("img-product")}>
-              <img src={product.thumbnail} alt="" />
+              <img src={product.thumbnail} alt={product.title} />
             </div>
             <div className={cx("info-product")}>
               <div className={cx("title-product")}>
-                {/* <div className={cx("description-product")}>Sản phẩm 1</div> */}
                 <a href="/">{product.title}</a>
-                <button>
-                  <RemoveIcon fontSize="smal" />
-                </button>
+                <div
+                  className={cx("remove-cart")}
+                  onClick={() => handleRemoveCart(product.id)}
+                >
+                  <button>
+                    <RemoveIcon fontSize="inherit" />
+                  </button>
+                </div>
               </div>
 
               <div className={cx("code-product")}>SKU: {product.SKU}</div>
 
               <div className={cx("number-product")}>
                 <div className={cx("number")}>
-                  <button>
+                  <button
+                    onClick={() =>
+                      handleUpdateQuantity(product.id, product.quantity - 1)
+                    }
+                  >
                     <RemoveIcon
                       fontSize="inherit"
                       style={{
                         fontSize: "12px",
-                        stroke: "currentColor", // Thêm viền
-                        strokeWidth: 1, // Làm viền đậm hơn
+                        stroke: "currentColor",
+                        strokeWidth: 1,
                       }}
                     />
                   </button>
                   <div className={cx("quantity")}>{product.quantity}</div>
-                  <button style={{ fontWeight: "600" }}>
+                  <button
+                    onClick={() =>
+                      handleUpdateQuantity(product.id, product.quantity + 1)
+                    }
+                  >
                     <AddIcon
                       fontSize="inherit"
                       style={{
                         fontSize: "12px",
-                        stroke: "currentColor", // Thêm viền
-                        strokeWidth: 1, // Làm viền đậm hơn
+                        stroke: "currentColor",
+                        strokeWidth: 1,
                       }}
                     />
                   </button>
@@ -101,10 +140,7 @@ function Cart({ cart }) {
                       {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
                         currency: "VND",
-                      }).format(
-                        product.price -
-                          (product.price * product.discountPercentage) / 100
-                      )}
+                      }).format(product.price)}
                     </div>
                   </div>
                 ) : (
