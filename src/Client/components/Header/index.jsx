@@ -28,6 +28,7 @@ import {
 } from "../../../services/user.service";
 import { jwtDecode } from "jwt-decode";
 import { AxiosInstance } from "../../../configs/axios";
+import { getCart } from "../../../services/cart.service";
 
 const cx = classNames.bind(styles);
 
@@ -59,6 +60,7 @@ const Header = () => {
     confirmPass: "",
   });
   const [user, setUser] = useState(null);
+  const [cart, setCart] = useState(null);
 
   const menuHeaders = [
     { id: 1, label: "Thương hiệu", title: "collection" },
@@ -250,19 +252,22 @@ const Header = () => {
   };
 
   useEffect(() => {
-
-
     const fetchUser = async () => {
-      const token = await refreshTokenUser(); // Thử lấy access token mới
-
+      const token = await refreshTokenUser();
       if (token) {
         try {
           const decodedUser = jwtDecode(token);
-          const user = await getUser(decodedUser.userId);
-          setUser(user.user);
+          const userData = await getUser(decodedUser.userId);
+
+          setUser(userData.user);
           AxiosInstance.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${token}`;
+
+          // ✅ Gọi fetchCart ngay sau khi setUser
+          if (userData.user?._id) {
+            fetchCart(userData.user._id);
+          }
         } catch (error) {
           console.error("❌ Lỗi giải mã token:", error);
           setUser(null);
@@ -275,6 +280,18 @@ const Header = () => {
 
     fetchUser();
   }, []);
+
+  // 🛠 Chỉnh sửa fetchCart để nhận userId làm tham số
+  const fetchCart = async (userId) => {
+    try {
+      const response = await getCart(userId);
+      if (response) {
+        setCart(response);
+      }
+    } catch (error) {
+      console.error("❌ Lỗi khi tải giỏ hàng:", error);
+    }
+  };
 
   return (
     <header className={cx("header")}>
@@ -897,7 +914,7 @@ const Header = () => {
                 // <div className={cx("cart")}>
                 //   Bạn chưa có sản phẩm nào trong giỏ hàng
                 // </div>
-                <Cart />
+                <Cart cart={cart} />
               )}
 
               {selectedCart === "delivery" && (
