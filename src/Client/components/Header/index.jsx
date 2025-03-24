@@ -29,6 +29,7 @@ import {
 import { jwtDecode } from "jwt-decode";
 import { AxiosInstance } from "../../../configs/axios";
 import { getCart } from "../../../services/cart.service";
+import { deleteAllLike, getLike } from "../../../services/like.service";
 
 const cx = classNames.bind(styles);
 
@@ -62,6 +63,7 @@ const Header = () => {
   const [user, setUser] = useState(null);
 
   const [cart, setCart] = useState(null);
+  const [like, setLike] = useState(null);
 
   const menuHeaders = [
     { id: 1, label: "Thương hiệu", title: "collection" },
@@ -268,6 +270,7 @@ const Header = () => {
           // ✅ Gọi fetchCart ngay sau khi setUser
           if (userData.user?._id) {
             fetchCart(userData.user._id);
+            fetchLike(userData.user._id);
           }
         } catch (error) {
           console.error("❌ Lỗi giải mã token:", error);
@@ -291,6 +294,26 @@ const Header = () => {
       }
     } catch (error) {
       console.error("❌ Lỗi khi tải giỏ hàng:", error);
+    }
+  };
+
+  const fetchLike = async (userId) => {
+    try {
+      const response = await getLike(userId);
+      if (response) {
+        setLike(response);
+      }
+    } catch (error) {
+      console.error("❌ Lỗi khi tải giỏ thích:", error);
+    }
+  };
+
+  const handleDeleteAllLike = async () => {
+    if (like) {
+      const response = await deleteAllLike(like.user_id);
+      if (response) {
+        console.log("Xóa tất cả sản phẩm thành công", response);
+      }
     }
   };
 
@@ -514,17 +537,17 @@ const Header = () => {
                 </div>
               )} */}
             </div>
-            <div className={cx("icon-section")}>
-              <FavoriteBorderIcon
-                fontSize="medium"
-                onClick={handleOpenModalLike}
-              />
+            <div className={cx("icon-section")} onClick={handleOpenModalLike}>
+              <FavoriteBorderIcon fontSize="medium" />
+              {like && like.products && like.products.length > 0 && (
+                <span className={cx("badge")}>{like.products.length}</span>
+              )}
             </div>
-            <div className={cx("icon-section")}>
-              <ShoppingBagOutlinedIcon
-                fontSize="medium"
-                onClick={handleOpenModalCart}
-              />
+            <div className={cx("icon-section")} onClick={handleOpenModalCart}>
+              <ShoppingBagOutlinedIcon fontSize="medium" />
+              {cart && cart.products && cart.products.length > 0 && (
+                <span className={cx("badgeCart")}>{cart.products.length}</span>
+              )}
             </div>
           </div>
         </div>
@@ -1000,13 +1023,16 @@ const Header = () => {
               Ưa thích
             </div>
 
-            <button style={{ fontSize: "14px", fontWeight: "700" }}>
+            <button
+              style={{ fontSize: "14px", fontWeight: "700" }}
+              onClick={() => handleDeleteAllLike()}
+            >
               Xóa hết
             </button>
           </div>
 
           <div className={cx("body-fav")}>
-            <CartFav />
+            <CartFav like={like} />
           </div>
         </Box>
       </Dialog>

@@ -16,6 +16,7 @@ import { refreshTokenUser } from "../../../services/user.service";
 import { jwtDecode } from "jwt-decode";
 import { AxiosInstance } from "../../../configs/axios";
 import { addToCart } from "../../../services/cart.service";
+import { addToLike } from "../../../services/like.service";
 
 const cx = classNames.bind(styles);
 
@@ -69,6 +70,7 @@ const DetailProduct = () => {
 
   const handleLike = () => {
     if (like === false) {
+      handleAddLike();
       setLike(true);
     } else {
       setLike(false);
@@ -122,6 +124,28 @@ const DetailProduct = () => {
 
     try {
       const response = await addToCart(userId, product._id, quantity);
+
+      if (response) {
+        console.log(response);
+      }
+    } catch (error) {
+      console.error(
+        "❌ Lỗi khi gọi API:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
+  console.log(product._id);
+
+  const handleAddLike = async () => {
+    if (!userId || !product._id) {
+      console.warn("⚠️ Không thể thêm vào giỏ hàng vì thiếu thông tin!");
+      return;
+    }
+
+    try {
+      const response = await addToLike(userId, product._id);
 
       if (response) {
         console.log(response);

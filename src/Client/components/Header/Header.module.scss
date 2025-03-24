@@ -121,6 +121,30 @@
   cursor: pointer;
   transition: color 0.3s ease;
   margin-left: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.badge,
+.badgeCart {
+  position: absolute;
+  top: 0px;
+  right: -13px;
+  font-size: 12px;
+  font-weight: 500;
+  color: white;
+  padding: 2px 2px;
+  border-radius: 50%;
+  min-width: 22px;
+  text-align: center;
+}
+
+.badge {
+  background-color: #ff4d4f; /* Like badge */
+}
+
+.badgeCart {
+  background-color: rgb(0, 0, 0); /* Cart badge */
 }
 
 .icon-section p {

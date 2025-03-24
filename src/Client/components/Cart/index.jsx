@@ -55,7 +55,6 @@ function Cart({ cart }) {
       )
     );
 
-    console.log(cart.user_id, id, newQuantity);
     const response = await updateCartQuantity(cart.user_id, id, newQuantity);
     if (!response) {
       console.error("❌ Cập nhật số lượng thất bại");
@@ -71,6 +70,7 @@ function Cart({ cart }) {
       );
     }
   };
+
 
   return (
     <div className={cx("div-cart")}>
