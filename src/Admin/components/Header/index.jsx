@@ -10,6 +10,7 @@ import { addCategory, getCategorys } from "../../../services/category.service";
 import { createCategorySelect } from "../../../helper/select-tree";
 import { addRole, getAllRoles } from "../../../services/role.service";
 import { addAccount } from "../../../services/account.service";
+import { createVoucher } from "../../../services/voucher.service";
 
 const cx = classNames.bind(styles);
 
@@ -19,8 +20,10 @@ const Header = ({
   fetchBrands,
   fetchRoles,
   fetchAccount,
+  fetchVoucher,
 }) => {
   const [isModalAdd, setIsModalAdd] = useState(false);
+  const [isModalSale, setIsModalSale] = useState(false);
   const [isModalAddBrand, setIsModalAddBrand] = useState(false);
   const [isModalAddRole, setIsModalAddRole] = useState(false);
   const [isModalAddUser, setIsModalAddUser] = useState(false);
@@ -32,6 +35,12 @@ const Header = ({
   const [category, setCategory] = useState({
     title: "",
     parent_id: "",
+    status: true,
+  });
+  const [voucher, setVoucher] = useState({
+    title: "",
+    discount: "",
+    description: "",
     status: true,
   });
   const [role, setRole] = useState({
@@ -108,6 +117,18 @@ const Header = ({
     });
   };
 
+  const handleChangeVoucher = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setVoucher((prev) => {
+      const newState = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+      return newState;
+    });
+  };
+
   const handleChangeRole = (e) => {
     const { name, value, type, checked } = e.target;
     setRole((prev) => {
@@ -140,6 +161,9 @@ const Header = ({
     }
     if (title === "Vai Trò & Quyền") {
       setIsModalAddRole(!isModalAddRole);
+    }
+    if (title === "Giảm Giá") {
+      setIsModalSale(!isModalSale);
     }
     if (title === "Người Dùng") {
       setIsModalAddUser(!isModalAddUser);
@@ -221,6 +245,30 @@ const Header = ({
         fetchRoles();
         setIsModalAddRole(false);
         setRole({ title: "", status: true });
+      }
+    } catch (error) {
+      console.error("Lỗi khi thêm vai trò:", error);
+    }
+  };
+
+  const handleAddVoucher = async () => {
+    if (!voucher.title && !voucher.discount && !voucher.description) {
+      alert("Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
+    console.log(voucher);
+    try {
+      const response = await createVoucher(voucher);
+      if (response) {
+        console.log("Thêm voucher thành công:", response);
+        fetchVoucher();
+        setIsModalSale(false);
+        setVoucher({
+          title: "",
+          discount: "",
+          description: "",
+          status: true,
+        });
       }
     } catch (error) {
       console.error("Lỗi khi thêm vai trò:", error);
@@ -378,11 +426,11 @@ const Header = ({
                   {...label}
                   name="status"
                   color="warning"
-                  checked={category.status}
-                  onClick={(e) =>
+                  checked={category?.status ?? false} // Tránh undefined
+                  onChange={(e) =>
                     setCategory((prev) => ({
                       ...prev,
-                      status: e.target.checked, // Switch luôn gửi boolean
+                      status: e.target.checked, // Switch gửi giá trị boolean chính xác
                     }))
                   }
                 />
@@ -570,6 +618,96 @@ const Header = ({
                 type="submit"
                 className={cx("btn-submit")}
                 onClick={handleAddRole}
+              >
+                Tạo mới
+              </button>
+            </div>
+          </div>
+        </Box>
+      </Dialog>
+
+      {/* Add Sale Modal */}
+      <Dialog
+        open={isModalSale}
+        onClose={handleCloseModalAdd}
+        PaperProps={{
+          style: {
+            marginTop: "-30px",
+            borderRadius: "16px",
+            height: "470px",
+            width: "500px",
+          },
+        }}
+      >
+        <Box>
+          <DialogActions>
+            <div className={cx("btn_exit")}>
+              <button onClick={handleCloseModalAdd}>
+                <CloseIcon fontSize="small" style={{ color: "red" }} />
+              </button>
+            </div>
+          </DialogActions>
+          <div className={cx("modalContent")}>
+            <div className={cx("title")}>Tạo voucher</div>
+            <div className={cx("formGroup")}>
+              <div className={cx("label")}>Tên voucher</div>
+              <input
+                type="text"
+                name="title"
+                className={cx("input")}
+                value={voucher.title || ""}
+                onChange={handleChangeVoucher}
+              />
+            </div>
+            <div className={cx("formGroup")}>
+              <div className={cx("label")}>Giảm giá</div>
+              <input
+                type="text"
+                name="discount"
+                className={cx("input")}
+                value={voucher.discount || ""}
+                onChange={handleChangeVoucher}
+              />
+            </div>
+            <div className={cx("formGroup")}>
+              <div className={cx("label")}>Mô tả</div>
+              <input
+                type="text"
+                name="description"
+                className={cx("input")}
+                value={voucher.description || ""}
+                onChange={handleChangeVoucher}
+              />
+            </div>
+            <div className={cx("status")}>
+              <div className={cx("label")}>Trạng thái</div>
+              <div className={cx("switch")}>
+                <Switch
+                  {...label}
+                  name="status"
+                  color="warning"
+                  checked={voucher.status}
+                  onChange={(e) =>
+                    setVoucher((prev) => ({
+                      ...prev,
+                      status: e.target.checked,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+            <div className={cx("buttons")}>
+              <button
+                type="button"
+                className={cx("btn-cancel")}
+                onClick={handleCloseModalAdd}
+              >
+                Hủy
+              </button>
+              <button
+                type="submit"
+                className={cx("btn-submit")}
+                onClick={handleAddVoucher}
               >
                 Tạo mới
               </button>

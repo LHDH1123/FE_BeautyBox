@@ -17,7 +17,7 @@ import AccountAdmin from "../Admin/pages/Account";
 import LoginAdmin from "../Admin/pages/Login";
 import RoleAdmin from "../Admin/pages/Role";
 import Dashboard from "../Admin/pages/Dashboard";
-import FlashSale from "../Admin/pages/FlashSale";
+import Voucher from "../Admin/pages/Voucher";
 import CreateProduct from "../Admin/pages/Product/CreateProduct";
 import DetailProduct from "../Admin/pages/DetailProduct";
 import EditProduct from "../Admin/pages/Product/EditProduct";
@@ -56,7 +56,7 @@ export default function Router() {
         <Route path="category" element={<CategoryAdmin />} />
         <Route path="user" element={<AccountAdmin />} />
         <Route path="role" element={<RoleAdmin />} />
-        <Route path="flashsale" element={<FlashSale />} />
+        <Route path="flashsale" element={<Voucher />} />
         <Route path="create-product" element={<CreateProduct />} />
         <Route path="detail-product/:id" element={<DetailProduct />} />
         <Route path="edit-product/:id" element={<EditProduct />} />

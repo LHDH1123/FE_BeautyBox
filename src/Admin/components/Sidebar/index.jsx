@@ -9,7 +9,7 @@ import CategoryIcon from "@mui/icons-material/Category";
 import LocalOfferIcon from "@mui/icons-material/LocalOffer";
 import PersonIcon from "@mui/icons-material/Person";
 import ShieldIcon from "@mui/icons-material/Shield";
-import FlashOnIcon from "@mui/icons-material/FlashOn";
+import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { logout } from "../../../services/auth.service";
 
@@ -106,8 +106,8 @@ const Sidebar = () => {
                 to="/adminbb/flashsale"
                 onClick={() => handleActive("/adminbb/flashsale")}
               >
-                <FlashOnIcon fontSize="small" />
-                <span>Flash Sale</span>
+                <TrendingDownIcon fontSize="small" />
+                <span>Giảm giá</span>
               </Link>
             </li>
           </ul>
