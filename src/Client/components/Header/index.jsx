@@ -23,6 +23,7 @@ import { getCategorys } from "../../../services/category.service";
 import {
   getUser,
   loginPost,
+  logout,
   refreshTokenUser,
   registerPost,
 } from "../../../services/user.service";
@@ -43,7 +44,7 @@ const Header = () => {
   const [isModalCart, setIsModalCart] = useState(false);
   const [isModalLike, setIsModalLike] = useState(false);
   const [isMore, setIsMore] = useState(false);
-  // const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(false);
   const [selectedCart, setSelectedCart] = useState("delivery");
   const navigate = useNavigate();
   const [hoveredMenu, setHoveredMenu] = useState(null);
@@ -165,12 +166,15 @@ const Header = () => {
   };
 
   const handleOpenModalLogin = () => {
+    if (isLogin === false) {
+      setIsLogin(true);
+    } else {
+      setIsLogin(false);
+    }
+  };
+
+  const handleModalLoginUser = () => {
     setIsModalLogin(true);
-    // if (isLogin === false) {
-    //   setIsLogin(true);
-    // } else {
-    //   setIsLogin(false);
-    // }
   };
 
   const handleCloseModalLogin = () => {
@@ -218,13 +222,24 @@ const Header = () => {
   const handleLogin = async (isRegister) => {
     try {
       if (!isRegister) {
+        // 🟢 Xử lý đăng nhập
         const response = await loginPost(login);
         if (response?.accessToken) {
           const decodedUser = jwtDecode(response.accessToken);
-          setUser(decodedUser);
+          const userData = await getUser(decodedUser.userId);
+
+          setUser(userData.user);
+          AxiosInstance.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${response.accessToken}`;
           setIsModalLogin(false);
+
+          // ✅ Gọi fetchCart và fetchLike ngay sau khi đăng nhập
+          fetchCart(userData.user._id);
+          fetchLike(userData.user._id);
         }
       } else {
+        // 🔵 Xử lý đăng ký
         if (register.password !== register.confirmPass) {
           alert("Password and Confirm Password must be the same");
           return;
@@ -267,8 +282,8 @@ const Header = () => {
             "Authorization"
           ] = `Bearer ${token}`;
 
-          // ✅ Gọi fetchCart ngay sau khi setUser
-          if (userData.user?._id) {
+          // ✅ Nếu user tồn tại, cập nhật giỏ hàng và danh sách yêu thích
+          if (userData.user) {
             fetchCart(userData.user._id);
             fetchLike(userData.user._id);
           }
@@ -285,8 +300,16 @@ const Header = () => {
     fetchUser();
   }, []);
 
-  // 🛠 Chỉnh sửa fetchCart để nhận userId làm tham số
+  // 🟢 Khi user thay đổi, tự động fetch lại giỏ hàng và danh sách yêu thích
+  useEffect(() => {
+    if (user) {
+      fetchCart(user._id);
+      fetchLike(user._id);
+    }
+  }, [user]);
+
   const fetchCart = async (userId) => {
+    if (!userId) return; // Tránh gọi API nếu userId không tồn tại
     try {
       const response = await getCart(userId);
       if (response) {
@@ -298,6 +321,7 @@ const Header = () => {
   };
 
   const fetchLike = async (userId) => {
+    if (!userId) return;
     try {
       const response = await getLike(userId);
       if (response) {
@@ -315,6 +339,26 @@ const Header = () => {
         console.log("Xóa tất cả sản phẩm thành công", response);
       }
     }
+  };
+
+  const handleLogOut = async () => {
+    try {
+      const response = await logout();
+      if (response) {
+        console.log("Logout successful:", response);
+        setLike("");
+        setCart("");
+        setUser("");
+        setIsLogin(false);
+      }
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
+  const handleProfile = () => {
+    navigate("/profile");
+    setIsLogin(false);
   };
 
   return (
@@ -436,15 +480,18 @@ const Header = () => {
             <div
               className={cx("icon-section")}
               style={{ borderLeft: "groove" }}
-              onClick={handleOpenModalLogin}
             >
               <UserIcon
                 fontSize="medium"
                 style={{ color: "#4b4b4b", marginLeft: "16px" }}
               />
-              {user ? <p>{user.fullName}</p> : <p>Đăng nhập</p>}
+              {user ? (
+                <p onClick={() => handleOpenModalLogin()}>{user.fullName}</p>
+              ) : (
+                <p onClick={() => handleModalLoginUser()}>Đăng nhập</p>
+              )}
 
-              {/* {isLogin && (
+              {isLogin && (
                 <div className={cx("more")} style={{ right: "24px" }}>
                   <ul className={cx("list-more")}>
                     <li
@@ -457,7 +504,7 @@ const Header = () => {
                     >
                       Hi, Lê Huy!
                     </li>
-                    <li className={cx("item")}>
+                    <li className={cx("item")} onClick={() => handleProfile()}>
                       <svg
                         width="29"
                         height="19"
@@ -530,12 +577,13 @@ const Header = () => {
                         padding: "15px",
                         fontWeight: "400",
                       }}
+                      onClick={() => handleLogOut()}
                     >
                       Đăng xuất
                     </li>
                   </ul>
                 </div>
-              )} */}
+              )}
             </div>
             <div className={cx("icon-section")} onClick={handleOpenModalLike}>
               <FavoriteBorderIcon fontSize="medium" />

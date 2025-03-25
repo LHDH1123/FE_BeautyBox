@@ -55,10 +55,7 @@ export async function logout() {
     await AxiosInstance.get("/user/logout", { withCredentials: true });
     return true;
   } catch (error) {
-    console.error(
-      "Lỗi khi đăng xuất:",
-      error.response?.data?.error || error.message
-    );
+    console.error("Lỗi khi đăng xuất:", error);
     return false;
   }
 }
