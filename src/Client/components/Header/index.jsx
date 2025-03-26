@@ -361,6 +361,15 @@ const Header = () => {
     setIsLogin(false);
   };
 
+  const handleNavigateCheckout = () => {
+    if (cart) {
+      navigate("/check-out", { state: cart });
+      setIsModalCart(false);
+    } else {
+      console.log("không có sản phẩm nào trong giỏ hàng");
+    }
+  };
+
   return (
     <header className={cx("header")}>
       <div className={cx("header_container")}>
@@ -1005,7 +1014,7 @@ const Header = () => {
                   </div>
 
                   <div className={cx("btn-checkout")}>
-                    <button type="submit">
+                    <button type="submit" onClick={handleNavigateCheckout}>
                       Tiếp tục với hình thức giao hàng
                     </button>
                   </div>

@@ -7,8 +7,8 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import {
   changeVoucherStatus,
   deleteVoucher,
+  getAllVouchers,
   getVoucherById,
-  getVouchers,
   updateVoucher,
 } from "../../../services/voucher.service";
 import { Box, Dialog, DialogActions, Switch } from "@mui/material";
@@ -31,7 +31,7 @@ const Voucher = () => {
   // Fetch danh sách voucher
   const fetchVoucher = async () => {
     try {
-      const response = await getVouchers();
+      const response = await getAllVouchers();
       if (response) {
         setVouchers(response);
       }

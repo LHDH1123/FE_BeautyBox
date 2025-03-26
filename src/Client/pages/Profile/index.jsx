@@ -17,8 +17,8 @@ import { AxiosInstance } from "../../../configs/axios";
 import {
   createAddress,
   deleteAddress,
-  getAddress,
   getAddressById,
+  getAllAddress,
   updateAddress,
 } from "../../../services/address.service";
 
@@ -140,7 +140,7 @@ const Profile = () => {
 
   const fetchAddress = async (userId) => {
     try {
-      const response = await getAddress(userId);
+      const response = await getAllAddress(userId);
       if (response) {
         setAddress(response);
         handleModal();

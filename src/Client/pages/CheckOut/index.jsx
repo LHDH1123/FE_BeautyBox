@@ -1,14 +1,144 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./CheckOut.module.scss";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
+import { useLocation } from "react-router-dom";
+import { getDetailProduct } from "../../../services/product.service";
+import {
+  getAllVouchers,
+  getVoucherById,
+} from "../../../services/voucher.service";
+import {
+  removeFromCart,
+  updateCartQuantity,
+} from "../../../services/cart.service";
+import { getAllAddress } from "../../../services/address.service";
+import { refreshTokenUser } from "../../../services/user.service";
+import { jwtDecode } from "jwt-decode";
 
 const cx = classNames.bind(styles);
 
 const CheckoutPage = () => {
   const [selectedPayment, setSelectedPayment] = useState("COD");
-  const [selectedVoucher, setSelectedVoucher] = useState("1");
+  const [selectedVoucher, setSelectedVoucher] = useState("");
+  const [products, setProducts] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [vouchers, setVouchers] = useState([]);
+  const [sale, setSale] = useState([]);
+  const [userId, setUserId] = useState([]);
+  const [allAddress, setAllAddress] = useState([]);
+  const [defaultddress, setDefaultddress] = useState([]);
+
+  // console.log(selectedVoucher);
+  const location = useLocation();
+  const cart = location.state;
+
+  const fetchVoucherDiscount = async () => {
+    try {
+      if (selectedVoucher !== "") {
+        const response = await getVoucherById(selectedVoucher);
+        if (response) {
+          setSale(response[0].discount / -100);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchAddress = async () => {
+    try {
+      if (userId) {
+        const response = await getAllAddress(userId);
+        if (response) {
+          setAllAddress(response);
+
+          // Lọc địa chỉ mặc định (status === true)
+          const defaultAddress = response.find(
+            (address) => address.status === true
+          );
+          if (defaultAddress) {
+            setDefaultddress(defaultAddress);
+          }
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const token = await refreshTokenUser();
+      if (token) {
+        try {
+          const decodedUser = jwtDecode(token);
+          setUserId(decodedUser.userId);
+        } catch (error) {
+          console.error("❌ Lỗi giải mã token:", error);
+        }
+      } else {
+        console.warn("🚪 Người dùng chưa đăng nhập hoặc token hết hạn");
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      if (!cart || !cart.products) return;
+
+      try {
+        const productDetails = await Promise.all(
+          cart.products.map(async (item) => {
+            const product = await getDetailProduct(item.product_id);
+            return {
+              id: product[0]._id,
+              thumbnail: Array.isArray(product[0].thumbnail)
+                ? product[0].thumbnail[0]
+                : product[0].thumbnail,
+              SKU: product[0].SKU,
+              title: product[0].title,
+              price: product[0].price,
+              discountPercentage: product[0].discountPercentage,
+              quantity: item.quantity,
+            };
+          })
+        );
+
+        setProducts(productDetails);
+        const total = productDetails.reduce((sum, product) => {
+          const discountedPrice =
+            product.price - (product.price * product.discountPercentage) / 100;
+          return sum + discountedPrice * product.quantity;
+        }, 0);
+
+        setTotalPrice(total);
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy thông tin sản phẩm:", error);
+      }
+    };
+    fetchProductDetails();
+  }, [cart]);
+
+  const fetchVouchers = async () => {
+    try {
+      const response = await getAllVouchers();
+      if (response) {
+        setVouchers(response);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVouchers();
+    fetchVoucherDiscount();
+    fetchAddress();
+  });
 
   const handlePaymentChange = (method) => {
     setSelectedPayment(method);
@@ -18,21 +148,72 @@ const CheckoutPage = () => {
     setSelectedVoucher(voucher);
   };
 
+  const handleUpdateQuantity = async (id, newQuantity) => {
+    if (newQuantity < 1) return; // Không cho giảm số lượng dưới 1
+
+    setProducts((prevProducts) =>
+      prevProducts.map((product) =>
+        product.id === id ? { ...product, quantity: newQuantity } : product
+      )
+    );
+
+    // Cập nhật ngay tổng giá trị đơn hàng
+    setTotalPrice((prevTotal) => {
+      const productToUpdate = products.find((product) => product.id === id);
+      if (!productToUpdate) return prevTotal;
+
+      const oldSubtotal =
+        (productToUpdate.price -
+          (productToUpdate.price * productToUpdate.discountPercentage) / 100) *
+        productToUpdate.quantity;
+
+      const newSubtotal =
+        (productToUpdate.price -
+          (productToUpdate.price * productToUpdate.discountPercentage) / 100) *
+        newQuantity;
+
+      return prevTotal - oldSubtotal + newSubtotal;
+    });
+
+    const response = await updateCartQuantity(cart.user_id, id, newQuantity);
+    if (!response) {
+      console.error("❌ Cập nhật số lượng thất bại");
+    }
+  };
+
+  const handleRemoveCart = async (id) => {
+    const response = await removeFromCart(cart.user_id, id);
+    if (response) {
+      console.log("Xóa sản phẩm thành công", response);
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product.id !== id)
+      );
+    }
+  };
+
   return (
     <div className={cx("checkout-container")}>
       <div className={cx("left-section")}>
         <div className={cx("title")}>Thông tin thanh toán</div>
-        <BuyerInfo />
+        <BuyerInfo defaultddress={defaultddress} />
         <PaymentMethods
           selectedPayment={selectedPayment}
           onPaymentChange={handlePaymentChange}
           selectedVoucher={selectedVoucher}
           onVoucherChange={handleVoucherChange}
+          vouchers={vouchers}
+          totalPrice={totalPrice}
         />
       </div>
 
       <div className={cx("right-section")}>
-        <OrderSummary />
+        <OrderSummary
+          products={products}
+          totalPrice={totalPrice}
+          sale={sale}
+          handleUpdateQuantity={handleUpdateQuantity}
+          handleRemoveCart={handleRemoveCart}
+        />
         <div className={cx("btn")}>
           <button className={cx("btn-order")}>ĐẶT HÀNG</button>
         </div>
@@ -42,7 +223,7 @@ const CheckoutPage = () => {
   );
 };
 
-const BuyerInfo = () => {
+const BuyerInfo = ({ defaultddress }) => {
   return (
     <div>
       <div className={cx("contact-account")}>
@@ -51,8 +232,8 @@ const BuyerInfo = () => {
         </div>
         <div className={cx("account")}>
           <span>Bạn đã đăng nhập với tài khoản </span>
-          <span className={cx("text-underline")}>lehuuduchuy124@gmail.com</span>
-          .<span className={cx("logout")}> Đăng xuất</span>
+          <span className={cx("text-underline")}>{defaultddress.email}</span>.
+          <span className={cx("logout")}> Đăng xuất</span>
         </div>
       </div>
       <div
@@ -61,11 +242,13 @@ const BuyerInfo = () => {
       >
         <div>
           <div className={cx("contact-info")}>
-            123 | 840932598727 | lehuuduchuy124@gmail.com
+            {defaultddress.last_name} {defaultddress.name} |{" "}
+            {defaultddress.phone} | {defaultddress.email}
           </div>
           <div>
-            Khối 5 | 12 Trần Nhân Tông, phường Vĩnh Điện, Thị xã Điện Bàn, Quảng
-            Nam
+            {defaultddress.titleAddress} | {defaultddress.address},{" "}
+            {defaultddress.ward}, {defaultddress.districts},{" "}
+            {defaultddress.city}
           </div>
         </div>
         <div className={cx("change")}>Thay đổi</div>
@@ -79,28 +262,12 @@ const PaymentMethods = ({
   onPaymentChange,
   selectedVoucher,
   onVoucherChange,
+  vouchers,
+  totalPrice,
 }) => {
   const methods = [
     { id: "COD", label: "Trả tiền mặt khi nhận hàng (COD)" },
     { id: "ZaloPay", label: "Zalopay & Chuyển khoản Ngân Hàng" },
-  ];
-
-  const vouchers = [
-    {
-      id: "1",
-      title: "Giảm 5%",
-      desciption: "Điều kiện: Tổng đơn hàng trên 500k",
-    },
-    {
-      id: "2",
-      title: "Giảm 10%",
-      desciption: "Điều kiện: Tổng đơn hàng trên 1000k",
-    },
-    {
-      id: "3",
-      title: "Giảm 15%",
-      desciption: "Điều kiện: Tổng đơn hàng trên 2000k",
-    },
   ];
 
   return (
@@ -122,71 +289,39 @@ const PaymentMethods = ({
 
       <h3 className={cx("payment-title")}>Voucher giảm giá</h3>
       <div className={cx("payment-methods")}>
-        {vouchers.map((voucher) => (
-          <div key={voucher.id} className={cx("method")}>
-            <input
-              type="radio"
-              name="voucher"
-              checked={selectedVoucher === voucher.id}
-              onChange={() => onVoucherChange(voucher.id)}
-            />
-            <label>{voucher.title}</label>
-            <div className={cx("condition")}>{voucher.desciption}</div>
-          </div>
-        ))}
+        {vouchers.map((voucher) => {
+          // Điều kiện voucher có phù hợp với totalPrice không?
+          const isApplicable = totalPrice >= voucher.minOrderValue; // Giả sử voucher có minOrderValue
+          return (
+            <div
+              key={voucher._id}
+              className={cx("method")}
+              style={{ opacity: isApplicable ? 1 : 0.5 }}
+            >
+              <input
+                type="radio"
+                name="voucher"
+                checked={selectedVoucher === voucher._id}
+                onChange={() => onVoucherChange(voucher._id)}
+                disabled={!isApplicable} // Không cho chọn nếu không đủ điều kiện
+              />
+              <label>{voucher.title}</label>
+              <div className={cx("condition")}>{voucher.description}</div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 };
 
-const OrderSummary = () => {
-  const products = [
-    {
-      SKU: "EC24-BBX12-CAMP-10",
-      id: "67ca77fc08ce99e90c59f200",
-      title:
-        "Trải Nghiệm Đủ Loại Mặt Nạ Hàn Tốt Nhất Từ Nhiều Thương Hiệu THE FACE SHOP - Goodal - Dermatory (20 miếng)",
-      price: 1123000,
-      discountPercentage: 56,
-      quantity: 1,
-      thumbnail:
-        "http://res.cloudinary.com/dqluwmghj/image/upload/v1741322236/products/bysazedtotnmpqpvnfh5.png",
-    },
-    {
-      SKU: "27280232",
-      id: "67d0fcf0fbc023f56a6bfe5d",
-      title:
-        "(Phiên bản mới - Soda Cafe) Son Tint Bóng Peripera Căng Mướt Môi Ink Mood Glowy Tint 4g",
-      price: 229000,
-      discountPercentage: 26,
-      quantity: 2,
-      thumbnail:
-        "https://image.hsv-tech.io/600x600/bbx/common/1df00f8c-b370-4292-b48f-38cfb61b5228.webp",
-    },
-    {
-      SKU: "27280232",
-      id: "67d0fcf0fbc023f56a6bfe5d",
-      title:
-        "(Phiên bản mới - Soda Cafe) Son Tint Bóng Peripera Căng Mướt Môi Ink Mood Glowy Tint 4g",
-      price: 229000,
-      discountPercentage: 26,
-      quantity: 2,
-      thumbnail:
-        "https://image.hsv-tech.io/600x600/bbx/common/1df00f8c-b370-4292-b48f-38cfb61b5228.webp",
-    },
-    {
-      SKU: "27280232",
-      id: "67d0fcf0fbc023f56a6bfe5d",
-      title:
-        "(Phiên bản mới - Soda Cafe) Son Tint Bóng Peripera Căng Mướt Môi Ink Mood Glowy Tint 4g",
-      price: 229000,
-      discountPercentage: 26,
-      quantity: 2,
-      thumbnail:
-        "https://image.hsv-tech.io/600x600/bbx/common/1df00f8c-b370-4292-b48f-38cfb61b5228.webp",
-    },
-  ];
-
+const OrderSummary = ({
+  products,
+  totalPrice,
+  sale,
+  handleUpdateQuantity,
+  handleRemoveCart,
+}) => {
   return (
     <div className={cx("order-summary")}>
       <h3 className={cx("order-title")}>Đơn hàng</h3>
@@ -202,7 +337,7 @@ const OrderSummary = () => {
                 <a href="/">{product.title}</a>
                 <div
                   className={cx("remove-cart")}
-                  //   onClick={() => handleRemoveCart(product.id)}
+                  onClick={() => handleRemoveCart(product.id)}
                 >
                   <button>
                     <RemoveIcon fontSize="inherit" />
@@ -215,9 +350,9 @@ const OrderSummary = () => {
               <div className={cx("number-product")}>
                 <div className={cx("number")}>
                   <button
-                  // onClick={() =>
-                  //   handleUpdateQuantity(product.id, product.quantity - 1)
-                  // }
+                    onClick={() =>
+                      handleUpdateQuantity(product.id, product.quantity - 1)
+                    }
                   >
                     <RemoveIcon
                       fontSize="inherit"
@@ -230,9 +365,9 @@ const OrderSummary = () => {
                   </button>
                   <div className={cx("quantity")}>{product.quantity}</div>
                   <button
-                  // onClick={() =>
-                  //   handleUpdateQuantity(product.id, product.quantity + 1)
-                  // }
+                    onClick={() =>
+                      handleUpdateQuantity(product.id, product.quantity + 1)
+                    }
                   >
                     <AddIcon
                       fontSize="inherit"
@@ -244,28 +379,18 @@ const OrderSummary = () => {
                     />
                   </button>
                 </div>
-                {product.discountPercentage === 0 ? (
-                  <div className={cx("price-product")}>
-                    <div className={cx("new-price")}>
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(product.price)}
-                    </div>
+
+                <div className={cx("price-product")}>
+                  <div className={cx("new-price")}>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(
+                      product.price -
+                        (product.price * product.discountPercentage) / 100
+                    )}
                   </div>
-                ) : (
-                  <div className={cx("price-product")}>
-                    <div className={cx("new-price")}>
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(
-                        product.price -
-                          (product.price * product.discountPercentage) / 100
-                      )}
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
           </div>
@@ -278,7 +403,7 @@ const OrderSummary = () => {
             {new Intl.NumberFormat("vi-VN", {
               style: "currency",
               currency: "VND",
-            }).format(1085000)}
+            }).format(totalPrice)}
           </div>
         </div>
         <div className={cx("totalProduct")}>
@@ -287,7 +412,7 @@ const OrderSummary = () => {
             {new Intl.NumberFormat("vi-VN", {
               style: "currency",
               currency: "VND",
-            }).format(-122000)}
+            }).format(totalPrice * sale)}
           </div>
         </div>
         <div
@@ -317,7 +442,7 @@ const OrderSummary = () => {
             {new Intl.NumberFormat("vi-VN", {
               style: "currency",
               currency: "VND",
-            }).format(1050000)}
+            }).format(totalPrice - totalPrice * sale + 12000)}
           </div>
         </div>
       </div>

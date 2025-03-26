@@ -82,6 +82,7 @@
 .change {
   color: #0992d0;
   margin-left: auto;
+  cursor: pointer;
 }
 
 .payment-methods {
@@ -231,6 +232,7 @@
 
 .title-product {
   display: flex;
+  font-size: 14px;
 }
 
 .title-product a {

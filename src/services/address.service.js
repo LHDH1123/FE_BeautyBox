@@ -1,6 +1,6 @@
 import { AxiosInstance } from "../configs/axios";
 
-export const getAddress = async (userId) => {
+export const getAllAddress = async (userId) => {
   try {
     const response = await AxiosInstance.get(`address/${userId}`);
     return response;

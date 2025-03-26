@@ -1,7 +1,7 @@
 import { AxiosInstance } from "../configs/axios";
 
 // Lấy danh sách voucher
-export async function getVouchers() {
+export async function getAllVouchers() {
   try {
     const response = await AxiosInstance.get("/voucher");
     return response;

@@ -11,6 +11,7 @@ import Product from "../Client/pages/Product";
 import Error404 from "../Client/pages/Error404";
 import Detail from "../Client/pages/Detail";
 import Checkout from "../Client/pages/CheckOut";
+import OrderCheckout from "../Client/pages/Order-Checkout";
 import ProductAdmin from "../Admin/pages/Product";
 import BrandAdmin from "../Admin/pages/Brand";
 import CategoryAdmin from "../Admin/pages/Category";
@@ -37,6 +38,7 @@ export default function Router() {
         <Route path="products/:slug" element={<Product />} />
         <Route path="detailProduct/:slug" element={<Detail />} />
         <Route path="check-out" element={<Checkout />} />
+        <Route path="order-checkout" element={<OrderCheckout />} />
         <Route path="*" element={<Error404 />} />
       </Route>
 
