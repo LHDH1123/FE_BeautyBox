@@ -1,0 +1,334 @@
+.checkout-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: 1.8fr 1.2fr;
+  gap: 24px;
+  font-family: "SVNMont", sans-serif;
+}
+
+.left-section {
+  .title {
+    font-size: 26px;
+    font-weight: bold;
+    // margin-bottom: 16px;
+  }
+}
+
+.title {
+  max-width: 1000px;
+  margin: 0 auto;
+  font-size: 26px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.right-section {
+  margin-top: 40px;
+  border: 1px solid rgb(236, 236, 236);
+  box-shadow: rgba(57, 105, 179, 0.25) 0px 0px 10px;
+  border-radius: 8px;
+
+  .btn-order {
+    width: 80%;
+    padding: 12px;
+    background: linear-gradient(90deg, #ffd400, #c73130 50.52%, #663695 99.61%);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 25px;
+    text-align: center;
+    // margin-top: 12px;
+    border: none;
+    cursor: pointer;
+  }
+
+  .note {
+    font-size: 12px;
+    color: #333;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 14px;
+  }
+}
+
+.btn {
+  display: flex;
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  align-items: center; /* Căn giữa theo chiều dọc (nếu cần) */
+  text-align: center;
+}
+
+.buyer-info,
+.method,
+.order-summary {
+  border-radius: 5px;
+  padding: 16px 8px;
+}
+
+.buyer-info {
+  font-size: 14px;
+  strong {
+    color: #333;
+  }
+
+  .contact-info {
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #0992d0;
+  }
+}
+
+.change {
+  color: #0992d0;
+  margin-left: auto;
+}
+
+.payment-methods {
+  .payment-title {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  .method {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+    border: 1px solid rgb(223, 223, 223);
+
+    label {
+      font-size: 16px;
+      font-family: "SVNMont", sans-serif;
+    }
+
+    input {
+      accent-color: #333;
+      font-size: larger;
+      cursor: pointer;
+    }
+  }
+}
+
+.order-summary {
+  .order-title {
+    font-size: 15px;
+    font-weight: bold;
+    margin: 0px;
+    margin-left: 14px;
+    margin-bottom: 8px;
+  }
+
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+
+  .discount {
+    color: #28a745;
+    font-size: 14px;
+  }
+
+  .total-section {
+    margin-top: 12px;
+    border-top: 1px solid #ccc;
+    padding-top: 8px;
+
+    .line-through {
+      text-decoration: line-through;
+      color: gray;
+    }
+
+    .total {
+      font-weight: bold;
+      font-size: 18px;
+    }
+  }
+}
+
+.text-underline {
+  text-decoration: underline !important;
+}
+
+.account {
+  margin-bottom: 10px;
+}
+
+.account span {
+  font-size: 16px;
+}
+
+.logout {
+  cursor: pointer;
+}
+
+.condition {
+  font-size: 14px;
+  color: #656565;
+  margin-left: auto;
+}
+
+.body {
+  max-height: 300px; /* Chiều cao tối đa cho container */
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: thin; // Cho Firefox
+  scrollbar-color: #ccc transparent; // Màu thanh cuộn
+}
+
+.body::-webkit-scrollbar {
+  width: 6px; /* Độ rộng thanh cuộn */
+}
+
+.body::-webkit-scrollbar-track {
+  background: #fafafa;
+  border-radius: 10px;
+  background: transparent;
+}
+
+.body::-webkit-scrollbar-thumb {
+  background: #bfbebe;
+  border-radius: 10px;
+}
+
+.title {
+  color: black;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.img-product img {
+  width: 80px;
+  min-width: 80px;
+  height: 80px;
+  border-radius: 10px;
+}
+
+.product {
+  display: flex;
+  font-size: 14px;
+  line-height: 1.5715;
+  margin-top: 20px;
+  border-radius: 10px;
+}
+
+.saperator {
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  margin: 0px 15px;
+  margin-top: 15px;
+}
+
+.info-product {
+  display: flex;
+  padding: 0px 8px;
+  width: 100%;
+  flex-direction: column;
+}
+
+.title-product {
+  display: flex;
+}
+
+.title-product a {
+  text-decoration: none;
+  font-size: 12px;
+  font-family: "SVNMont", sans-serif;
+  color: black;
+  cursor: pointer;
+  display: -webkit-box;
+  -webkit-box-orient: vertical; /* Đặt hướng của box là dọc */
+  -webkit-line-clamp: 2; /* Giới hạn tối đa 2 dòng */
+  text-overflow: ellipsis; /* Thêm dấu ba chấm */
+  overflow: hidden;
+  margin-right: 36px;
+}
+
+.code-product {
+  font-size: 12px;
+  font-family: "SVNMont", sans-serif;
+  color: black;
+  margin-top: 5px;
+}
+
+.title-product button {
+  border: none;
+  width: 25px;
+  height: 25px;
+  background-color: rgb(223, 223, 223);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 100%;
+  text-align: center;
+  flex-basis: 33%;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.number-product {
+  display: flex;
+  margin-top: 6px;
+}
+
+.number {
+  display: flex;
+  -webkit-box-align: center;
+  align-items: center;
+  -webkit-box-pack: center;
+  justify-content: center;
+  border: 1px solid rgb(223, 223, 223);
+  border-radius: 13px;
+}
+
+.number button {
+  border: none;
+  background-color: transparent;
+  padding-top: 7px;
+  padding-bottom: 3px;
+  cursor: pointer;
+}
+
+.price-product {
+  display: flex;
+  margin-left: auto;
+}
+
+.quantity {
+  font-size: 12px;
+  font-family: "SVNMont", sans-serif;
+  color: black;
+  padding: 0px 3px;
+}
+
+.new-price {
+  font-size: 14px;
+  font-family: "SVNMont", sans-serif;
+  font-weight: 700;
+}
+
+.price {
+  font-size: 12px;
+  text-decoration: line-through;
+  opacity: 0.5;
+  margin-right: 10px;
+  font-weight: 700;
+  font-family: "SVNMont", sans-serif;
+}
+
+.totalProduct {
+  display: flex;
+  font-family: "SVNMont", sans-serif;
+  font-size: 16px;
+  margin-top: 14px;
+}
+
+.total-cart {
+  margin-left: auto;
+  font-size: 14px;
+  font-family: "SVNMont", sans-serif;
+  font-weight: 700;
+}

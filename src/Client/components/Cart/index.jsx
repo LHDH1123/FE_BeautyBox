@@ -71,7 +71,6 @@ function Cart({ cart }) {
     }
   };
 
-
   return (
     <div className={cx("div-cart")}>
       <div className={cx("cart")}>
