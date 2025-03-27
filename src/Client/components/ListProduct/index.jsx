@@ -137,23 +137,36 @@ function ListProduct({ title }) {
                 <a href="/">{product.nameBrand}</a>
                 <div className={cx("description")}>{product.title}</div>
                 <div className={cx("price_product")}>
-                  <div className={cx("new_price")}>
-                    {new Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(product.newPrice)}
-                  </div>
-                  <div className={cx("price")}>
-                    {new Intl.NumberFormat("vi-VN", {
-                      style: "currency",
-                      currency: "VND",
-                    }).format(product.price)}
-                  </div>
-                  <span className={cx("discount-tag")}>
-                    <div className={cx("tag")}>
-                      -{product.discountPercentage}%
+                  {product.discountPercentage === 0 ? (
+                    <div className={cx("new_price")}>
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(product.newPrice)}
                     </div>
-                  </span>
+                  ) : (
+                    <div style={{ display: "flex" }}>
+                      <div className={cx("new_price")}>
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(product.newPrice)}
+                      </div>
+                      <div className={cx("price")}>
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(product.price)}
+                      </div>
+                    </div>
+                  )}
+                  {product.discountPercentage !== 0 && (
+                    <span className={cx("discount-tag")}>
+                      <div className={cx("tag")}>
+                        -{product.discountPercentage}%
+                      </div>
+                    </span>
+                  )}
                 </div>
                 <div className={cx("review")}>
                   <div className={cx("rate")}>

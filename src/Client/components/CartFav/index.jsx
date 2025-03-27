@@ -3,11 +3,13 @@ import classNames from "classnames/bind";
 import styles from "./CartFav.module.scss";
 import { getDetailProduct } from "../../../services/product.service";
 import { removeFromLike } from "../../../services/like.service";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
-function CartFav({ like }) {
+function CartFav({ like, setLike }) {
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -43,6 +45,7 @@ function CartFav({ like }) {
                     : product[0].thumbnail,
                   title: product[0].title,
                   price: product[0].price,
+                  slug: product[0].slug,
                   discountPercentage: product[0].discountPercentage,
                 };
               } catch (error) {
@@ -71,8 +74,14 @@ function CartFav({ like }) {
       setProducts((prevProducts) =>
         prevProducts.filter((product) => product.id !== id)
       );
+      setLike(response.like);
     }
   };
+
+  const handleNavigate = (id, slug) => {
+    navigate(`/detailProduct/${slug}`, { state: { id } });
+  };
+
   return (
     <div className={cx("div-cart")}>
       {products.map((product) => (
@@ -83,7 +92,12 @@ function CartFav({ like }) {
           <div className={cx("info-product")}>
             <div className={cx("title-product")}>
               {/* <div className={cx("description-product")}>Sản phẩm 1</div> */}
-              <a href="/">{product.title}</a>
+              <div
+                style={{ fontWeight: "bold", cursor: "pointer" }}
+                onClick={() => handleNavigate(product.id, product.slug)}
+              >
+                {product.title}
+              </div>
             </div>
 
             <div className={cx("number-product")}>

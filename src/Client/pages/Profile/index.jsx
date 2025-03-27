@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Profile.module.scss";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
@@ -7,20 +7,15 @@ import SearchIcon from "@mui/icons-material/Search";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import { Box, Dialog, DialogActions } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import {
-  editUser,
-  getUser,
-  refreshTokenUser,
-} from "../../../services/user.service";
-import { jwtDecode } from "jwt-decode";
-import { AxiosInstance } from "../../../configs/axios";
+import { editUser } from "../../../services/user.service";
+
 import {
   createAddress,
   deleteAddress,
   getAddressById,
-  getAllAddress,
   updateAddress,
 } from "../../../services/address.service";
+import { useAuth } from "../../Context/AuthContext";
 
 const cx = classNames.bind(styles);
 
@@ -29,14 +24,9 @@ const Profile = () => {
   const listTab = ["Tài khoản", "Đơn hàng", "Địa chỉ giao nhận"];
   const [isModalAddress, setIsModalAddress] = useState(false);
   const [isModalAdd, setIsModalAdd] = useState(false);
-  const [user, setUser] = useState({
-    id: "",
-    fullName: "",
-    email: "",
-    phone: "",
-  });
-  const [nameUser, setNameUser] = useState("");
-  const [address, setAddress] = useState([]);
+
+  // const [nameUser, setNameUser] = useState("");
+  // const [address, setAddress] = useState([]);
   const [editAddress, setEditAddress] = useState({
     titleAddress: "",
     name: "",
@@ -62,6 +52,16 @@ const Profile = () => {
     status: false,
   });
 
+  const {
+    updateUser,
+    setUpdateUser,
+    setUser,
+    nameUser,
+    setNameUser,
+    address,
+    setAddress,
+  } = useAuth();
+
   const handleFoward = (tab) => {
     setActiveTab(tab);
   };
@@ -74,52 +74,17 @@ const Profile = () => {
     setIsModalAdd((prev) => !prev);
   };
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      const token = await refreshTokenUser(); // Thử lấy access token mới
-
-      if (token) {
-        try {
-          const decodedUser = jwtDecode(token);
-
-          const user = await getUser(decodedUser.userId);
-
-          setUser({
-            id: user.user._id || "",
-            fullName: user.user.fullName || "",
-            email: user.user.email || "",
-            phone: user.user.phone || "",
-          });
-          setNameUser(user.user.fullName);
-          fetchAddress(user.user._id);
-
-          AxiosInstance.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${token}`;
-        } catch (error) {
-          console.error("❌ Lỗi giải mã token:", error);
-          setUser(null);
-        }
-      } else {
-        console.warn("🚪 Người dùng chưa đăng nhập hoặc token hết hạn");
-        setUser(null);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
   const handleChange = (e) => {
-    setUser({ ...user, [e.target.name]: e.target.value });
+    setUpdateUser({ ...updateUser, [e.target.name]: e.target.value });
   };
 
   const handleSave = async () => {
-    console.log("Thông tin đã lưu:", user);
+    console.log("Thông tin đã lưu:", updateUser);
     try {
-      const response = await editUser(user.id, {
-        fullName: user.fullName,
-        email: user.email,
-        phone: user.phone,
+      const response = await editUser(updateUser.id, {
+        fullName: updateUser.fullName,
+        email: updateUser.email,
+        phone: updateUser.phone,
       });
 
       if (response) {
@@ -132,18 +97,6 @@ const Profile = () => {
         }));
 
         setNameUser(response.user.fullName);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const fetchAddress = async (userId) => {
-    try {
-      const response = await getAllAddress(userId);
-      if (response) {
-        setAddress(response);
-        handleModal();
       }
     } catch (error) {
       console.error(error);
@@ -216,7 +169,7 @@ const Profile = () => {
 
   const handleAdd = async () => {
     try {
-      const response = await createAddress(user.id, addAddress);
+      const response = await createAddress(updateUser.id, addAddress);
       if (response) {
         setAddress((prevAddresses) =>
           addAddress.status
@@ -311,7 +264,7 @@ const Profile = () => {
               <input
                 type="text"
                 name="fullName"
-                value={user.fullName}
+                value={updateUser.fullName}
                 onChange={handleChange}
               />
             </div>
@@ -325,7 +278,7 @@ const Profile = () => {
               <input
                 type="email"
                 name="email"
-                value={user.email}
+                value={updateUser.email}
                 onChange={handleChange}
               />
             </div>
@@ -334,7 +287,7 @@ const Profile = () => {
               <input
                 type="tel"
                 name="phone"
-                value={user.phone}
+                value={updateUser.phone}
                 onChange={handleChange}
               />
             </div>

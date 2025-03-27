@@ -24,13 +24,13 @@ import {
   getUser,
   loginPost,
   logout,
-  refreshTokenUser,
   registerPost,
 } from "../../../services/user.service";
 import { jwtDecode } from "jwt-decode";
 import { AxiosInstance } from "../../../configs/axios";
-import { getCart } from "../../../services/cart.service";
 import { deleteAllLike, getLike } from "../../../services/like.service";
+import { useAuth } from "../../Context/AuthContext";
+import { getCart } from "../../../services/cart.service";
 
 const cx = classNames.bind(styles);
 
@@ -61,10 +61,18 @@ const Header = () => {
     phone: "",
     confirmPass: "",
   });
-  const [user, setUser] = useState(null);
 
-  const [cart, setCart] = useState(null);
-  const [like, setLike] = useState(null);
+  const {
+    setUpdateUser,
+    user,
+    setUser,
+    nameUser,
+    setNameUser,
+    cart,
+    setCart,
+    like,
+    setLike,
+  } = useAuth();
 
   const menuHeaders = [
     { id: 1, label: "Thương hiệu", title: "collection" },
@@ -228,15 +236,31 @@ const Header = () => {
           const decodedUser = jwtDecode(response.accessToken);
           const userData = await getUser(decodedUser.userId);
 
+          // ✅ Cập nhật state ngay lập tức
           setUser(userData.user);
+          setNameUser(userData.user.fullName);
+          setUpdateUser({
+            id: userData.user._id,
+            fullName: userData.user.fullName,
+            email: userData.user.email,
+            phone: userData.user.phone,
+          });
+
+          // ✅ Cập nhật Axios với token mới
           AxiosInstance.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${response.accessToken}`;
-          setIsModalLogin(false);
 
-          // ✅ Gọi fetchCart và fetchLike ngay sau khi đăng nhập
-          fetchCart(userData.user._id);
-          fetchLike(userData.user._id);
+          // ✅ Gọi API để cập nhật giỏ hàng & danh sách yêu thích
+          const [cartData, likeData] = await Promise.all([
+            getCart(userData.user._id),
+            getLike(userData.user._id),
+          ]);
+          setCart(cartData);
+          setLike(likeData);
+
+          // ✅ Đóng modal login nếu có
+          setIsModalLogin(false);
         }
       } else {
         // 🔵 Xử lý đăng ký
@@ -266,69 +290,6 @@ const Header = () => {
       }
     } catch (error) {
       console.error("❌ Lỗi đăng nhập / đăng ký:", error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      const token = await refreshTokenUser();
-      if (token) {
-        try {
-          const decodedUser = jwtDecode(token);
-          const userData = await getUser(decodedUser.userId);
-
-          setUser(userData.user);
-          AxiosInstance.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${token}`;
-
-          // ✅ Nếu user tồn tại, cập nhật giỏ hàng và danh sách yêu thích
-          if (userData.user) {
-            fetchCart(userData.user._id);
-            fetchLike(userData.user._id);
-          }
-        } catch (error) {
-          console.error("❌ Lỗi giải mã token:", error);
-          setUser(null);
-        }
-      } else {
-        console.warn("🚪 Người dùng chưa đăng nhập hoặc token hết hạn");
-        setUser(null);
-      }
-    };
-
-    fetchUser();
-  }, []);
-
-  // 🟢 Khi user thay đổi, tự động fetch lại giỏ hàng và danh sách yêu thích
-  useEffect(() => {
-    if (user) {
-      fetchCart(user._id);
-      fetchLike(user._id);
-    }
-  }, [user]);
-
-  const fetchCart = async (userId) => {
-    if (!userId) return; // Tránh gọi API nếu userId không tồn tại
-    try {
-      const response = await getCart(userId);
-      if (response) {
-        setCart(response);
-      }
-    } catch (error) {
-      console.error("❌ Lỗi khi tải giỏ hàng:", error);
-    }
-  };
-
-  const fetchLike = async (userId) => {
-    if (!userId) return;
-    try {
-      const response = await getLike(userId);
-      if (response) {
-        setLike(response);
-      }
-    } catch (error) {
-      console.error("❌ Lỗi khi tải giỏ thích:", error);
     }
   };
 
@@ -495,7 +456,7 @@ const Header = () => {
                 style={{ color: "#4b4b4b", marginLeft: "16px" }}
               />
               {user ? (
-                <p onClick={() => handleOpenModalLogin()}>{user.fullName}</p>
+                <p onClick={() => handleOpenModalLogin()}>{nameUser}</p>
               ) : (
                 <p onClick={() => handleModalLoginUser()}>Đăng nhập</p>
               )}
@@ -995,7 +956,7 @@ const Header = () => {
                 // <div className={cx("cart")}>
                 //   Bạn chưa có sản phẩm nào trong giỏ hàng
                 // </div>
-                <Cart cart={cart} />
+                <Cart cart={cart} setCart={setCart} />
               )}
 
               {selectedCart === "delivery" && (
@@ -1089,7 +1050,7 @@ const Header = () => {
           </div>
 
           <div className={cx("body-fav")}>
-            <CartFav like={like} />
+            <CartFav like={like} setLike={setLike} />
           </div>
         </Box>
       </Dialog>

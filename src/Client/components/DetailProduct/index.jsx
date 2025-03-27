@@ -20,11 +20,11 @@ import { addToLike } from "../../../services/like.service";
 
 const cx = classNames.bind(styles);
 
-const DetailProduct = () => {
+const DetailProduct = ({ setLike, setCart }) => {
   const [mainImage, setMainImage] = useState([]); // State to track the main image
   const [selectedImage, setSelectedImage] = useState([]); // State to track the selected thumbnail
   const sliderRef = useRef(null);
-  const [like, setLike] = useState(false);
+  const [isLike, setIsLike] = useState(false);
   const [quantity, setQuantity] = useState(1);
   const location = useLocation();
   const { id } = location.state;
@@ -69,11 +69,11 @@ const DetailProduct = () => {
   };
 
   const handleLike = () => {
-    if (like === false) {
+    if (isLike === false) {
       handleAddLike();
-      setLike(true);
+      setIsLike(true);
     } else {
-      setLike(false);
+      setIsLike(false);
     }
   };
 
@@ -127,6 +127,7 @@ const DetailProduct = () => {
 
       if (response) {
         console.log(response);
+        setCart(response.cart);
       }
     } catch (error) {
       console.error(
@@ -135,8 +136,6 @@ const DetailProduct = () => {
       );
     }
   };
-
-  console.log(product._id);
 
   const handleAddLike = async () => {
     if (!userId || !product._id) {
@@ -149,6 +148,7 @@ const DetailProduct = () => {
 
       if (response) {
         console.log(response);
+        setLike(response.like);
       }
     } catch (error) {
       console.error(
@@ -222,11 +222,29 @@ const DetailProduct = () => {
             </div>
           </div>
           <div className={cx("price_product")}>
-            <div className={cx("new_price")}>711.000đ</div>
-            <div className={cx("price")}>{product.price}</div>
-            <span className={cx("discount-tag")}>
-              <div className={cx("tag")}>-{product.discountPercentage}%</div>
-            </span>
+            <div className={cx("new_price")}>
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(
+                product.price -
+                  (product.price * product.discountPercentage) / 100
+              )}
+            </div>
+            {product.discountPercentage !== 0 && (
+              <div className={cx("price")}>
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  currency: "VND",
+                }).format(product.price)}
+              </div>
+            )}
+
+            {product.discountPercentage !== 0 && (
+              <span className={cx("discount-tag")}>
+                <div className={cx("tag")}>-{product.discountPercentage}%</div>
+              </span>
+            )}
           </div>
         </div>
         <div className={cx("shopping-options")}>
@@ -285,7 +303,7 @@ const DetailProduct = () => {
           </div>
           <div className={cx("like")} onClick={handleLike}>
             <button>
-              {like === true ? (
+              {isLike === true ? (
                 <FavoriteIcon style={{ color: "red" }} />
               ) : (
                 <FavoriteBorderIcon />

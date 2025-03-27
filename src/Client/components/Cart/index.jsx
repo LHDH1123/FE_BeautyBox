@@ -8,11 +8,13 @@ import {
   removeFromCart,
   updateCartQuantity,
 } from "../../../services/cart.service";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
-function Cart({ cart }) {
+function Cart({ cart, setCart }) {
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   // Lấy thông tin sản phẩm từ API
   useEffect(() => {
@@ -31,6 +33,7 @@ function Cart({ cart }) {
               SKU: product[0].SKU,
               title: product[0].title,
               price: product[0].price,
+              slug: product[0].slug,
               discountPercentage: product[0].discountPercentage,
               quantity: item.quantity, // Lấy số lượng từ cart
             };
@@ -58,6 +61,8 @@ function Cart({ cart }) {
     const response = await updateCartQuantity(cart.user_id, id, newQuantity);
     if (!response) {
       console.error("❌ Cập nhật số lượng thất bại");
+    } else {
+      setCart(response.cart);
     }
   };
 
@@ -68,7 +73,12 @@ function Cart({ cart }) {
       setProducts((prevProducts) =>
         prevProducts.filter((product) => product.id !== id)
       );
+      setCart(response.cart);
     }
+  };
+
+  const handleNavigate = (id, slug) => {
+    navigate(`/detailProduct/${slug}`, { state: { id } });
   };
 
   return (
@@ -88,7 +98,12 @@ function Cart({ cart }) {
             </div>
             <div className={cx("info-product")}>
               <div className={cx("title-product")}>
-                <a href="/">{product.title}</a>
+                <div
+                  style={{ cursor: "pointer" }}
+                  onClick={() => handleNavigate(product.id, product.slug)}
+                >
+                  {product.title}
+                </div>
                 <div
                   className={cx("remove-cart")}
                   onClick={() => handleRemoveCart(product.id)}
