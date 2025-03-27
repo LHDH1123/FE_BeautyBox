@@ -3,7 +3,7 @@ import classNames from "classnames/bind";
 import styles from "./CheckOut.module.scss";
 import RemoveIcon from "@mui/icons-material/Remove";
 import AddIcon from "@mui/icons-material/Add";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { getDetailProduct } from "../../../services/product.service";
 import {
   getAllVouchers,
@@ -13,9 +13,18 @@ import {
   removeFromCart,
   updateCartQuantity,
 } from "../../../services/cart.service";
-import { getAllAddress } from "../../../services/address.service";
-import { refreshTokenUser } from "../../../services/user.service";
+import {
+  createAddress,
+  getAddressById,
+  getAllAddress,
+  updateAddress,
+} from "../../../services/address.service";
+import { getUser, refreshTokenUser } from "../../../services/user.service";
 import { jwtDecode } from "jwt-decode";
+import { Box, Dialog, DialogActions } from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import { createOrder } from "../../../services/checkout.service";
 
 const cx = classNames.bind(styles);
 
@@ -29,10 +38,28 @@ const CheckoutPage = () => {
   const [userId, setUserId] = useState([]);
   const [allAddress, setAllAddress] = useState([]);
   const [defaultddress, setDefaultddress] = useState([]);
-
-  // console.log(selectedVoucher);
+  const [isAddress, setIsAddress] = useState(false);
+  const [editAddress, setEditAddress] = useState({
+    titleAddress: "",
+    name: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    city: "",
+    districts: "",
+    ward: "",
+    address: "",
+    status: true,
+  });
   const location = useLocation();
   const cart = location.state;
+  const [isModalAddress, setIsModalAddress] = useState(false);
+  const [isModalAllAddress, setIsModalAllAddress] = useState(false);
+  // const [address, setAddress] = useState([]);
+  const [selectedAddress, setSelectedAddress] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+
+  const navigate = useNavigate();
 
   const fetchVoucherDiscount = async () => {
     try {
@@ -53,20 +80,39 @@ const CheckoutPage = () => {
         const response = await getAllAddress(userId);
         if (response) {
           setAllAddress(response);
-
-          // Lọc địa chỉ mặc định (status === true)
-          const defaultAddress = response.find(
-            (address) => address.status === true
-          );
-          if (defaultAddress) {
-            setDefaultddress(defaultAddress);
-          }
         }
+        const defaultAddress = response.find(
+          (address) => address.status === true
+        );
+        setDefaultddress(defaultAddress);
+        setSelectedAddress(defaultAddress._id);
       }
     } catch (error) {
       console.error(error);
     }
   };
+
+  const fetchVouchers = async () => {
+    try {
+      const response = await getAllVouchers();
+      if (response) {
+        setVouchers(response);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchVoucherDiscount();
+  }, [selectedVoucher]);
+
+  useEffect(() => {
+    fetchAddress();
+    fetchVouchers();
+  }, [userId]);
+
+  // Chỉ chạy khi allAddress thay đổi
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -75,6 +121,10 @@ const CheckoutPage = () => {
         try {
           const decodedUser = jwtDecode(token);
           setUserId(decodedUser.userId);
+          const response = await getUser(decodedUser.userId);
+          if (response) {
+            setUserEmail(response.user);
+          }
         } catch (error) {
           console.error("❌ Lỗi giải mã token:", error);
         }
@@ -123,29 +173,12 @@ const CheckoutPage = () => {
     fetchProductDetails();
   }, [cart]);
 
-  const fetchVouchers = async () => {
-    try {
-      const response = await getAllVouchers();
-      if (response) {
-        setVouchers(response);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  useEffect(() => {
-    fetchVouchers();
-    fetchVoucherDiscount();
-    fetchAddress();
-  });
-
   const handlePaymentChange = (method) => {
     setSelectedPayment(method);
   };
 
-  const handleVoucherChange = (voucher) => {
-    setSelectedVoucher(voucher);
+  const handleVoucherChange = (id) => {
+    setSelectedVoucher(id);
   };
 
   const handleUpdateQuantity = async (id, newQuantity) => {
@@ -191,11 +224,139 @@ const CheckoutPage = () => {
     }
   };
 
+  const handleModal = () => {
+    setIsModalAddress((prev) => !prev);
+  };
+
+  const handleModalAllAddress = () => {
+    setIsModalAllAddress((prev) => !prev);
+  };
+
+  const handleChangeEdit = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    setEditAddress((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleUpdateAddress = async () => {
+    try {
+      const response = await updateAddress(editAddress._id, editAddress);
+      if (response) {
+        setAllAddress((prevAddresses) =>
+          prevAddresses.map(
+            (addr) =>
+              addr._id === editAddress._id
+                ? { ...response, status: editAddress.status }
+                : { ...addr, status: editAddress.status ? false : addr.status } // Set false nếu addr không phải là editAddress
+          )
+        );
+        handleModal();
+      }
+    } catch (error) {
+      console.error("Lỗi khi cập nhật địa chỉ:", error);
+    }
+  };
+
+  const handleEdit = async (id) => {
+    handleModal();
+    try {
+      const response = await getAddressById(id);
+      if (response) {
+        setEditAddress(response);
+      } else {
+        console.warn("No address found for the given ID");
+      }
+    } catch (error) {
+      console.error("Error fetching address:", error);
+    }
+  };
+
+  const handleModalAdd = async () => {
+    handleModal();
+    setEditAddress({
+      titleAddress: "",
+      name: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      city: "",
+      districts: "",
+      ward: "",
+      address: "",
+      status: true,
+    });
+    setIsAddress(true);
+  };
+
+  const handleAdd = async () => {
+    try {
+      const response = await createAddress(userId, editAddress);
+      if (response) {
+        setAllAddress((prevAddresses) =>
+          allAddress.status
+            ? prevAddresses
+                .map((addr) => ({ ...addr, status: false }))
+                .concat(response.data)
+            : [...prevAddresses, response.data]
+        );
+        handleModal();
+        setEditAddress({
+          titleAddress: "",
+          name: "",
+          lastName: "",
+          email: "",
+          phone: "",
+          city: "",
+          districts: "",
+          ward: "",
+          address: "",
+          status: false,
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi khi thêm địa chỉ:", error);
+    }
+  };
+
+  const handleChooseAddress = async () => {
+    try {
+      const response = await getAddressById(selectedAddress);
+      if (response) {
+        setDefaultddress(response);
+        setIsModalAllAddress(false);
+      } else {
+        console.warn("No address found for the given ID");
+      }
+    } catch (error) {
+      console.error("Error fetching address:", error);
+    }
+  };
+
+  const handleOrder = async () => {
+    try {
+      const response = await createOrder(userId);
+      if (response) {
+        console.log(response);
+        const orderId = response;
+        navigate("/order-checkout", { state: { orderId, sale } });
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div className={cx("checkout-container")}>
       <div className={cx("left-section")}>
         <div className={cx("title")}>Thông tin thanh toán</div>
-        <BuyerInfo defaultddress={defaultddress} />
+        <BuyerInfo
+          defaultddress={defaultddress}
+          handleModalAllAddress={handleModalAllAddress}
+          userEmail={userEmail}
+        />
         <PaymentMethods
           selectedPayment={selectedPayment}
           onPaymentChange={handlePaymentChange}
@@ -215,15 +376,274 @@ const CheckoutPage = () => {
           handleRemoveCart={handleRemoveCart}
         />
         <div className={cx("btn")}>
-          <button className={cx("btn-order")}>ĐẶT HÀNG</button>
+          <button className={cx("btn-order")} onClick={handleOrder}>
+            ĐẶT HÀNG
+          </button>
         </div>
         <p className={cx("note")}>*Vui lòng không hủy đơn hàng đã thanh toán</p>
       </div>
+
+      <Dialog
+        open={isModalAddress}
+        onClose={handleModal}
+        maxWidth="none"
+        PaperProps={{
+          style: {
+            marginTop: "-30px",
+            borderRadius: "16px",
+            height: "600px",
+            width: "700px",
+          },
+        }}
+      >
+        <Box>
+          <DialogActions>
+            <div className={cx("btn_exit")}>
+              <button
+                onClick={() => {
+                  handleModal();
+                }}
+              >
+                <CloseIcon fontSize="small" style={{ color: "red" }} />
+              </button>
+            </div>
+          </DialogActions>
+
+          <div className={cx("modalContent")}>
+            {isAddress ? (
+              <div className={cx("title-edit")}>Thêm địa chỉ</div>
+            ) : (
+              <div className={cx("title-edit")}>Chỉnh sửa địa chỉ</div>
+            )}
+
+            <div className={cx("formGroup")}>
+              <input
+                type="text"
+                name="titleAddress"
+                value={editAddress.titleAddress}
+                className={cx("input")}
+                onChange={handleChangeEdit}
+                placeholder="Tên địa chỉ (vd: Văn phòng, Nhà, ...)"
+              />
+            </div>
+
+            <div className={cx("formGroup")}>
+              <div className={cx("fullname")}>
+                <input
+                  type="text"
+                  name="name"
+                  value={editAddress.name}
+                  className={cx("input")}
+                  onChange={handleChangeEdit}
+                  placeholder="Tên"
+                />
+                <input
+                  type="text"
+                  name="last_name"
+                  value={editAddress.last_name}
+                  className={cx("input")}
+                  onChange={handleChangeEdit}
+                  placeholder="Họ"
+                />
+              </div>
+            </div>
+
+            <div className={cx("formGroup")}>
+              <input
+                type="text"
+                name="phone"
+                value={editAddress.phone}
+                className={cx("input")}
+                onChange={handleChangeEdit}
+                placeholder="SĐT"
+              />
+            </div>
+            <div className={cx("formGroup")}>
+              <input
+                type="text"
+                name="email"
+                value={editAddress.email}
+                className={cx("input")}
+                onChange={handleChangeEdit}
+                placeholder="Email"
+              />
+            </div>
+
+            <div className={cx("formGroup")}>
+              <input
+                type="text"
+                name="city"
+                value={editAddress.city}
+                className={cx("input")}
+                onChange={handleChangeEdit}
+                placeholder="Tỉnh/ Thành phố"
+              />
+            </div>
+
+            <div className={cx("formGroup")}>
+              <div className={cx("districts")}>
+                <input
+                  type="text"
+                  name="districts"
+                  value={editAddress.districts}
+                  className={cx("input")}
+                  onChange={handleChangeEdit}
+                  placeholder="Quận/ Huyện"
+                />
+                <input
+                  type="text"
+                  name="ward"
+                  value={editAddress.ward}
+                  className={cx("input")}
+                  onChange={handleChangeEdit}
+                  placeholder="Phường/ Xã"
+                />
+              </div>
+            </div>
+
+            <div className={cx("formGroup")}>
+              <input
+                type="text"
+                name="address"
+                value={editAddress.address}
+                className={cx("input")}
+                onChange={handleChangeEdit}
+                placeholder="Tòa nhà, số nhà, tên đường"
+              />
+            </div>
+
+            <div className={cx("formGroup")}>
+              <div className={cx("default")}>
+                <div>
+                  <input
+                    type="checkbox"
+                    name="status"
+                    checked={editAddress.status}
+                    onChange={(e) =>
+                      setEditAddress({
+                        ...editAddress,
+                        status: e.target.checked,
+                      })
+                    }
+                    className={cx("input")}
+                  />
+                </div>
+                <div className={cx("addressDefault")}>
+                  Đặt làm dịa chỉ mặc định
+                </div>
+              </div>
+            </div>
+
+            <div className={cx("buttons")}>
+              {isAddress ? (
+                <div>
+                  <button
+                    type="submit"
+                    className={cx("btn-submit")}
+                    onClick={handleAdd}
+                  >
+                    Lưu
+                  </button>
+                </div>
+              ) : (
+                <div>
+                  <button
+                    type="submit"
+                    className={cx("btn-submit")}
+                    onClick={handleUpdateAddress}
+                  >
+                    Lưu
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </Box>
+      </Dialog>
+
+      <Dialog
+        open={isModalAllAddress}
+        onClose={handleModalAllAddress}
+        maxWidth="none"
+        PaperProps={{
+          style: {
+            marginTop: "-200px",
+            borderRadius: "16px",
+            width: "700px",
+          },
+        }}
+      >
+        <Box>
+          <DialogActions>
+            <div className={cx("btn_exit")}>
+              <button
+                onClick={() => {
+                  handleModalAllAddress();
+                }}
+              >
+                <CloseIcon fontSize="small" style={{ color: "red" }} />
+              </button>
+            </div>
+          </DialogActions>
+
+          <div className={cx("modalContent")}>
+            <div className={cx("title-choose")}>Chọn địa chỉ</div>
+
+            <div>
+              {allAddress.map((address) => (
+                <div key={address._id} className={cx("address-item")}>
+                  <input
+                    type="radio"
+                    value={address.id}
+                    checked={selectedAddress === address._id}
+                    onChange={() => setSelectedAddress(address._id)}
+                  />
+                  <div className={cx("address-info")}>
+                    <div className={cx("title-header")}>
+                      <div className={cx("title-address")}>
+                        {address.last_name} {address.name} | {address.phone} |{" "}
+                        {address.email}
+                      </div>
+                      <div className={cx("icon-edit")}>
+                        {address.status === true && (
+                          <div className={cx("title-default")}>Mặc định</div>
+                        )}
+                        <DriveFileRenameOutlineIcon
+                          fontSize="inherit"
+                          sx={{
+                            color: "#ab2328",
+                            marginTop: "5px",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => handleEdit(address._id)}
+                        />
+                      </div>
+                    </div>
+                    <div className={cx("title-address")}>
+                      {address.titleAddress} | {address.address}, {address.ward}
+                      , {address.districts}, {address.city}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className={cx("add-save")}>
+              <div className={cx("add")} onClick={handleModalAdd}>
+                + Thêm địa chỉ
+              </div>
+              <button className={cx("save")} onClick={handleChooseAddress}>
+                Lưu
+              </button>
+            </div>
+          </div>
+        </Box>
+      </Dialog>
     </div>
   );
 };
 
-const BuyerInfo = ({ defaultddress }) => {
+const BuyerInfo = ({ defaultddress, handleModalAllAddress, userEmail }) => {
   return (
     <div>
       <div className={cx("contact-account")}>
@@ -232,8 +652,7 @@ const BuyerInfo = ({ defaultddress }) => {
         </div>
         <div className={cx("account")}>
           <span>Bạn đã đăng nhập với tài khoản </span>
-          <span className={cx("text-underline")}>{defaultddress.email}</span>.
-          <span className={cx("logout")}> Đăng xuất</span>
+          <span className={cx("text-underline")}>{userEmail.email}</span>.
         </div>
       </div>
       <div
@@ -251,7 +670,9 @@ const BuyerInfo = ({ defaultddress }) => {
             {defaultddress.city}
           </div>
         </div>
-        <div className={cx("change")}>Thay đổi</div>
+        <div className={cx("change")} onClick={() => handleModalAllAddress()}>
+          Thay đổi
+        </div>
       </div>
     </div>
   );
@@ -442,7 +863,7 @@ const OrderSummary = ({
             {new Intl.NumberFormat("vi-VN", {
               style: "currency",
               currency: "VND",
-            }).format(totalPrice - totalPrice * sale + 12000)}
+            }).format(totalPrice + totalPrice * sale + 12000)}
           </div>
         </div>
       </div>

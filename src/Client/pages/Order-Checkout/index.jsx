@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -11,44 +11,40 @@ import {
   Box,
   Avatar,
 } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import { OrderSuccess } from "../../../services/checkout.service";
 
 const OrderSummary = () => {
-  const orderItems = [
-    {
-      name: "Mascara Chống Trôi Clio Kill Lash Superproof Mascara 7G",
-      price: 339000,
-      sku: "17990022",
-      quantity: 1,
-      image: "https://via.placeholder.com/50",
-    },
-    {
-      name: "Son Kem Peripera Mịn Lì Over Blur Tint 3.5g",
-      price: 249000,
-      sku: "25260012",
-      quantity: 1,
-      image: "https://via.placeholder.com/50",
-    },
-    {
-      name: "Nước Cân Bằng Cocoon Hoa Sen Hau Giang Lotus Soothing Toner",
-      price: 195000,
-      sku: "11111239",
-      quantity: 1,
-      image: "https://via.placeholder.com/50",
-    },
-  ];
+  const location = useLocation();
+  const { orderId, sale } = location.state; // Nhận orderId từ location.state
+  const [order, setOrder] = useState(null);
+  console.log(sale);
+  console.log(orderId);
 
-  const discount = 130000;
-  const shipping = 12000;
-  const subtotal = orderItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  );
-  const total = subtotal - discount + shipping;
+  useEffect(() => {
+    const fetchOrderSuccess = async () => {
+      try {
+        const response = await OrderSuccess(orderId.orderId);
+        if (response) {
+          setOrder(response.order);
+        }
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy đơn hàng:", error);
+      }
+    };
+
+    fetchOrderSuccess();
+  }, [orderId]);
+
+  if (!order) {
+    return <Typography align="center">Đang tải đơn hàng...</Typography>;
+  }
 
   return (
     <div>
       <h1 style={{ maxWidth: 1050, margin: "auto" }}>
-        Order# <span>32LAGJ23</span>
+        Order#
+        <span>{order._id}</span>
       </h1>
       <Card
         sx={{
@@ -65,12 +61,12 @@ const OrderSummary = () => {
             Đơn hàng
           </Typography>
           <List>
-            {orderItems.map((item, index) => (
+            {order.products.map((item, index) => (
               <div key={index}>
                 <ListItem sx={{ px: 3 }} style={{ padding: "10px 0px" }}>
                   <Avatar
-                    src={item.image}
-                    alt={item.name}
+                    src={item.productInfo.thumbnail[0]}
+                    alt={item.productInfo.title}
                     sx={{ width: 50, height: 50, marginRight: 2 }}
                   />
                   <ListItemText
@@ -81,20 +77,18 @@ const OrderSummary = () => {
                           cursor: "pointer",
                         }}
                       >
-                        {item.name}
+                        {item.productInfo.title}
                       </span>
                     }
                     secondary={
-                      <span style={{ color: "black" }}>
-                        <span>SKU:</span> {item.sku} &nbsp; x{item.quantity}
-                      </span>
+                      <span style={{ color: "black" }}>x{item.quantity}</span>
                     }
                   />
                   <Typography variant="body1" fontWeight="bold">
-                    {item.price.toLocaleString()}đ
+                    {parseInt(item.priceNew).toLocaleString()}đ
                   </Typography>
                 </ListItem>
-                {index < orderItems.length - 1 && <Divider />}
+                {index < order.products.length - 1 && <Divider />}
               </div>
             ))}
           </List>
@@ -103,23 +97,36 @@ const OrderSummary = () => {
 
           <Box display="flex" justifyContent="space-between" my={1} px={0}>
             <Typography>Tạm tính</Typography>
-            <Typography>{subtotal.toLocaleString()}đ</Typography>
+            <Typography>
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(order.total)}
+            </Typography>
           </Box>
           <Box display="flex" justifyContent="space-between" my={1} px={0}>
             <Typography>Giảm giá</Typography>
             <Typography color="#0992d0">
-              -{discount.toLocaleString()}đ
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(order.total * sale)}
             </Typography>
           </Box>
-          <Box display="flex" flexWrap="wrap" gap={1} mt={2} px={3}>
+          {/* <Box display="flex" flexWrap="wrap" gap={1} mt={2} px={3}>
             <Chip label="sticker vegan" variant="outlined" />
             <Chip label="AWO CLIO - Đồng giá 279k" variant="outlined" />
             <Chip label="AWO CLIO - Đồng giá 179k" variant="outlined" />
             <Chip label="FREESHIP 15k cho mọi đơn" variant="outlined" />
-          </Box>
+          </Box> */}
           <Box display="flex" justifyContent="space-between" my={1} px={0}>
             <Typography>Shipping</Typography>
-            <Typography>{shipping.toLocaleString()}đ</Typography>
+            <Typography>
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                currency: "VND",
+              }).format(12000)}
+            </Typography>
           </Box>
 
           <Divider sx={{ my: 2 }} />
@@ -132,7 +139,13 @@ const OrderSummary = () => {
             px={0}
           >
             <Typography>Tổng</Typography>
-            <Typography>{total.toLocaleString()}đ</Typography>
+            <Typography>
+              {new Intl.NumberFormat("vi-VN", {
+                style: "currency",
+                fontWeight: "bold",
+                currency: "VND",
+              }).format(order.total + order.total * sale + 12000)}
+            </Typography>
           </Box>
         </CardContent>
       </Card>
