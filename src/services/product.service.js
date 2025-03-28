@@ -20,6 +20,16 @@ export async function getDetailProduct(id) {
   }
 }
 
+export async function getDetailProductSlug(slug) {
+  try {
+    const response = await AxiosInstance.get(`/products/slug/${slug}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return null;
+  }
+}
+
 export async function addProduct(data) {
   try {
     const response = await AxiosInstance.post("/products/create", data);

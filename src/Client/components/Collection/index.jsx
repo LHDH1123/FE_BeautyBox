@@ -32,8 +32,8 @@ function Collection({ props }) {
     fetchBrand();
   }, []);
 
-  const handleListProduct = (name, brandId) => {
-    navigate(`/products/${name}`, { state: { brandId } });
+  const handleListProductBrand = (name) => {
+    navigate(`/products/${name}`);
   };
 
   return (
@@ -58,7 +58,7 @@ function Collection({ props }) {
               key={brand._id}
               className={cx("title-info")}
               onClick={() => {
-                handleListProduct(brand.name, brand._id);
+                handleListProductBrand(brand.name);
               }}
             >
               {brand.name}

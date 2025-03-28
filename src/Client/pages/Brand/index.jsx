@@ -93,12 +93,7 @@ const Brand = () => {
                   <div className={cx("ant-row-brand")}>
                     {groupedBrands[letter].map((brand) => (
                       <div key={brand} className={cx("list-brand")}>
-                        <a
-                          role="presentation"
-                          href={`/collections/${brand
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")}`}
-                        >
+                        <a role="presentation" href={`/products/${brand}`}>
                           <span className="size-16 link">{brand}</span>
                         </a>
                       </div>

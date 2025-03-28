@@ -20,6 +20,16 @@ export async function getDetail(id) {
   }
 }
 
+export async function getDetailName(name) {
+  try {
+    const response = await AxiosInstance.get(`/brands/name/${name}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching brands:", error);
+    return null;
+  }
+}
+
 export async function addBrand(brand) {
   try {
     const response = await AxiosInstance.post("/brands/create", brand);

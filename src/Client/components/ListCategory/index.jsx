@@ -5,15 +5,20 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import StarIcon from "@mui/icons-material/Star";
 import { getAllProducts } from "../../../services/product.service";
-import { getCategorys } from "../../../services/category.service";
-import { getNameBrand } from "../../../services/brand.service";
+import {
+  getCategorys,
+  getDetailSlug,
+} from "../../../services/category.service";
+import { getDetailName, getNameBrand } from "../../../services/brand.service";
+import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
-function ListCategory({ id, brandId, onTotalChange }) {
+function ListCategory({ slug, onTotalChange }) {
   const scrollableRef = useRef(null);
   const [favoritedItems, setFavoritedItems] = useState([]);
   const [listProduct, setListProduct] = useState([]);
+  const navigate = useNavigate();
 
   const handleClickTym = (index) => {
     setFavoritedItems((prev) => {
@@ -40,29 +45,36 @@ function ListCategory({ id, brandId, onTotalChange }) {
           categoryMap.set(cat._id, cat.parent_id);
         });
 
-        // Lấy tất cả danh mục con của `id`
+        const detailSlug = await getDetailSlug(slug);
+
         const categorySet = new Set();
-        const findCategories = (categoryId) => {
-          if (!categorySet.has(categoryId)) {
-            categorySet.add(categoryId);
-            allCategories.forEach((cat) => {
-              if (cat.parent_id === categoryId) {
-                findCategories(cat._id);
-              }
-            });
-          }
-        };
-        findCategories(id);
+        if (detailSlug && detailSlug._id) {
+          // Kiểm tra `_id` tồn tại
+          // Lấy tất cả danh mục con của `id`
+          const findCategories = (categoryId) => {
+            if (!categorySet.has(categoryId)) {
+              categorySet.add(categoryId);
+              allCategories.forEach((cat) => {
+                if (cat.parent_id === categoryId) {
+                  findCategories(cat._id);
+                }
+              });
+            }
+          };
+          findCategories(detailSlug._id);
+        }
 
         // Lọc sản phẩm theo danh mục trước
         // let filteredProducts = allProducts.filter((product) =>
         //   categorySet.has(product.category_id)
         // );
+        const detailNameBrand = await getDetailName(slug);
+
         let filteredProducts = [];
         // Nếu có brandId, lọc theo thương hiệu
-        if (brandId) {
+        if (detailNameBrand && detailNameBrand._id) {
           filteredProducts = allProducts.filter(
-            (product) => product.brand_id === brandId
+            (product) => product.brand_id === detailNameBrand._id
           );
         } else {
           filteredProducts = allProducts.filter((product) =>
@@ -102,14 +114,22 @@ function ListCategory({ id, brandId, onTotalChange }) {
     };
 
     fetchData();
-  }, [id, brandId, onTotalChange]);
+  }, [slug, onTotalChange]);
+
+  const handleDetail = (slug) => {
+    navigate(`/detailProduct/${slug}`);
+  };
 
   return (
     <div className={cx("list")}>
       <div className={cx("scroll-list")}>
         <div className={cx("list_product")} ref={scrollableRef}>
           {listProduct.map((product, index) => (
-            <div key={product._id} className={cx("product")}>
+            <div
+              key={product._id}
+              className={cx("product")}
+              onClick={() => handleDetail(product.slug)}
+            >
               <div className={cx("productList-img")}>
                 <img
                   src={
@@ -132,7 +152,12 @@ function ListCategory({ id, brandId, onTotalChange }) {
                 </div>
               </div>
               <div className={cx("product_info")}>
-                <a href="/">{product.nameBrand}</a>
+                <a
+                  href={`/products/${product.nameBrand}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {product.nameBrand}
+                </a>
                 <div className={cx("description")}>{product.title}</div>
                 <div className={cx("price_product")}>
                   <div className={cx("new_price")}>

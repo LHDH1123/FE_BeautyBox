@@ -217,8 +217,8 @@ const Header = () => {
     setSelectedCart(buttonId);
   };
 
-  const handleListProduct = (slug, id, title) => {
-    navigate(`/products/${slug}`, { state: { id, title } });
+  const handleListProduct = (slug, title) => {
+    navigate(`/products/${slug}`, { state: { title } });
     // console.log(id, slug);
   };
 
@@ -605,7 +605,7 @@ const Header = () => {
             <div
               key={menu._id}
               className={cx("menu-header")}
-              onClick={() => handleListProduct(menu.slug, menu._id, menu.title)}
+              onClick={() => handleListProduct(menu.slug, menu.title)}
               onMouseEnter={() => setHoveredMenu(menu._id)}
               onMouseLeave={() => {
                 setHoveredMenu(null);

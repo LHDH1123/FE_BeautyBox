@@ -102,8 +102,8 @@ function ListProduct({ title }) {
     );
   };
 
-  const handleDetail = (slug, id) => {
-    navigate(`/detailProduct/${slug}`, { state: { id } });
+  const handleDetail = (slug) => {
+    navigate(`/detailProduct/${slug}`);
     // console.log(id, slug);
   };
 
@@ -121,7 +121,7 @@ function ListProduct({ title }) {
             <div
               key={product._id}
               className={cx("product")}
-              onClick={() => handleDetail(product.slug, product._id)}
+              onClick={() => handleDetail(product.slug)}
             >
               <div className={cx("tym")} onClick={() => handleClickTym(index)}>
                 {favoritedItems[index] ? (
@@ -134,7 +134,9 @@ function ListProduct({ title }) {
                 <img src={product.thumbnail[0]} alt="Product" />
               </div>
               <div className={cx("product_info")}>
-                <a href="/">{product.nameBrand}</a>
+                <a href={`/products/${product.nameBrand}`}>
+                  {product.nameBrand}
+                </a>
                 <div className={cx("description")}>{product.title}</div>
                 <div className={cx("price_product")}>
                   {product.discountPercentage === 0 ? (

@@ -20,6 +20,16 @@ export async function getDetail(id) {
   }
 }
 
+export async function getDetailSlug(slug) {
+  try {
+    const response = await AxiosInstance.get(`/categorys/slug/${slug}`);
+    return response;
+  } catch (error) {
+    console.error("Error fetching categorys:", error);
+    return null;
+  }
+}
+
 export async function addCategory(data) {
   try {
     const response = await AxiosInstance.post("/categorys/create", data);

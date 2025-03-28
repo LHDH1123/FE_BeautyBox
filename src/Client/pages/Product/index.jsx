@@ -6,13 +6,14 @@ import ListCategory from "../../components/ListCategory";
 import Sidebar from "../../components/Sidebar";
 import Filter from "../../components/Filter";
 import { FilterProvider } from "../../Context/FilterContext"; // Import FilterProvider
-import { useLocation } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
 const Product = () => {
   const location = useLocation();
-  const { id, title, brandId } = location.state || {};
+  const { title } = location.state || {};
+  const { slug } = useParams();
 
   const [totalProducts, setTotalProducts] = useState(0);
 
@@ -25,11 +26,7 @@ const Product = () => {
           <div className={cx("sidebar")}>
             <Sidebar />
           </div>
-          <ListCategory
-            id={id}
-            brandId={brandId}
-            onTotalChange={setTotalProducts}
-          />
+          <ListCategory slug={slug} onTotalChange={setTotalProducts} />
         </div>
       </div>
     </FilterProvider>

@@ -78,8 +78,8 @@ function CartFav({ like, setLike }) {
     }
   };
 
-  const handleNavigate = (id, slug) => {
-    navigate(`/detailProduct/${slug}`, { state: { id } });
+  const handleNavigate = (slug) => {
+    navigate(`/detailProduct/${slug}`);
   };
 
   return (
@@ -94,7 +94,7 @@ function CartFav({ like, setLike }) {
               {/* <div className={cx("description-product")}>Sản phẩm 1</div> */}
               <div
                 style={{ fontWeight: "bold", cursor: "pointer" }}
-                onClick={() => handleNavigate(product.id, product.slug)}
+                onClick={() => handleNavigate(product.slug)}
               >
                 {product.title}
               </div>

@@ -281,6 +281,12 @@
   color: rgb(176, 16, 15);
   margin: 5px 0px;
   font-weight: 700;
+  text-decoration: none;
+}
+
+.brand:hover {
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 .info-product h1 {

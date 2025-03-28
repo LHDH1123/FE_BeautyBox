@@ -9,8 +9,8 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import Rating from "@mui/material/Rating";
-import { useLocation } from "react-router-dom";
-import { getDetailProduct } from "../../../services/product.service";
+import { useParams } from "react-router-dom";
+import { getDetailProductSlug } from "../../../services/product.service";
 import { getNameBrand } from "../../../services/brand.service";
 import { refreshTokenUser } from "../../../services/user.service";
 import { jwtDecode } from "jwt-decode";
@@ -26,8 +26,7 @@ const DetailProduct = ({ setLike, setCart }) => {
   const sliderRef = useRef(null);
   const [isLike, setIsLike] = useState(false);
   const [quantity, setQuantity] = useState(1);
-  const location = useLocation();
-  const { id } = location.state;
+  const { slug } = useParams();
   const [userId, setUserId] = useState(1);
 
   const [product, setProduct] = useState([]);
@@ -35,10 +34,10 @@ const DetailProduct = ({ setLike, setCart }) => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await getDetailProduct(id);
+        const response = await getDetailProductSlug(slug);
         if (response) {
-          const nameBrand = await getNameBrand(response[0].brand_id);
-          const updatedProduct = { ...response[0], nameBrand };
+          const nameBrand = await getNameBrand(response.brand_id);
+          const updatedProduct = { ...response, nameBrand };
 
           setProduct(updatedProduct);
           if (updatedProduct.thumbnail.length > 1) {
@@ -53,10 +52,10 @@ const DetailProduct = ({ setLike, setCart }) => {
       }
     };
 
-    if (id) {
+    if (slug) {
       fetchProduct();
     }
-  }, [id]);
+  }, [slug]);
 
   const handleUpQuantity = () => {
     setQuantity(quantity + 1);
@@ -196,7 +195,9 @@ const DetailProduct = ({ setLike, setCart }) => {
 
       <div className={cx("detail__content")}>
         <div className={cx("info-product")}>
-          <div className={cx("brand")}>{product.nameBrand}</div>
+          <a href={`/products/${product.nameBrand}`} className={cx("brand")}>
+            {product.nameBrand}
+          </a>
           <h1>{product.title}</h1>
           <div className={cx("review")}>
             <div className={cx("evaluate")}>

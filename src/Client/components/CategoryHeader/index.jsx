@@ -46,8 +46,8 @@ function CategoryHeader({ props }) {
     fetchCategorys();
   }, [props]);
 
-  const handleListProduct = (slug, id, title) => {
-    navigate(`/products/${slug}`, { state: { id, title } });
+  const handleListProduct = (slug, title) => {
+    navigate(`/products/${slug}`, { state: { title } });
   };
 
   return (
@@ -58,11 +58,7 @@ function CategoryHeader({ props }) {
             <div
               className={cx("title-category")}
               onClick={() =>
-                handleListProduct(
-                  categoryGroup.slug,
-                  categoryGroup.parent_id,
-                  categoryGroup.title
-                )
+                handleListProduct(categoryGroup.slug, categoryGroup.title)
               }
             >
               {categoryGroup.title}
