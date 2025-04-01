@@ -1,5 +1,15 @@
 import { AxiosInstance } from "../configs/axios";
 
+export async function getAllUser() {
+  try {
+    const response = await AxiosInstance.get(`/user`);
+    return response;
+  } catch (error) {
+    console.error("Lỗi lấy tất cả người dùng:", error);
+    return null;
+  }
+}
+
 export async function getUser(id) {
   try {
     const response = await AxiosInstance.get(`/user/${id}`);

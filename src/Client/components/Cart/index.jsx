@@ -77,8 +77,8 @@ function Cart({ cart, setCart }) {
     }
   };
 
-  const handleNavigate = (slug) => {
-    navigate(`/detailProduct/${slug}`);
+  const handleNavigate = (id, slug) => {
+    navigate(`/detailProduct/${slug}`, { state: { id } });
   };
 
   return (
@@ -100,7 +100,7 @@ function Cart({ cart, setCart }) {
               <div className={cx("title-product")}>
                 <div
                   style={{ cursor: "pointer" }}
-                  onClick={() => handleNavigate(product.slug)}
+                  onClick={() => handleNavigate(product.id, product.slug)}
                 >
                   {product.title}
                 </div>

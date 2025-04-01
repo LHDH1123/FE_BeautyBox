@@ -5,3 +5,4 @@ export * as roleService from "./role.service";
 export * as accountService from "./account.service";
 export * as authService from "./auth.service";
 export * as userService from "./user.service";
+export * as orderService from "./order.service";

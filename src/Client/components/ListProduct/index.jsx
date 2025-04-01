@@ -45,7 +45,12 @@ function ListProduct({ title }) {
                 (product.price * product.discountPercentage) / 100,
             }))
           );
-          setListProducts(productsWithBrand);
+          const sortedProducts = [...productsWithBrand].sort(
+            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+
+          const products = sortedProducts.slice(0, 20);
+          setListProducts(products);
           setFavoritedItems(Array(productsWithBrand.length).fill(false));
         }
       } catch (error) {

@@ -10,9 +10,12 @@ export const fetchCartDetails = async (userId) => {
   }
 };
 
-export const createOrder = async (userId) => {
+export const createOrder = async (userId, data) => {
   try {
-    const response = await AxiosInstance.post(`/check-out/order/${userId}`);
+    const response = await AxiosInstance.post(
+      `/check-out/order/${userId}`,
+      data
+    );
     return response; // Trả về thông tin đơn hàng
   } catch (error) {
     console.error("❌ Lỗi khi đặt hàng:", error);

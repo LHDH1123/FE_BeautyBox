@@ -58,7 +58,6 @@ const CheckoutPage = () => {
   // const [address, setAddress] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [userEmail, setUserEmail] = useState("");
-
   const navigate = useNavigate();
 
   const fetchVoucherDiscount = async () => {
@@ -337,7 +336,11 @@ const CheckoutPage = () => {
 
   const handleOrder = async () => {
     try {
-      const response = await createOrder(userId);
+      const fullName = userEmail.fullName;
+      const phone = userEmail.phone;
+      const address = `${defaultddress.address}, ${defaultddress.ward}, ${defaultddress.districts}, ${defaultddress.city}`;
+
+      const response = await createOrder(userId, { fullName, phone, address });
       if (response) {
         console.log(response);
         const orderId = response;

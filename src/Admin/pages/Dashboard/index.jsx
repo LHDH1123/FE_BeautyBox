@@ -18,6 +18,8 @@ import {
   Legend,
 } from "recharts";
 import { getAllProducts } from "../../../services/product.service";
+import { getAllUser } from "../../../services/user.service";
+import { getAllOrder } from "../../../services/order.service";
 const data = [
   { name: "Jan", Sales: 300 },
   { name: "Feb", Sales: 200 },
@@ -36,15 +38,74 @@ const cx = classNames.bind(styles);
 
 const Dashboard = () => {
   const [listProduct, setListProduct] = useState([]);
-
+  const [listUser, setListUser] = useState([]);
+  const [listOrder, setListOrder] = useState([]);
+  const [total, setTotal] = useState([]);
+  console.log(listProduct);
   const fetchProduct = async () => {
-    const response = await getAllProducts();
-    if (response) {
-      setListProduct(response);
+    try {
+      const response = await getAllProducts();
+      if (response) {
+        // Sắp xếp sản phẩm theo createAt giảm dần (mới nhất -> cũ nhất)
+        const sortedProducts = response.sort(
+          (a, b) =>
+            new Date(b.createdBy.createAt) - new Date(a.createdBy.createAt)
+        );
+
+        // Lấy 5 sản phẩm mới nhất
+        const latestProducts = sortedProducts.slice(0, 5);
+
+        setListProduct(latestProducts);
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy sản phẩm:", error);
     }
   };
+
+  const fetchUsers = async () => {
+    try {
+      const response = await getAllUser();
+      if (response) {
+        setListUser(response);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const fetchOrders = async () => {
+    try {
+      const response = await getAllOrder();
+      if (response) {
+        setListOrder(response);
+
+        const calculateTotalPrice = (orders) => {
+          return orders.reduce((total, order) => {
+            const orderTotal = order.products.reduce((sum, product) => {
+              return (
+                sum +
+                (product.price -
+                  (product.price * product.discountPercentage) / 100) *
+                  product.quantity
+              );
+            }, 0);
+            return total + orderTotal;
+          }, 0);
+        };
+
+        // Gọi hàm để tính tổng
+        const totalPrice = calculateTotalPrice(response);
+        setTotal(totalPrice.toLocaleString("vi-VN"));
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   useEffect(() => {
     fetchProduct();
+    fetchUsers();
+    fetchOrders();
   }, []);
 
   return (
@@ -86,7 +147,7 @@ const Dashboard = () => {
             <h6>Doanh Thu</h6>
             <h3>
               <span className={cx("counters")} data-count="95000.45">
-                95000.45
+                {total}
               </span>
               VNĐ
             </h3>
@@ -95,14 +156,14 @@ const Dashboard = () => {
         </div>
         <div className={cx("total-oder")}>
           <div className={cx("card")}>
-            <h3 className={cx("counters")}>10,000</h3>
+            <h3 className={cx("counters")}>{listOrder.length}</h3>
             <div className={cx("title-card")}>Tổng hóa đơn</div>
           </div>
           <img src={iconOder} alt="" />
         </div>
         <div className={cx("total-oder", "pg-green")}>
           <div className={cx("card")}>
-            <h3 className={cx("counters")}>800</h3>
+            <h3 className={cx("counters")}>{listUser.length}</h3>
             <p>Tổng khách hàng</p>
           </div>
           <img src={iconUser} alt="" />

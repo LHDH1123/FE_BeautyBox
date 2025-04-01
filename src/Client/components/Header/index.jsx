@@ -13,7 +13,14 @@ import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { Dialog, Box, DialogActions } from "@mui/material";
+import {
+  Dialog,
+  Box,
+  DialogActions,
+  Stack,
+  Alert,
+  Snackbar,
+} from "@mui/material";
 import Cart from "../Cart";
 import CartFav from "../CartFav";
 import { useNavigate } from "react-router-dom";
@@ -31,6 +38,7 @@ import { AxiosInstance } from "../../../configs/axios";
 import { deleteAllLike, getLike } from "../../../services/like.service";
 import { useAuth } from "../../Context/AuthContext";
 import { getCart } from "../../../services/cart.service";
+import { getDetailProduct } from "../../../services/product.service";
 
 const cx = classNames.bind(styles);
 
@@ -76,10 +84,56 @@ const Header = () => {
 
   const menuHeaders = [
     { id: 1, label: "Thương hiệu", title: "collection" },
-    { id: 2, label: "Khuyến mãi hot", title: "collection" },
-    { id: 3, label: "Sản phẩm cao cấp", title: "collection" },
+    { id: 2, label: "Khuyến mãi hot", title: "new" },
+    { id: 3, label: "Sản phẩm cao cấp", title: "new" },
+    { id: 4, label: "Sản phẩm mới", title: "new" },
+    // { id: 5, label: "Mã giảm", title: "new" },
   ];
   const [listCategorys, setListCategorys] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isEmailPassword, setIsEmailPassword] = useState("");
+  const [isHaveAcc, setIsHaveAcc] = useState("");
+
+  useEffect(() => {
+    const fetchProductDetails = async () => {
+      if (!cart || !cart.products) return;
+
+      try {
+        const productDetails = await Promise.all(
+          cart.products.map(async (item) => {
+            const product = await getDetailProduct(item.product_id);
+            return {
+              id: product[0]._id,
+              SKU: product[0].SKU,
+              title: product[0].title,
+              price: product[0].price,
+              discountPercentage: product[0].discountPercentage,
+              quantity: item.quantity, // Lấy số lượng từ cart
+            };
+          })
+        );
+
+        const calculateTotalPrice = () => {
+          const total = productDetails.reduce((acc, product) => {
+            const discountedPrice =
+              product.price -
+              (product.price * product.discountPercentage) / 100;
+            return acc + discountedPrice * product.quantity;
+          }, 0);
+
+          setTotalPrice(total);
+        };
+
+        calculateTotalPrice();
+      } catch (error) {
+        console.error("❌ Lỗi khi lấy thông tin sản phẩm:", error);
+      }
+    };
+
+    fetchProductDetails();
+  }, [cart]);
 
   useEffect(() => {
     const fetchCategorys = async () => {
@@ -229,9 +283,25 @@ const Header = () => {
 
   const handleLogin = async (isRegister) => {
     try {
+      if (!login.email) {
+        setIsEmailPassword(true);
+        return;
+      }
+
+      if (!login.password) {
+        setIsEmailPassword(false);
+        return;
+      }
+
+      setIsEmailPassword("");
+
       if (!isRegister) {
         // 🟢 Xử lý đăng nhập
         const response = await loginPost(login);
+        if (response === null) {
+          setIsHaveAcc(true);
+        }
+
         if (response?.accessToken) {
           const decodedUser = jwtDecode(response.accessToken);
           const userData = await getUser(decodedUser.userId);
@@ -290,6 +360,7 @@ const Header = () => {
       }
     } catch (error) {
       console.error("❌ Lỗi đăng nhập / đăng ký:", error);
+      setIsHaveAcc(true);
     }
   };
 
@@ -461,6 +532,22 @@ const Header = () => {
                 <p onClick={() => handleModalLoginUser()}>Đăng nhập</p>
               )}
 
+              {errorMessage && (
+                <Snackbar
+                  open={openSnackbar}
+                  autoHideDuration={3000} // Ẩn sau 3 giây
+                  onClose={() => setOpenSnackbar(false)}
+                  anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+                >
+                  <Alert
+                    severity="warning"
+                    onClose={() => setOpenSnackbar(false)}
+                  >
+                    {errorMessage}
+                  </Alert>
+                </Snackbar>
+              )}
+
               {isLogin && (
                 <div className={cx("more")} style={{ right: "24px" }}>
                   <ul className={cx("list-more")}>
@@ -589,7 +676,7 @@ const Header = () => {
               }}
             >
               {menu.label}
-              {hoveredMenu === menu.id && (
+              {menu.title !== "new" && hoveredMenu === menu.id && (
                 <div
                   className={cx("menu-dropdown")}
                   onClick={(event) => {
@@ -812,6 +899,21 @@ const Header = () => {
                     name="password"
                     onChange={handleChange}
                   />
+                  {isEmailPassword && (
+                    <div className={cx("alert-login")}>
+                      * Vui lòng nhập email
+                    </div>
+                  )}
+                  {isEmailPassword === false && (
+                    <div className={cx("alert-login")}>
+                      * Vui lòng nhập password
+                    </div>
+                  )}
+                  {isHaveAcc && (
+                    <div className={cx("alert-login")}>
+                      * Email, Mật khẩu không đúng
+                    </div>
+                  )}
                 </div>
               )}
               {/* Đăng kí */}
@@ -963,7 +1065,12 @@ const Header = () => {
                 <div className={cx("checkout")}>
                   <div className={cx("shipment")}>
                     <div className={cx("title-checkout")}>Giao hàng</div>
-                    <div className={cx("price")}>0đ</div>
+                    <div className={cx("price")}>
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(totalPrice)}
+                    </div>
                   </div>
 
                   <div
@@ -994,7 +1101,12 @@ const Header = () => {
                 <div className={cx("checkout")}>
                   <div className={cx("shipment")}>
                     <div className={cx("title-checkout")}>Giao hàng</div>
-                    <div className={cx("price")}>0đ</div>
+                    <div className={cx("price")}>
+                      {new Intl.NumberFormat("vi-VN", {
+                        style: "currency",
+                        currency: "VND",
+                      }).format(totalPrice)}
+                    </div>
                   </div>
 
                   <div
