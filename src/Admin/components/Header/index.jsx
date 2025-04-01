@@ -212,8 +212,12 @@ const Header = ({
         alert("Không có phản hồi từ server.");
       }
     } catch (error) {
+      if (error.message) {
+        // Hiển thị thông báo lỗi từ backend
+        setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+        setOpenSnackbar(true);
+      }
       console.error("Lỗi khi thêm thương hiệu:", error);
-      alert("Đã xảy ra lỗi! Vui lòng thử lại.");
     }
   };
 
@@ -243,8 +247,12 @@ const Header = ({
         status: true,
       });
     } catch (error) {
+      if (error.message) {
+        // Hiển thị thông báo lỗi từ backend
+        setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+        setOpenSnackbar(true);
+      }
       console.error("Lỗi khi thêm thương hiệu:", error);
-      alert("Đã xảy ra lỗi! Vui lòng thử lại.");
     }
   };
 
@@ -263,6 +271,11 @@ const Header = ({
         setRole({ title: "", status: true });
       }
     } catch (error) {
+      if (error.message) {
+        // Hiển thị thông báo lỗi từ backend
+        setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+        setOpenSnackbar(true);
+      }
       console.error("Lỗi khi thêm vai trò:", error);
     }
   };
@@ -297,6 +310,11 @@ const Header = ({
         });
       }
     } catch (error) {
+      if (error.message) {
+        // Hiển thị thông báo lỗi từ backend
+        setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+        setOpenSnackbar(true);
+      }
       console.error("Lỗi khi thêm vai trò:", error);
     }
   };
@@ -395,6 +413,11 @@ const Header = ({
         alert("Lỗi khi thêm tài khoản!");
       }
     } catch (error) {
+      if (error.message) {
+        // Hiển thị thông báo lỗi từ backend
+        setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+        setOpenSnackbar(true);
+      }
       console.error("Lỗi khi thêm tài khoản:", error);
     }
   };

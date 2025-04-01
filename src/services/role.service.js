@@ -36,7 +36,7 @@ export async function addRole(data) {
     return response;
   } catch (error) {
     console.error("Error adding roles:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 
@@ -59,7 +59,7 @@ export async function updateRole(id, data) {
     return response;
   } catch (error) {
     console.error("Error editing roles:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 

@@ -36,7 +36,7 @@ export async function addBrand(brand) {
     return response;
   } catch (error) {
     console.error("Error adding brand:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 
@@ -56,7 +56,7 @@ export async function updateBrand(id, brand) {
     return response;
   } catch (error) {
     console.error("Error editing brand:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 

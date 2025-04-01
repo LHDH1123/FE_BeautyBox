@@ -226,6 +226,12 @@ const User = () => {
         alert("Lỗi khi sửa tài khoản!");
       }
     } catch (error) {
+      if (error.message) {
+        // Hiển thị thông báo lỗi từ backend
+        setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+        setOpenSnackbar(true);
+        setIsAccess(false);
+      }
       console.error("Lỗi khi sửa tài khoản:", error);
     }
   };

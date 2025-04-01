@@ -253,6 +253,13 @@ const Create = ({ title, productId }) => {
           });
         }
       } catch (error) {
+        if (error.message) {
+          // Hiển thị thông báo lỗi từ backend
+          setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+          setOpenSnackbar(true);
+          setLoading(false);
+          setIsAccess(false);
+        }
         console.error("❌ Lỗi:", error);
       }
     } else {
@@ -351,7 +358,13 @@ const Create = ({ title, productId }) => {
           });
         }
       } catch (error) {
-        console.error("❌ Lỗi:", error);
+        if (error.message) {
+          // Hiển thị thông báo lỗi từ backend
+          setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+          setOpenSnackbar(true);
+          setLoading(false);
+          setIsAccess(false);
+        }
       }
     }
   };

@@ -29,7 +29,7 @@ export async function createVoucher(data) {
     return response;
   } catch (error) {
     console.error("Error creating voucher:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 
@@ -40,7 +40,7 @@ export async function updateVoucher(id, data) {
     return response;
   } catch (error) {
     console.error("Error updating voucher:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 

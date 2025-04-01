@@ -194,6 +194,12 @@ const Category = () => {
         setOpenSnackbar(true);
         setIsAccess(true);
       } catch (error) {
+        if (error.message) {
+          // Hiển thị thông báo lỗi từ backend
+          setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+          setOpenSnackbar(true);
+          setIsAccess(false);
+        }
         console.error("Error updating category:", error);
       }
     }

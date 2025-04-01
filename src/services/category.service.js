@@ -36,7 +36,7 @@ export async function addCategory(data) {
     return response;
   } catch (error) {
     console.error("Error adding category:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 
@@ -56,7 +56,7 @@ export async function updateCategory(id, data) {
     return response;
   } catch (error) {
     console.error("Error editing category:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 

@@ -110,6 +110,12 @@ const Role = () => {
         console.log(response);
       }
     } catch (error) {
+      if (error.message) {
+        // Hiển thị thông báo lỗi từ backend
+        setErrorMessage(error.message); // Lấy lỗi từ backend và hiển thị
+        setOpenSnackbar(true);
+        setIsAccess(false);
+      }
       console.log(error);
     }
   };

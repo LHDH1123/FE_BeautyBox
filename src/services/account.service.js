@@ -26,7 +26,7 @@ export async function addAccount(data) {
     return response;
   } catch (error) {
     console.error("Error adding Accounts:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 
@@ -46,7 +46,7 @@ export async function updateAccount(id, data) {
     return response;
   } catch (error) {
     console.error("Error editing Accounts:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 

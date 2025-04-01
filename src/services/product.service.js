@@ -35,8 +35,8 @@ export async function addProduct(data) {
     const response = await AxiosInstance.post("/products/create", data);
     return response;
   } catch (error) {
-    console.error("Error adding product:", error);
-    return null;
+    console.error("Error adding product:", error.response.data.error);
+    throw new Error(error.response.data.error);
   }
 }
 
@@ -56,7 +56,7 @@ export async function updateProduct(id, data) {
     return response;
   } catch (error) {
     console.error("Error editing product:", error);
-    return null;
+    throw new Error(error.response.data.error);
   }
 }
 
