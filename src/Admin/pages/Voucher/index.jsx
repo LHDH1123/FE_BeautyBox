@@ -11,7 +11,15 @@ import {
   getVoucherById,
   updateVoucher,
 } from "../../../services/voucher.service";
-import { Box, Dialog, DialogActions, Switch } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Snackbar,
+  Switch,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 const cx = classNames.bind(styles);
@@ -25,8 +33,12 @@ const Voucher = () => {
     description: "",
     status: true,
   });
-
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const label = { inputProps: { "aria-label": "Switch demo" } };
+  const [isAccess, setIsAccess] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   // Fetch danh sách voucher
   const fetchVoucher = async () => {
@@ -44,15 +56,30 @@ const Voucher = () => {
     fetchVoucher();
   }, []);
 
+  const handleDelete = (id) => {
+    setSelectedId(id); // Lưu id của vai trò cần xóa
+    setOpen(true); // Mở hộp thoại xác nhận
+  };
+
   // Xóa voucher
-  const handleDelete = async (id) => {
+  const handleConfirmDelete = async () => {
+    if (!selectedId) return;
+    
     try {
-      const response = await deleteVoucher(id);
+      const response = await deleteVoucher(selectedId);
       if (response) {
-        setVouchers((prev) => prev.filter((voucher) => voucher._id !== id));
+        setVouchers((prev) =>
+          prev.filter((voucher) => voucher._id !== selectedId)
+        );
+        setErrorMessage("Xóa voucher thành công");
+        setOpenSnackbar(true);
+        setIsAccess(true);
       }
     } catch (error) {
       console.error("Lỗi khi xóa voucher:", error);
+    } finally {
+      setOpen(false); // Đóng hộp thoại sau khi xử lý xong
+      setSelectedId(null); // Xóa id đã lưu
     }
   };
 
@@ -102,18 +129,34 @@ const Voucher = () => {
 
   // Cập nhật voucher
   const handleEditVoucher = async () => {
-    if (
-      !editVoucher.title ||
-      !editVoucher.discount ||
-      !editVoucher.description
-    ) {
-      alert("Vui lòng nhập đầy đủ thông tin!");
+    if (!editVoucher.title) {
+      setErrorMessage("Vui lòng nhập tên voucher");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+
+      return;
+    }
+    if (!editVoucher.discount) {
+      setErrorMessage("Vui lòng nhập % giảm giá");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+
+      return;
+    }
+    if (!editVoucher.description) {
+      setErrorMessage("Vui lòng nhập mô tả");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+
       return;
     }
     try {
       await updateVoucher(editVoucher._id, editVoucher);
       fetchVoucher(); // Cập nhật lại danh sách voucher
       setIsModalSale(false); // Đóng modal
+      setErrorMessage("Cập nhật voucher thành công");
+      setOpenSnackbar(true);
+      setIsAccess(true);
     } catch (error) {
       console.error("Lỗi khi cập nhật voucher:", error);
       alert("Có lỗi xảy ra khi cập nhật voucher!");
@@ -123,6 +166,24 @@ const Voucher = () => {
   return (
     <div className={cx("table")}>
       <Header title="Giảm Giá" fetchVoucher={fetchVoucher} />
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+        >
+          {isAccess ? (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          )}
+        </Snackbar>
+      )}
       <div className={cx("table-list")}>
         <div className={cx("brand-list")}>
           <table className={cx("table", "datanew")}>
@@ -179,6 +240,35 @@ const Voucher = () => {
         </div>
       </div>
 
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          style: {
+            marginTop: "-100px",
+          },
+        }}
+      >
+        <DialogTitle>Bạn có muốn xóa voucher này?</DialogTitle>
+
+        <DialogActions>
+          <button
+            type="button"
+            className={cx("btn-cancel")}
+            onClick={() => setOpen(false)}
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            className={cx("btn-submit")}
+            onClick={handleConfirmDelete}
+          >
+            Xóa
+          </button>
+        </DialogActions>
+      </Dialog>
+
       {/* Modal chỉnh sửa voucher */}
       <Dialog
         open={isModalSale}
@@ -203,7 +293,9 @@ const Voucher = () => {
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Chỉnh sửa voucher</div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Tên voucher</div>
+              <div className={cx("label")}>
+                Tên voucher <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="title"
@@ -213,7 +305,9 @@ const Voucher = () => {
               />
             </div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Giảm giá</div>
+              <div className={cx("label")}>
+                Giảm giá <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="discount"
@@ -223,7 +317,9 @@ const Voucher = () => {
               />
             </div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Mô tả</div>
+              <div className={cx("label")}>
+                Mô tả <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="description"

@@ -12,7 +12,16 @@ import {
   getDetail,
   updateBrand,
 } from "../../../services/brand.service";
-import { Box, Dialog, DialogActions, Pagination, Switch } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Pagination,
+  Snackbar,
+  Switch,
+} from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
 
@@ -31,8 +40,13 @@ const Brand = () => {
     status: false,
     thumbnail: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const fileInputRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   //pagnigation
   const [currentPage, setCurrentPage] = useState(1);
@@ -66,12 +80,17 @@ const Brand = () => {
     fetchBrands();
   }, []);
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa thương hiệu này không?")) return;
+  const handleDelete = (id) => {
+    setSelectedId(id); // Lưu id của vai trò cần xóa
+    setOpen(true); // Mở hộp thoại xác nhận
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedId) return;
 
     try {
-      await deletebrand(id);
-      const updatedBrands = brands.filter((brand) => brand._id !== id);
+      await deletebrand(selectedId);
+      const updatedBrands = brands.filter((brand) => brand._id !== selectedId);
       setBrands(updatedBrands);
 
       // Tính lại totalPage sau khi xóa
@@ -81,8 +100,14 @@ const Brand = () => {
       if (currentPage > newTotalPage) {
         setCurrentPage(1);
       }
+      setErrorMessage("Xóa thương hiệu thành công");
+      setOpenSnackbar(true);
+      setIsAccess(true);
     } catch (error) {
       console.error("Lỗi khi xóa thương hiệu:", error);
+    } finally {
+      setOpen(false); // Đóng hộp thoại sau khi xử lý xong
+      setSelectedId(null); // Xóa id đã lưu
     }
   };
 
@@ -172,6 +197,13 @@ const Brand = () => {
   }, [getBrand]);
 
   const handleUpdate = async () => {
+    if (!editBrand.name) {
+      setErrorMessage("Vui lòng nhập tên thương hiệu");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+
     const formData = new FormData();
 
     // Thêm các dữ liệu khác của thương hiệu vào formData
@@ -189,6 +221,9 @@ const Brand = () => {
         console.log(response);
         fetchBrands();
         setIsModalEditBrand(false);
+        setErrorMessage("Cập nhật thương hiệu thành công");
+        setOpenSnackbar(true);
+        setIsAccess(true);
       }
     } catch (error) {
       console.error("Error updating brand:", error);
@@ -208,6 +243,24 @@ const Brand = () => {
   return (
     <div className={cx("table")}>
       <Header title="Thương Hiệu" fetchBrands={fetchBrands} />
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+        >
+          {isAccess ? (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          )}
+        </Snackbar>
+      )}
       <div className={cx("table-list")}>
         <TableHeader
           selectedBrands={selectedBrands}
@@ -306,6 +359,35 @@ const Brand = () => {
       </div>
 
       <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          style: {
+            marginTop: "-100px",
+          },
+        }}
+      >
+        <DialogTitle>Bạn có muốn xóa voucher này?</DialogTitle>
+
+        <DialogActions>
+          <button
+            type="button"
+            className={cx("btn-cancel")}
+            onClick={() => setOpen(false)}
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            className={cx("btn-submit")}
+            onClick={handleConfirmDelete}
+          >
+            Xóa
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
         open={isModalEditBrand}
         onClose={handleCloseModalEdit}
         PaperProps={{
@@ -333,7 +415,9 @@ const Brand = () => {
             <div className={cx("title")}>Chỉnh sửa thương hiệu</div>
 
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Thương hiệu</div>
+              <div className={cx("label")}>
+                Thương hiệu <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="name"
@@ -348,7 +432,9 @@ const Brand = () => {
               style={{ display: "flex", alignItems: "center" }}
             >
               <div>
-                <div className={cx("label")}>Logo</div>
+                <div className={cx("label")}>
+                  Logo <span style={{ color: "red" }}>*</span>
+                </div>
                 <label className={cx("input-blocks")}>
                   <input
                     type="file"

@@ -13,14 +13,7 @@ import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import {
-  Dialog,
-  Box,
-  DialogActions,
-  Stack,
-  Alert,
-  Snackbar,
-} from "@mui/material";
+import { Dialog, Box, DialogActions } from "@mui/material";
 import Cart from "../Cart";
 import CartFav from "../CartFav";
 import { useNavigate } from "react-router-dom";
@@ -91,8 +84,7 @@ const Header = () => {
   ];
   const [listCategorys, setListCategorys] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [errorMessage, setErrorMessage] = useState("");
-  const [openSnackbar, setOpenSnackbar] = useState(false);
+
   const [isEmailPassword, setIsEmailPassword] = useState("");
   const [isHaveAcc, setIsHaveAcc] = useState("");
 
@@ -530,22 +522,6 @@ const Header = () => {
                 <p onClick={() => handleOpenModalLogin()}>{nameUser}</p>
               ) : (
                 <p onClick={() => handleModalLoginUser()}>Đăng nhập</p>
-              )}
-
-              {errorMessage && (
-                <Snackbar
-                  open={openSnackbar}
-                  autoHideDuration={3000} // Ẩn sau 3 giây
-                  onClose={() => setOpenSnackbar(false)}
-                  anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
-                >
-                  <Alert
-                    severity="warning"
-                    onClose={() => setOpenSnackbar(false)}
-                  >
-                    {errorMessage}
-                  </Alert>
-                </Snackbar>
               )}
 
               {isLogin && (

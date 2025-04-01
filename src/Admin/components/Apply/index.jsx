@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import classNames from "classnames/bind";
 import styles from "./Apply.module.scss";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import { Dialog, DialogTitle, DialogActions } from "@mui/material";
 import { changeMulti } from "../../../services/brand.service";
 import { changeMultiCategory } from "../../../services/category.service";
 import { changeMultiProduct } from "../../../services/product.service";
@@ -21,37 +22,43 @@ const Apply = ({
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedTag, setSelectedTag] = useState("Tất cả");
+  const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const dropdownRef = useRef(null);
 
   const tags = ["Xóa tất cả", "Hoạt động", "Không hoạt động"];
 
-  // Đóng dropdown khi click ra ngoài
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
 
-  // Xử lý chọn tag từ dropdown
   const handleTagClick = (tag) => {
     setSelectedTag(tag);
     setIsDropdownOpen(false);
   };
 
-  // Xử lý áp dụng thay đổi
-  const handleApply = async () => {
+  const handleApply = () => {
     if (!selectedTag.length) {
       alert("Vui lòng chọn ít nhất một thương hiệu hoặc danh mục.");
       return;
-    }
+    } else {
+      if (selectedTag === "Xóa tất cả") {
+        setOpenConfirmDialog(true);
+        return;
+      }
 
+      applyChanges();
+    }
+  };
+
+  const applyChanges = async () => {
     let data = {};
     let dataCategory = {};
     let dataProduct = {};
@@ -81,39 +88,22 @@ const Apply = ({
     }
 
     try {
-      if (selectedBrands !== undefined) {
-        if (selectedTag === "Xóa tất cả") {
-          if (!window.confirm("Bạn có chắc muốn xóa thương hiệu này không?"))
-            return;
-        }
+      if (selectedBrands?.length) {
         await changeMulti(data);
         await fetchBrands();
       }
 
-      if (selectedCategorys !== undefined) {
-        if (selectedTag === "Xóa tất cả") {
-          if (!window.confirm("Bạn có chắc muốn xóa thương hiệu này không?"))
-            return;
-        }
+      if (selectedCategorys?.length) {
         await changeMultiCategory(dataCategory);
         await fetchCategorys();
       }
 
-      if (selectedProducts !== undefined) {
-        if (selectedTag === "Xóa tất cả") {
-          if (!window.confirm("Bạn có chắc muốn xóa thương hiệu này không?"))
-            return;
-        }
+      if (selectedProducts?.length) {
         await changeMultiProduct(dataProduct);
         await fetchProducts();
       }
 
-      if (selectedAccounts !== undefined) {
-        if (selectedTag === "Xóa tất cả") {
-          if (!window.confirm("Bạn có chắc muốn xóa thương hiệu này không?"))
-            return;
-        }
-        console.log(dataAccount);
+      if (selectedAccounts?.length) {
         await changeMultiAccount(dataAccount);
         await fetchAccount();
       }
@@ -151,6 +141,33 @@ const Apply = ({
       <div className={cx("submit")} onClick={handleApply}>
         <button>Áp dụng</button>
       </div>
+
+      {/* Hộp thoại xác nhận */}
+      <Dialog
+        open={openConfirmDialog}
+        onClose={() => setOpenConfirmDialog(false)}
+      >
+        <DialogTitle>Bạn có chắc muốn xóa các mục đã chọn không?</DialogTitle>
+        <DialogActions>
+          <button
+            type="button"
+            className={cx("btn-cancel")}
+            onClick={() => setOpenConfirmDialog(false)}
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            className={cx("btn-submit")}
+            onClick={() => {
+              setOpenConfirmDialog(false);
+              applyChanges();
+            }}
+          >
+            Xóa
+          </button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

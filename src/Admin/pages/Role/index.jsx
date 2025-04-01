@@ -12,7 +12,15 @@ import {
   getAllRoles,
   updateDataRole,
 } from "../../../services/role.service";
-import { Box, Dialog, DialogActions, Switch } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Snackbar,
+  Switch,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +31,13 @@ const Role = () => {
   const label = { inputProps: { "aria-label": "Switch demo" } };
   const [isModalAddRole, setIsModalAddRole] = useState(false);
   const [getRole, setGetRole] = useState([]);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
   const navigate = useNavigate();
+
   const fetchRoles = async () => {
     const response = await getAllRoles();
     if (response) {
@@ -78,12 +92,21 @@ const Role = () => {
       title: getRole.title,
       status: getRole.status,
     };
-    // console.log(getRole);
+    if (!getRole.title) {
+      setErrorMessage("Vui lòng nhập tên vai trò");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
     try {
       const response = await updateDataRole(getRole._id, data);
       if (response) {
         setIsModalAddRole(false);
         fetchRoles();
+        setErrorMessage("Cập nhật vai trò thành công");
+        setIsAccess(false);
+
+        setOpenSnackbar(true);
         console.log(response);
       }
     } catch (error) {
@@ -91,15 +114,27 @@ const Role = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa vai trò này không?")) return;
+  const handleDelete = (id) => {
+    setSelectedId(id); // Lưu id của vai trò cần xóa
+    setOpen(true); // Mở hộp thoại xác nhận
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedId) return;
 
     try {
-      await deleteRoles(id);
-      const updatedRoles = listRoles.filter((role) => role._id !== id);
-      setListRoles(updatedRoles);
+      await deleteRoles(selectedId);
+      setListRoles((prevRoles) =>
+        prevRoles.filter((role) => role._id !== selectedId)
+      );
+      setErrorMessage("Xóa vai trò thành công");
+      setOpenSnackbar(true);
+      setIsAccess(true);
     } catch (error) {
-      console.log(error);
+      console.error("Lỗi khi xóa vai trò:", error);
+    } finally {
+      setOpen(false); // Đóng hộp thoại sau khi xử lý xong
+      setSelectedId(null); // Xóa id đã lưu
     }
   };
 
@@ -110,7 +145,24 @@ const Role = () => {
   return (
     <div className={cx("table")}>
       <Header title="Vai Trò & Quyền" fetchRoles={fetchRoles} />
-
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+        >
+          {isAccess ? (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          )}
+        </Snackbar>
+      )}
       <div className={cx("table-list")}>
         <TableHeader title="Vai Trò & Quyền" />
 
@@ -183,6 +235,35 @@ const Role = () => {
       </div>
 
       <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          style: {
+            marginTop: "-100px",
+          },
+        }}
+      >
+        <DialogTitle>Bạn có muốn xóa vai trò này?</DialogTitle>
+
+        <DialogActions>
+          <button
+            type="button"
+            className={cx("btn-cancel")}
+            onClick={() => setOpen(false)}
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            className={cx("btn-submit")}
+            onClick={handleConfirmDelete}
+          >
+            Xóa
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
         open={isModalAddRole}
         onClose={handleCloseModalAdd}
         PaperProps={{
@@ -205,7 +286,9 @@ const Role = () => {
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Tạo vai trò</div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Tên vai trò</div>
+              <div className={cx("label")}>
+                Tên vai trò <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="title"

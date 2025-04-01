@@ -12,7 +12,15 @@ import {
   getDetail,
   updateCategory,
 } from "../../../services/category.service";
-import { Box, Dialog, DialogActions, Switch } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Snackbar,
+  Switch,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { createCategorySelect } from "../../../helper/select-tree";
 
@@ -31,6 +39,11 @@ const Category = () => {
     status: false,
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   const fetchCategorys = async () => {
     const response = await getCategorys();
@@ -42,7 +55,7 @@ const Category = () => {
 
   useEffect(() => {
     fetchCategorys();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateCategoryStatus = (categories, id, newStatus) => {
@@ -82,13 +95,25 @@ const Category = () => {
     }
   };
 
-  const handleDeleteCategory = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa danh mục này không?")) return;
+  const handleDeleteCategory = (id) => {
+    setSelectedId(id); // Lưu id của vai trò cần xóa
+    setOpen(true); // Mở hộp thoại xác nhận
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedId) return;
+
     try {
-      await deleteCategory(id);
+      await deleteCategory(selectedId);
       await fetchCategorys();
+      setErrorMessage("Xóa danh mục thành công");
+      setOpenSnackbar(true);
+      setIsAccess(true);
     } catch (error) {
       console.error("Lỗi khi xóa danh mục:", error);
+    } finally {
+      setOpen(false); // Đóng hộp thoại sau khi xử lý xong
+      setSelectedId(null); // Xóa id đã lưu
     }
   };
 
@@ -154,10 +179,20 @@ const Category = () => {
 
   const handleUpdate = async () => {
     if (editCategory) {
+      if (!editCategory.title) {
+        setErrorMessage("Vui lòng nhập tên danh mục");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+
       try {
         await updateCategory(editCategory._id, editCategory);
         fetchCategorys();
         setIsModalAdd(false);
+        setErrorMessage("Cập nhật danh mục thành công");
+        setOpenSnackbar(true);
+        setIsAccess(true);
       } catch (error) {
         console.error("Error updating category:", error);
       }
@@ -250,6 +285,24 @@ const Category = () => {
   return (
     <div className={cx("table")}>
       <Header title="Danh mục" fetchCategorys={fetchCategorys} />
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+        >
+          {isAccess ? (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          )}
+        </Snackbar>
+      )}
       <div className={cx("table-list")}>
         <TableHeader
           selectedCategorys={selectedCategorys}
@@ -279,6 +332,35 @@ const Category = () => {
       </div>
 
       <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          style: {
+            marginTop: "-100px",
+          },
+        }}
+      >
+        <DialogTitle>Bạn có muốn xóa voucher này?</DialogTitle>
+
+        <DialogActions>
+          <button
+            type="button"
+            className={cx("btn-cancel")}
+            onClick={() => setOpen(false)}
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            className={cx("btn-submit")}
+            onClick={handleConfirmDelete}
+          >
+            Xóa
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
         open={isModalAdd}
         onClose={handleCloseModal}
         PaperProps={{
@@ -301,7 +383,9 @@ const Category = () => {
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Chỉnh sửa danh mục</div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Tên danh mục</div>
+              <div className={cx("label")}>
+                Tên danh mục <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="title"

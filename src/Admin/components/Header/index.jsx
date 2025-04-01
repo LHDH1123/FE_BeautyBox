@@ -3,7 +3,14 @@ import classNames from "classnames/bind";
 import styles from "./Header.module.scss";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
-import { Box, Dialog, DialogActions, Switch } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Dialog,
+  DialogActions,
+  Snackbar,
+  Switch,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { addBrand } from "../../../services/brand.service";
 import { addCategory, getCategorys } from "../../../services/category.service";
@@ -62,7 +69,8 @@ const Header = ({
   const fileInputRef = useRef(null);
   const fileInputRefAccount = useRef(null);
   const [getBrand, setGetBrand] = useState([]);
-
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
   const navigate = useNavigate();
 
   const label = { inputProps: { "aria-label": "Switch demo" } };
@@ -171,8 +179,14 @@ const Header = ({
   };
 
   const handleAddBrand = async () => {
-    if (!brand.name || !brand.thumbnail) {
-      alert("Vui lòng nhập tên thương hiệu và tải lên ảnh thương hiệu!");
+    if (!brand.name) {
+      setErrorMessage("Vui lòng nhập tên thương hiệu");
+      setOpenSnackbar(true);
+      return;
+    }
+    if (!brand.thumbnail) {
+      setErrorMessage("Vui lòng chọn ảnh thương hiệu");
+      setOpenSnackbar(true);
       return;
     }
 
@@ -205,7 +219,8 @@ const Header = ({
 
   const handleAddCateogy = async () => {
     if (!category.title) {
-      alert("Vui lòng nhập tên danh mục!");
+      setErrorMessage("Vui lòng nhập tên danh mục");
+      setOpenSnackbar(true);
       return;
     }
 
@@ -235,7 +250,8 @@ const Header = ({
 
   const handleAddRole = async () => {
     if (!role.title) {
-      alert("Vui lòng nhập vai trò!");
+      setErrorMessage("Vui lòng nhập tên vai trò");
+      setOpenSnackbar(true);
       return;
     }
     try {
@@ -252,11 +268,21 @@ const Header = ({
   };
 
   const handleAddVoucher = async () => {
-    if (!voucher.title && !voucher.discount && !voucher.description) {
-      alert("Vui lòng nhập đầy đủ thông tin!");
+    if (!voucher.title) {
+      setErrorMessage("Vui lòng nhập tên voucher");
+      setOpenSnackbar(true);
       return;
     }
-    console.log(voucher);
+    if (!voucher.discount) {
+      setErrorMessage("Vui lòng nhập % giảm giá");
+      setOpenSnackbar(true);
+      return;
+    }
+    if (!voucher.description) {
+      setErrorMessage("Vui lòng nhập mô tả");
+      setOpenSnackbar(true);
+      return;
+    }
     try {
       const response = await createVoucher(voucher);
       if (response) {
@@ -298,17 +324,41 @@ const Header = ({
   };
 
   const handleAddAccount = async () => {
-    if (!account.fullName || !account.email || !account.password) {
-      alert("Vui lòng nhập đầy đủ thông tin!");
+    if (!account.thumbnail) {
+      setErrorMessage("Vui lòng chọn ảnh đại diện");
+      setOpenSnackbar(true);
+      return;
+    }
+    if (!account.fullName) {
+      setErrorMessage("Vui lòng nhập tên");
+      setOpenSnackbar(true);
+      return;
+    }
+    if (!account.phone) {
+      setErrorMessage("Vui lòng nhập Email");
+      setOpenSnackbar(true);
+      return;
+    }
+    if (!account.email) {
+      setErrorMessage("Vui lòng nhập Email");
+      setOpenSnackbar(true);
+      return;
+    }
+    if (!account.role_id) {
+      setErrorMessage("Vui lòng chọn vai trò");
+      setOpenSnackbar(true);
+      return;
+    }
+    if (!account.password) {
+      setErrorMessage("Vui lòng nhập mật khẩu");
+      setOpenSnackbar(true);
       return;
     }
 
     if (account.password !== account.confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp!");
+      setErrorMessage("Mật khẩu xác nhận không khớp");
+      setOpenSnackbar(true);
       return;
-    }
-    if (!account.role_id) {
-      alert("Vui lòng chọn vai trò!");
     }
 
     try {
@@ -363,6 +413,18 @@ const Header = ({
           )}
         </div>
       </div>
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+        >
+          <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+            {errorMessage}
+          </Alert>
+        </Snackbar>
+      )}
 
       {title !== "Chi tiết sản phẩm" && title !== "Quyền hạn" && (
         <div className={cx("btn-add")} onClick={handleCloseModalAdd}>
@@ -397,7 +459,9 @@ const Header = ({
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Tạo danh mục</div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Tên danh mục</div>
+              <div className={cx("label")}>
+                Tên danh mục <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="title"
@@ -480,7 +544,9 @@ const Header = ({
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Tạo thương hiệu</div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Thương hiệu</div>
+              <div className={cx("label")}>
+                Thương hiệu <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="name"
@@ -494,7 +560,9 @@ const Header = ({
               style={{ display: "flex", alignItems: "center" }}
             >
               <div>
-                <div className={cx("label")}>Logo</div>
+                <div className={cx("label")}>
+                  Logo <span style={{ color: "red" }}>*</span>
+                </div>
                 <div className={cx("input-blocks")}>
                   <input
                     type="file"
@@ -585,7 +653,9 @@ const Header = ({
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Tạo vai trò</div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Tên vai trò</div>
+              <div className={cx("label")}>
+                Tên vai trò <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="title"
@@ -650,7 +720,9 @@ const Header = ({
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Tạo voucher</div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Tên voucher</div>
+              <div className={cx("label")}>
+                Tên voucher <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="title"
@@ -660,7 +732,9 @@ const Header = ({
               />
             </div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Giảm giá</div>
+              <div className={cx("label")}>
+                Giảm giá <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="discount"
@@ -670,7 +744,9 @@ const Header = ({
               />
             </div>
             <div className={cx("formGroup")}>
-              <div className={cx("label")}>Mô tả</div>
+              <div className={cx("label")}>
+                Mô tả <span style={{ color: "red" }}>*</span>
+              </div>
               <input
                 type="text"
                 name="description"
@@ -739,7 +815,9 @@ const Header = ({
               style={{ display: "flex", alignItems: "center" }}
             >
               <div>
-                <div className={cx("label")}>Ảnh đại diện</div>
+                <div className={cx("label")}>
+                  Ảnh đại diện <span style={{ color: "red" }}>*</span>
+                </div>
                 <div
                   className={cx("input-blocks")}
                   onClick={handleClickChangeImage}
@@ -779,7 +857,9 @@ const Header = ({
             </div>
             <div className={cx("info")}>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>Tên</div>
+                <div className={cx("label")}>
+                  Tên <span style={{ color: "red" }}>*</span>
+                </div>
                 <input
                   type="text"
                   name="fullName"
@@ -788,7 +868,9 @@ const Header = ({
                 />
               </div>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>SĐT</div>
+                <div className={cx("label")}>
+                  SĐT <span style={{ color: "red" }}>*</span>
+                </div>
                 <input
                   type="text"
                   name="phone"
@@ -799,7 +881,9 @@ const Header = ({
             </div>
             <div className={cx("info")}>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>Email</div>
+                <div className={cx("label")}>
+                  Email <span style={{ color: "red" }}>*</span>
+                </div>
                 <input
                   type="text"
                   name="email"
@@ -808,7 +892,9 @@ const Header = ({
                 />
               </div>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>Vai trò</div>
+                <div className={cx("label")}>
+                  Vai trò <span style={{ color: "red" }}>*</span>
+                </div>
                 <select
                   name="role_id"
                   className={cx("select-role")}
@@ -825,19 +911,23 @@ const Header = ({
             </div>
             <div className={cx("info")}>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>Mật khẩu </div>
+                <div className={cx("label")}>
+                  Mật khẩu <span style={{ color: "red" }}>*</span>
+                </div>
                 <input
-                  type="text"
+                  type="password"
                   name="password"
                   className={cx("input")}
                   onChange={handleChangeAccount}
                 />
               </div>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>Xác nhận lại mật khẩu</div>
+                <div className={cx("label")}>
+                  Xác nhận lại mật khẩu <span style={{ color: "red" }}>*</span>
+                </div>
                 <input
                   name="confirmPassword"
-                  type="text"
+                  type="password"
                   className={cx("input")}
                   onChange={handleChangeAccount}
                 />

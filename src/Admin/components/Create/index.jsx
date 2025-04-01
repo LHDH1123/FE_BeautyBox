@@ -13,7 +13,13 @@ import { useNavigate } from "react-router-dom";
 import { createCategorySelect } from "../../../helper/select-tree";
 import { getCategorys } from "../../../services/category.service";
 import { getBrands } from "../../../services/brand.service";
-import { TextField } from "@mui/material";
+import {
+  Alert,
+  Backdrop,
+  CircularProgress,
+  Snackbar,
+  TextField,
+} from "@mui/material";
 import {
   addProduct,
   getDetailProduct,
@@ -60,6 +66,10 @@ const Create = ({ title, productId }) => {
     thumbnail: [],
     position: "",
   });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fileInputRef = useRef(null);
 
@@ -119,7 +129,7 @@ const Create = ({ title, productId }) => {
     if (title === "Chỉnh sửa sản phẩm") {
       fetchProducts();
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleChange = (e) => {
@@ -154,6 +164,56 @@ const Create = ({ title, productId }) => {
 
   const handleAdd = async () => {
     if (title === "Chỉnh sửa sản phẩm") {
+      if (!editProduct.title) {
+        setErrorMessage("Vui lòng nhập tên sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!editProduct.SKU) {
+        setErrorMessage("Vui lòng nhập mã SKU");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!editProduct.brand_id) {
+        setErrorMessage("Vui lòng chọn thương hiệu của sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!editProduct.category_id) {
+        setErrorMessage("Vui lòng chọn danh mục sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (divEditImages.length === 0) {
+        setErrorMessage("Vui lòng chọn ảnh sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!editProduct.price) {
+        setErrorMessage("Vui lòng nhập giá sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!editProduct.discountPercentage) {
+        setErrorMessage("Vui lòng nhập % giảm giá sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+
+        return;
+      }
+      if (!editProduct.stock) {
+        setErrorMessage("Vui lòng nhập số lượng sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      setLoading(true);
       const formData = new FormData();
       formData.append("title", editProduct.title);
       formData.append("category_id", editProduct.category_id);
@@ -175,7 +235,9 @@ const Create = ({ title, productId }) => {
         if (response) {
           console.log("Chỉnh sửa sản phẩm thành công!", response);
           navigate("/adminbb/product-list");
-
+          setOpenSnackbar(true);
+          setIsAccess(true);
+          setLoading(false);
           setProduct({
             title: "",
             SKU: "",
@@ -194,6 +256,55 @@ const Create = ({ title, productId }) => {
         console.error("❌ Lỗi:", error);
       }
     } else {
+      if (!product.title) {
+        setErrorMessage("Vui lòng nhập tên sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!product.SKU) {
+        setErrorMessage("Vui lòng nhập mã SKU");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!product.brand_id) {
+        setErrorMessage("Vui lòng chọn thương hiệu của sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!product.category_id) {
+        setErrorMessage("Vui lòng chọn danh mục sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (images.length === 0) {
+        setErrorMessage("Vui lòng chọn ảnh sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!product.price) {
+        setErrorMessage("Vui lòng nhập giá sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!product.discountPercentage) {
+        setErrorMessage("Vui lòng nhập % giảm giá sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      if (!product.stock) {
+        setErrorMessage("Vui lòng nhập số lượng sản phẩm");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
+      setLoading(true);
       const formData = new FormData();
       formData.append("title", product.title);
       formData.append("SKU", product.SKU);
@@ -215,12 +326,14 @@ const Create = ({ title, productId }) => {
         });
       }
 
-      console.log(images[0]);
-
       try {
         const response = await addProduct(formData);
         if (response) {
           console.log("✅ Thêm sản phẩm thành công!", response);
+          setErrorMessage("Thêm sản phẩm thành công!");
+          setOpenSnackbar(true);
+          setIsAccess(true);
+          setLoading(false);
           navigate("/adminbb/product-list");
 
           setProduct({
@@ -287,6 +400,35 @@ const Create = ({ title, productId }) => {
             )}
           </div>
         </div>
+        {errorMessage && (
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000} // Ẩn sau 3 giây
+            onClose={() => setOpenSnackbar(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+          >
+            {isAccess ? (
+              <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+                {errorMessage}
+              </Alert>
+            ) : (
+              <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+                {errorMessage}
+              </Alert>
+            )}
+          </Snackbar>
+        )}
+        {loading && (
+          <Backdrop
+            sx={{
+              color: "#ff9f43",
+              zIndex: (theme) => theme.zIndex.drawer + 1,
+            }}
+            open={loading}
+          >
+            <CircularProgress color="#ff9f43" />
+          </Backdrop>
+        )}
         <div className={cx("btn-add")} onClick={handleProduct}>
           <ArrowBackIcon fontSize="inherit" />
           <button>Quay lại sản phẩm</button>
@@ -300,7 +442,9 @@ const Create = ({ title, productId }) => {
               fontSize="inherit"
               style={{ color: "#ff9f43", marginTop: "3px" }}
             />
-            <div className={cx("title-header")}>Thông tin sản phẩm</div>
+            <div className={cx("title-header")}>
+              Thông tin sản phẩm <span style={{ color: "red" }}>*</span>
+            </div>
             <div className={cx("icon")}>
               {isInfo === true ? (
                 <KeyboardArrowUpIcon style={{ color: "#ff9f43" }} />
@@ -313,7 +457,9 @@ const Create = ({ title, productId }) => {
             <div className={cx("info-content")}>
               <div className={cx("info")}>
                 <div className={cx("info-item")}>
-                  <div className={cx("title-item")}>Tên sản phẩm</div>
+                  <div className={cx("title-item")}>
+                    Tên sản phẩm <span style={{ color: "red" }}>*</span>
+                  </div>
                   <input
                     type="text"
                     name="title"
@@ -327,7 +473,9 @@ const Create = ({ title, productId }) => {
                   />
                 </div>
                 <div className={cx("info-item")}>
-                  <div className={cx("title-item")}>SKU </div>
+                  <div className={cx("title-item")}>
+                    SKU <span style={{ color: "red" }}>*</span>
+                  </div>
                   <input
                     type="text"
                     name="SKU"
@@ -344,7 +492,9 @@ const Create = ({ title, productId }) => {
 
               <div className={cx("info")}>
                 <div className={cx("info-item")}>
-                  <div className={cx("title-item")}>Thương hiệu </div>
+                  <div className={cx("title-item")}>
+                    Thương hiệu <span style={{ color: "red" }}>*</span>
+                  </div>
                   <select
                     name="brand_id"
                     className={cx("form-select")}
@@ -364,7 +514,9 @@ const Create = ({ title, productId }) => {
                   </select>
                 </div>
                 <div className={cx("info-item")}>
-                  <div className={cx("title-item")}>Danh mục</div>
+                  <div className={cx("title-item")}>
+                    Danh mục <span style={{ color: "red" }}>*</span>
+                  </div>
                   <select
                     name="category_id"
                     className={cx("form-select")}
@@ -476,7 +628,9 @@ const Create = ({ title, productId }) => {
               fontSize="inherit"
               style={{ color: "#ff9f43", marginTop: "3px" }}
             />
-            <div className={cx("title-header")}>Hình ảnh</div>
+            <div className={cx("title-header")}>
+              Hình ảnh <span style={{ color: "red" }}>*</span>
+            </div>
             <div className={cx("icon")}>
               {isImg === true ? (
                 <KeyboardArrowUpIcon style={{ color: "#ff9f43" }} />
@@ -533,7 +687,9 @@ const Create = ({ title, productId }) => {
               fontSize="inherit"
               style={{ color: "#ff9f43", marginTop: "3px" }}
             />
-            <div className={cx("title-header")}>Giá cả</div>
+            <div className={cx("title-header")}>
+              Giá cả <span style={{ color: "red" }}>*</span>
+            </div>
             <div className={cx("icon")}>
               {isPrice === true ? (
                 <KeyboardArrowUpIcon style={{ color: "#ff9f43" }} />
@@ -546,7 +702,9 @@ const Create = ({ title, productId }) => {
             <div className={cx("info-content")}>
               <div className={cx("info")}>
                 <div className={cx("info-item")}>
-                  <div className={cx("title-item")}>Giá sản phẩm</div>
+                  <div className={cx("title-item")}>
+                    Giá sản phẩm <span style={{ color: "red" }}>*</span>
+                  </div>
                   <input
                     type="text"
                     name="price"
@@ -560,7 +718,9 @@ const Create = ({ title, productId }) => {
                   />
                 </div>
                 <div className={cx("info-item")}>
-                  <div className={cx("title-item")}>% Giảm giá </div>
+                  <div className={cx("title-item")}>
+                    % Giảm giá <span style={{ color: "red" }}>*</span>
+                  </div>
                   <input
                     type="text"
                     name="discountPercentage"
@@ -577,7 +737,9 @@ const Create = ({ title, productId }) => {
 
               <div className={cx("info")}>
                 <div className={cx("info-item")}>
-                  <div className={cx("title-item")}>Số lượng</div>
+                  <div className={cx("title-item")}>
+                    Số lượng <span style={{ color: "red" }}>*</span>
+                  </div>
                   <input
                     type="text"
                     name="stock"

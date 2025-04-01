@@ -21,6 +21,13 @@ import {
   getNameCategory,
 } from "../../../services/category.service";
 import { useNavigate } from "react-router-dom";
+import {
+  Alert,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Snackbar,
+} from "@mui/material";
 
 const cx = classNames.bind(styles);
 
@@ -36,6 +43,10 @@ const Product = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [listBrands, setListBrands] = useState([]);
   const [listCategorys, setListCategorys] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
 
   const handleSelectAll = () => {
     const newCheckedState = !isAllChecked;
@@ -150,21 +161,30 @@ const Product = () => {
       console.error("Lỗi khi thay đổi trạng thái:", error);
     }
   };
+  const handleDelete = (id) => {
+    setSelectedId(id); // Lưu id của vai trò cần xóa
+    setOpen(true); // Mở hộp thoại xác nhận
+  };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa sản phẩm này không?")) return;
-
+  // Xóa voucher
+  const handleConfirmDelete = async () => {
+    if (!selectedId) return;
     try {
-      console.log(id);
-      const response = await deleteProduct(id);
+      console.log(selectedId);
+      const response = await deleteProduct(selectedId);
       if (response) {
         const updatedProducts = listProducts.filter(
-          (brand) => brand._id !== id
+          (brand) => brand._id !== selectedId
         );
         setListProducts(updatedProducts);
+        setErrorMessage("Xóa sản phẩm thành công");
+        setOpenSnackbar(true);
       }
     } catch (error) {
       console.error(error);
+    } finally {
+      setOpen(false); // Đóng hộp thoại sau khi xử lý xong
+      setSelectedId(null); // Xóa id đã lưu
     }
   };
 
@@ -231,6 +251,19 @@ const Product = () => {
   return (
     <div className={cx("table")}>
       <Header title="Sản Phẩm" />
+
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+        >
+          <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+            {errorMessage}
+          </Alert>
+        </Snackbar>
+      )}
 
       <div className={cx("table-list")}>
         <TableHeader
@@ -409,6 +442,35 @@ const Product = () => {
           </table>
         </div>
       </div>
+
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          style: {
+            marginTop: "-100px",
+          },
+        }}
+      >
+        <DialogTitle>Bạn có muốn xóa voucher này?</DialogTitle>
+
+        <DialogActions>
+          <button
+            type="button"
+            className={cx("btn-cancel")}
+            onClick={() => setOpen(false)}
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            className={cx("btn-submit")}
+            onClick={handleConfirmDelete}
+          >
+            Xóa
+          </button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };

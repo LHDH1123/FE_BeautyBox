@@ -12,7 +12,15 @@ import {
   updateAccount,
 } from "../../../services/account.service";
 import { getAllRoles, getNameRole } from "../../../services/role.service";
-import { Box, Dialog, DialogActions, Switch } from "@mui/material";
+import {
+  Alert,
+  Box,
+  Dialog,
+  DialogActions,
+  DialogTitle,
+  Snackbar,
+  Switch,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 
@@ -37,6 +45,11 @@ const User = () => {
   const [selectAll, setSelectAll] = useState(false);
   const [selectedAccounts, setSelectedAccounts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
 
   const fetchAccount = async () => {
     try {
@@ -84,17 +97,28 @@ const User = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Bạn có chắc muốn xóa tài khoản này không?")) return;
+  const handleDelete = (id) => {
+    setSelectedId(id); // Lưu id của vai trò cần xóa
+    setOpen(true); // Mở hộp thoại xác nhận
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedId) return;
 
     try {
-      await deleteAccounts(id);
+      await deleteAccounts(selectedId);
       const updatedAccounts = allAccount.filter(
-        (account) => account._id !== id
+        (account) => account._id !== selectedId
       );
       setAllAccount(updatedAccounts);
+      setErrorMessage("Xóa người dùng thành công");
+      setOpenSnackbar(true);
+      setIsAccess(true);
     } catch (error) {
       console.error("Lỗi khi xóa tài khoản:", error);
+    } finally {
+      setOpen(false); // Đóng hộp thoại sau khi xử lý xong
+      setSelectedId(null); // Xóa id đã lưu
     }
   };
 
@@ -147,19 +171,36 @@ const User = () => {
   };
 
   const handleUpdate = async () => {
-    if (!editAccount.fullName || !editAccount.email) {
-      alert("Vui lòng nhập đầy đủ thông tin!");
+    if (!editAccount.thumbnail) {
+      setErrorMessage("Vui lòng chọn ảnh đại diện");
+      setOpenSnackbar(true);
+      setIsAccess(false);
       return;
     }
-
-    if (editAccount.password !== editAccount.confirmPassword) {
-      alert("Mật khẩu xác nhận không khớp!");
+    if (!editAccount.fullName) {
+      setErrorMessage("Vui lòng nhập tên");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    if (!editAccount.phone) {
+      setErrorMessage("Vui lòng nhập Email");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    if (!editAccount.email) {
+      setErrorMessage("Vui lòng nhập Email");
+      setOpenSnackbar(true);
+      setIsAccess(false);
       return;
     }
     if (!editAccount.role_id) {
-      alert("Vui lòng chọn vai trò!");
+      setErrorMessage("Vui lòng chọn vai trò");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
     }
-    console.log(editAccount);
     try {
       const formData = new FormData();
       formData.append("fullName", editAccount.fullName);
@@ -177,6 +218,9 @@ const User = () => {
       if (response) {
         console.log(response);
         setIsModalAddUser(false);
+        setOpenSnackbar(true);
+        setIsAccess(true);
+        setErrorMessage("Cập nhật người dùng thành công");
         fetchAccount();
       } else {
         alert("Lỗi khi sửa tài khoản!");
@@ -227,7 +271,24 @@ const User = () => {
   return (
     <div className={cx("table")}>
       <Header title="Người Dùng" fetchAccount={fetchAccount} />
-
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+        >
+          {isAccess ? (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          )}
+        </Snackbar>
+      )}
       <div className={cx("table-list")}>
         <TableHeader
           selectedAccounts={selectedAccounts}
@@ -314,6 +375,35 @@ const User = () => {
       </div>
 
       <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        PaperProps={{
+          style: {
+            marginTop: "-100px",
+          },
+        }}
+      >
+        <DialogTitle>Bạn có muốn xóa voucher này?</DialogTitle>
+
+        <DialogActions>
+          <button
+            type="button"
+            className={cx("btn-cancel")}
+            onClick={() => setOpen(false)}
+          >
+            Hủy
+          </button>
+          <button
+            type="button"
+            className={cx("btn-submit")}
+            onClick={handleConfirmDelete}
+          >
+            Xóa
+          </button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog
         open={isModalAddUser}
         onClose={handleCloseModalAdd}
         PaperProps={{
@@ -335,7 +425,9 @@ const User = () => {
               style={{ display: "flex", alignItems: "center" }}
             >
               <div>
-                <div className={cx("label")}>Ảnh đại diện</div>
+                <div className={cx("label")}>
+                  Ảnh đại diện <span style={{ color: "red" }}>*</span>
+                </div>
                 <div
                   className={cx("input-blocks")}
                   onClick={handleClickChangeImage}
@@ -375,7 +467,9 @@ const User = () => {
             </div>
             <div className={cx("info")}>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>Tên</div>
+                <div className={cx("label")}>
+                  Tên <span style={{ color: "red" }}>*</span>
+                </div>
                 <input
                   type="text"
                   name="fullName"
@@ -385,7 +479,9 @@ const User = () => {
                 />
               </div>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>SĐT</div>
+                <div className={cx("label")}>
+                  SĐT <span style={{ color: "red" }}>*</span>
+                </div>
                 <input
                   type="text"
                   name="phone"
@@ -397,7 +493,9 @@ const User = () => {
             </div>
             <div className={cx("info")}>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>Email</div>
+                <div className={cx("label")}>
+                  Email <span style={{ color: "red" }}>*</span>
+                </div>
                 <input
                   type="text"
                   name="email"
@@ -407,7 +505,9 @@ const User = () => {
                 />
               </div>
               <div className={cx("formGroup")}>
-                <div className={cx("label")}>Vai trò</div>
+                <div className={cx("label")}>
+                  Vai trò <span style={{ color: "red" }}>*</span>
+                </div>
                 <select
                   name="role_id"
                   className={cx("select-role")}
@@ -465,7 +565,7 @@ const User = () => {
                 className={cx("btn-submit")}
                 onClick={handleUpdate}
               >
-                Tạo mới
+                Lưu
               </button>
             </div>
           </div>
