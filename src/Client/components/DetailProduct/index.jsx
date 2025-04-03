@@ -9,7 +9,7 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import AddShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
 import Rating from "@mui/material/Rating";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getDetailProductSlug } from "../../../services/product.service";
 import { getNameBrand } from "../../../services/brand.service";
 import { refreshTokenUser } from "../../../services/user.service";
@@ -30,7 +30,8 @@ const DetailProduct = ({ setLike, setCart }) => {
   const [userId, setUserId] = useState(1);
 
   const [product, setProduct] = useState([]);
-
+  const navigate = useNavigate();
+  
   useEffect(() => {
     const fetchProduct = async () => {
       try {
@@ -155,6 +156,19 @@ const DetailProduct = ({ setLike, setCart }) => {
         error.response?.data || error.message
       );
     }
+  };
+
+  const handleCheckOut = async () => {
+    const selectCart = {
+      products: [
+        {
+          product_id: product._id,
+          quantity: quantity,
+        },
+      ],
+      user_id: userId,
+    };
+    navigate("/check-out", { state: selectCart });
   };
 
   return (
@@ -299,7 +313,7 @@ const DetailProduct = ({ setLike, setCart }) => {
               <span>Thêm vào giỏ hàng</span>
             </button>
           </div>
-          <div className={cx("buy")}>
+          <div className={cx("buy")} onClick={handleCheckOut}>
             <button>Mua ngay</button>
           </div>
           <div className={cx("like")} onClick={handleLike}>

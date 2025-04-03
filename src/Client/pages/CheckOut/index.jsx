@@ -184,45 +184,71 @@ const CheckoutPage = () => {
   const [cartState, setCartState] = useState(selectCart);
 
   const handleUpdateQuantity = async (id, newQuantity) => {
-    if (newQuantity < 1) return;
+    if (selectCart._id) {
+      if (newQuantity < 1) return;
 
-    setProducts((prevProducts) =>
-      prevProducts.map((product) =>
-        product.id === id ? { ...product, quantity: newQuantity } : product
-      )
-    );
-
-    setCartState((prevCart) => ({
-      ...prevCart,
-      products: prevCart.products.map((item) =>
-        item.product_id === id ? { ...item, quantity: newQuantity } : item
-      ),
-    }));
-
-    setTotalPrice((prevTotal) => {
+      // Check if the quantity has already been updated for this product
       const productToUpdate = products.find((product) => product.id === id);
-      if (!productToUpdate) return prevTotal;
+      if (productToUpdate && productToUpdate.quantity === newQuantity) return; // Skip if already updated
 
-      const oldSubtotal =
-        (productToUpdate.price -
-          (productToUpdate.price * productToUpdate.discountPercentage) / 100) *
-        productToUpdate.quantity;
+      // Set products with the updated quantity
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === id ? { ...product, quantity: newQuantity } : product
+        )
+      );
 
-      const newSubtotal =
-        (productToUpdate.price -
-          (productToUpdate.price * productToUpdate.discountPercentage) / 100) *
-        newQuantity;
+      // Update the cart state with the new quantity
+      setCartState((prevCart) => ({
+        ...prevCart,
+        products: prevCart.products.map((item) =>
+          item.product_id === id ? { ...item, quantity: newQuantity } : item
+        ),
+      }));
 
-      return prevTotal - oldSubtotal + newSubtotal;
-    });
+      // Update the total price based on the updated quantity
+      setTotalPrice((prevTotal) => {
+        const productToUpdate = products.find((product) => product.id === id);
+        if (!productToUpdate) return prevTotal;
 
-    const response = await updateCartQuantity(
-      selectCart.user_id,
-      id,
-      newQuantity
-    );
-    if (!response) {
-      console.error("❌ Cập nhật số lượng thất bại");
+        const oldSubtotal =
+          (productToUpdate.price -
+            (productToUpdate.price * productToUpdate.discountPercentage) /
+              100) *
+          productToUpdate.quantity;
+
+        const newSubtotal =
+          (productToUpdate.price -
+            (productToUpdate.price * productToUpdate.discountPercentage) /
+              100) *
+          newQuantity;
+
+        return prevTotal - oldSubtotal + newSubtotal;
+      });
+
+      // Update the quantity in the backend (selectCart)
+      const response = await updateCartQuantity(
+        selectCart.user_id,
+        id,
+        newQuantity
+      );
+      if (!response) {
+        console.error("❌ Cập nhật số lượng thất bại");
+      }
+    } else {
+      setCartState((prevCart) => ({
+        ...prevCart,
+        products: prevCart.products.map((item) =>
+          item.product_id === id ? { ...item, quantity: newQuantity } : item
+        ),
+      }));
+
+      // Cập nhật số lượng trên UI (products state)
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === id ? { ...product, quantity: newQuantity } : product
+        )
+      );
     }
   };
 
@@ -347,7 +373,7 @@ const CheckoutPage = () => {
     }
   };
 
-  console.log(cart);
+  console.log(cartState);
 
   const handleOrder = async () => {
     try {
