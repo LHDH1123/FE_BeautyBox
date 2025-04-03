@@ -11,6 +11,7 @@ const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState(null);
+  const [selectCart, setSelectCart] = useState(null);
   const [like, setLike] = useState(null);
   const [address, setAddress] = useState(null);
   const [updateUser, setUpdateUser] = useState({
@@ -106,6 +107,8 @@ export const AuthProvider = ({ children }) => {
         setNameUser,
         cart,
         setCart,
+        selectCart,
+        setSelectCart,
         like,
         setLike,
         address,

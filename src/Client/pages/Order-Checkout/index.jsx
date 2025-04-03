@@ -7,7 +7,6 @@ import {
   ListItem,
   ListItemText,
   Divider,
-  Chip,
   Box,
   Avatar,
 } from "@mui/material";
@@ -18,8 +17,6 @@ const OrderSummary = () => {
   const location = useLocation();
   const { orderId, sale } = location.state; // Nhận orderId từ location.state
   const [order, setOrder] = useState(null);
-  console.log(sale);
-  console.log(orderId);
 
   useEffect(() => {
     const fetchOrderSuccess = async () => {

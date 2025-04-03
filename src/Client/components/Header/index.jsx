@@ -71,6 +71,8 @@ const Header = () => {
     setNameUser,
     cart,
     setCart,
+    selectCart,
+    setSelectCart,
     like,
     setLike,
   } = useAuth();
@@ -387,7 +389,7 @@ const Header = () => {
 
   const handleNavigateCheckout = () => {
     if (cart) {
-      navigate("/check-out", { state: cart });
+      navigate("/check-out", { state: selectCart });
       setIsModalCart(false);
     } else {
       console.log("không có sản phẩm nào trong giỏ hàng");
@@ -1034,7 +1036,12 @@ const Header = () => {
                 // <div className={cx("cart")}>
                 //   Bạn chưa có sản phẩm nào trong giỏ hàng
                 // </div>
-                <Cart cart={cart} setCart={setCart} />
+                <Cart
+                  cart={cart}
+                  setCart={setCart}
+                  selectCart={selectCart}
+                  setSelectCart={setSelectCart}
+                />
               )}
 
               {selectedCart === "delivery" && (

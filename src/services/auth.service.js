@@ -1,22 +1,10 @@
 import { AxiosInstance } from "../configs/axios";
 
-export async function login() {
-  try {
-    await AxiosInstance.get("/auth/login");
-    return true;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-}
-
 export async function loginPost(data) {
   try {
-    const response = await AxiosInstance.post(
-      "/auth/loginPost",
-      data,
-      { withCredentials: true } // Bật gửi cookie
-    );
+    const response = await AxiosInstance.post("/auth/loginPost", data, {
+      withCredentials: true, // Đảm bảo cookies được gửi đi
+    });
     return response;
   } catch (error) {
     console.error(

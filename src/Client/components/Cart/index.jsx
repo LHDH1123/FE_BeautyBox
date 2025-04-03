@@ -12,8 +12,10 @@ import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
-function Cart({ cart, setCart }) {
+function Cart({ cart, setCart, selectCart, setSelectCart }) {
   const [products, setProducts] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [selectedProducts, setSelectedProducts] = useState([]);
   const navigate = useNavigate();
 
   // Lấy thông tin sản phẩm từ API
@@ -81,10 +83,61 @@ function Cart({ cart, setCart }) {
     navigate(`/detailProduct/${slug}`, { state: { id } });
   };
 
+  const handleSelectAll = () => {
+    setSelectAll(!selectAll);
+    if (!selectAll) {
+      setSelectedProducts(products.map((product) => product.id));
+    } else {
+      setSelectedProducts([]);
+    }
+  };
+
+  const handleSelectProduct = (id) => {
+    setSelectedProducts((prevSelected) =>
+      prevSelected.includes(id)
+        ? prevSelected.filter((pid) => pid !== id)
+        : [...prevSelected, id]
+    );
+  };
+
+  useEffect(() => {
+    setSelectAll(
+      selectedProducts.length === products.length && products.length > 0
+    );
+  }, [selectedProducts, products]);
+
+  useEffect(() => {
+    if (!cart || !cart.products) return;
+
+    // Lọc sản phẩm trong cart dựa trên selectedProducts
+    const filteredCart = {
+      ...cart, // Giữ nguyên các thông tin khác trong cart
+      products: cart.products.filter((item) =>
+        selectedProducts.includes(item.product_id)
+      ),
+    };
+
+    setSelectCart(filteredCart);
+  }, [selectedProducts, cart, setSelectCart]);
+
+
   return (
     <div className={cx("div-cart")}>
       <div className={cx("cart")}>
-        <input type="checkbox" />
+        <input
+          type="checkbox"
+          className={cx("cb")}
+          checked={selectAll}
+          onChange={handleSelectAll}
+          style={{
+            width: "18px",
+            height: "18px",
+            cursor: "pointer",
+            transition: "all 0.2s ease",
+            accentColor: "#fe9f43", // accent-color dùng camelCase
+          }}
+        />
+
         <div className={cx("title")}>Chọn tất cả</div>
       </div>
       <div className={cx("saperator")}></div>
@@ -92,7 +145,12 @@ function Cart({ cart, setCart }) {
       <div className={cx("body")}>
         {products.map((product) => (
           <div className={cx("product")} key={product.id}>
-            <input type="checkbox" />
+            <input
+              type="checkbox"
+              className={cx("cb")}
+              checked={selectedProducts.includes(product.id)}
+              onChange={() => handleSelectProduct(product.id)}
+            />
             <div className={cx("img-product")}>
               <img src={product.thumbnail} alt={product.title} />
             </div>

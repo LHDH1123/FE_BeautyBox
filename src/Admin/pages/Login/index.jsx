@@ -3,7 +3,6 @@ import { TextField, Button, Typography, Grid, Paper, Box } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { loginPost } from "../../../services/auth.service";
 import { useNavigate } from "react-router-dom";
-import Cookies from "js-cookie";
 
 const theme = createTheme();
 
@@ -12,6 +11,7 @@ const Login = () => {
     email: "",
     password: "",
   });
+  const [token, setToken] = useState([]);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -23,12 +23,15 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    console.log(formData);
     try {
-      const response = await loginPost(formData);
+      const response = await loginPost(formData); // Gọi API để đăng nhập
 
       if (response) {
-        window.location.href = "/adminbb"; // Chuyển hướng khi đăng nhập thành công
+        console.log(response.token);
+        setToken(response.token);
+
+        // Sử dụng navigate từ React Router để chuyển hướng
+        navigate("/adminbb"); // Chuyển đến trang admin sau khi đăng nhập thành công
       }
     } catch (err) {
       console.log(err);
@@ -36,11 +39,10 @@ const Login = () => {
   };
 
   useEffect(() => {
-    const token = Cookies.get("token"); // Lấy token từ cookie
-    if (token) {
-      navigate("/adminbb"); // Nếu có token, chuyển đến trang admin
-    }
-  }, [navigate]);
+    // if (token) {
+    //   navigate("/adminbb"); // Nếu có token, chuyển đến trang admin
+    // }
+  });
 
   return (
     <ThemeProvider theme={theme}>

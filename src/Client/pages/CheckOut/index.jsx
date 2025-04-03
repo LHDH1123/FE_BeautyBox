@@ -25,6 +25,7 @@ import { Box, Dialog, DialogActions } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { createOrder } from "../../../services/checkout.service";
+import { useAuth } from "../../Context/AuthContext";
 
 const cx = classNames.bind(styles);
 
@@ -52,13 +53,14 @@ const CheckoutPage = () => {
     status: true,
   });
   const location = useLocation();
-  const cart = location.state;
+  const selectCart = location.state;
   const [isModalAddress, setIsModalAddress] = useState(false);
   const [isModalAllAddress, setIsModalAllAddress] = useState(false);
   // const [address, setAddress] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
+  const { cart, setCart } = useAuth();
 
   const fetchVoucherDiscount = async () => {
     try {
@@ -137,11 +139,11 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     const fetchProductDetails = async () => {
-      if (!cart || !cart.products) return;
+      if (!selectCart || !selectCart.products) return;
 
       try {
         const productDetails = await Promise.all(
-          cart.products.map(async (item) => {
+          selectCart.products.map(async (item) => {
             const product = await getDetailProduct(item.product_id);
             return {
               id: product[0]._id,
@@ -170,7 +172,7 @@ const CheckoutPage = () => {
       }
     };
     fetchProductDetails();
-  }, [cart]);
+  }, [selectCart]);
 
   const handlePaymentChange = (method) => {
     setSelectedPayment(method);
@@ -179,9 +181,10 @@ const CheckoutPage = () => {
   const handleVoucherChange = (id) => {
     setSelectedVoucher(id);
   };
+  const [cartState, setCartState] = useState(selectCart);
 
   const handleUpdateQuantity = async (id, newQuantity) => {
-    if (newQuantity < 1) return; // Không cho giảm số lượng dưới 1
+    if (newQuantity < 1) return;
 
     setProducts((prevProducts) =>
       prevProducts.map((product) =>
@@ -189,7 +192,13 @@ const CheckoutPage = () => {
       )
     );
 
-    // Cập nhật ngay tổng giá trị đơn hàng
+    setCartState((prevCart) => ({
+      ...prevCart,
+      products: prevCart.products.map((item) =>
+        item.product_id === id ? { ...item, quantity: newQuantity } : item
+      ),
+    }));
+
     setTotalPrice((prevTotal) => {
       const productToUpdate = products.find((product) => product.id === id);
       if (!productToUpdate) return prevTotal;
@@ -207,14 +216,18 @@ const CheckoutPage = () => {
       return prevTotal - oldSubtotal + newSubtotal;
     });
 
-    const response = await updateCartQuantity(cart.user_id, id, newQuantity);
+    const response = await updateCartQuantity(
+      selectCart.user_id,
+      id,
+      newQuantity
+    );
     if (!response) {
       console.error("❌ Cập nhật số lượng thất bại");
     }
   };
 
   const handleRemoveCart = async (id) => {
-    const response = await removeFromCart(cart.user_id, id);
+    const response = await removeFromCart(selectCart.user_id, id);
     if (response) {
       console.log("Xóa sản phẩm thành công", response);
       setProducts((prevProducts) =>
@@ -334,17 +347,32 @@ const CheckoutPage = () => {
     }
   };
 
+  console.log(cart);
+
   const handleOrder = async () => {
     try {
       const fullName = userEmail.fullName;
       const phone = userEmail.phone;
       const address = `${defaultddress.address}, ${defaultddress.ward}, ${defaultddress.districts}, ${defaultddress.city}`;
-
-      const response = await createOrder(userId, { fullName, phone, address });
+      const orderCart = cartState.products;
+      const response = await createOrder(userId, {
+        fullName,
+        phone,
+        address,
+        cart: orderCart,
+      });
       if (response) {
         console.log(response);
         const orderId = response;
         navigate("/order-checkout", { state: { orderId, sale } });
+        setCart({
+          products: cart.products.filter(
+            (item) =>
+              !orderCart.some(
+                (orderItem) => orderItem.product_id === item.product_id
+              )
+          ),
+        });
       }
     } catch (error) {
       console.error(error);
