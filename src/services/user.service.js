@@ -70,6 +70,20 @@ export async function logout() {
   }
 }
 
+export async function changePassWord(userId, data) {
+  try {
+    const response = await AxiosInstance.post(
+      `/user/change-pass/${userId}`,
+      data
+    );
+    return response;
+  } catch (error) {
+    console.error("Lỗi khi thay đổi mật khẩu:", error);
+    // Ném lỗi để hàm gọi có thể xử lý
+    throw error;
+  }
+}
+
 export async function refreshTokenUser() {
   try {
     const response = await AxiosInstance.post("/user/refresh-token", null, {

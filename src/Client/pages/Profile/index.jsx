@@ -6,6 +6,7 @@ import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined
 import SearchIcon from "@mui/icons-material/Search";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import {
+  Alert,
   Avatar,
   Box,
   Card,
@@ -16,10 +17,11 @@ import {
   List,
   ListItem,
   ListItemText,
+  Snackbar,
   Typography,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { editUser } from "../../../services/user.service";
+import { changePassWord, editUser } from "../../../services/user.service";
 
 import {
   createAddress,
@@ -35,13 +37,20 @@ const cx = classNames.bind(styles);
 
 const Profile = () => {
   const [activeTab, setActiveTab] = useState("Tài khoản");
-  const listTab = ["Tài khoản", "Đơn hàng", "Địa chỉ giao nhận"];
+  const listTab = ["Tài khoản", "Đơn hàng", "Địa chỉ giao nhận", "Mật khẩu"];
   const [isModalAddress, setIsModalAddress] = useState(false);
   const [isModalAdd, setIsModalAdd] = useState(false);
   const [isModalDetail, setIsModalDetail] = useState(false);
   const [orders, setOrders] = useState([]);
   const [orderDetail, setOrderDetail] = useState([]);
-
+  const [resetPass, setResetPass] = useState({
+    oldPass: "",
+    newPass: "",
+    confirmPass: "",
+  });
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
   // const [nameUser, setNameUser] = useState("");
   // const [address, setAddress] = useState([]);
   const [editAddress, setEditAddress] = useState({
@@ -98,6 +107,10 @@ const Profile = () => {
 
   const handleChange = (e) => {
     setUpdateUser({ ...updateUser, [e.target.name]: e.target.value });
+  };
+
+  const handleChangePass = (e) => {
+    setResetPass({ ...resetPass, [e.target.name]: e.target.value });
   };
 
   const handleSave = async () => {
@@ -254,8 +267,78 @@ const Profile = () => {
     }
   };
 
+  const handleSavePass = async () => {
+    // Kiểm tra xem các trường mật khẩu có được nhập đầy đủ không
+    if (!resetPass.oldPass || !resetPass.newPass || !resetPass.confirmPass) {
+      setErrorMessage("Vui lòng nhập đầy đủ thông tin");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+
+    // Kiểm tra xem mật khẩu mới có khớp với mật khẩu xác nhận không
+    if (resetPass.newPass !== resetPass.confirmPass) {
+      setErrorMessage("Xác nhận mật khẩu không khớp.");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+
+    try {
+      // Gửi yêu cầu đổi mật khẩu
+      const response = await changePassWord(user._id, {
+        oldPassword: resetPass.oldPass,
+        newPassword: resetPass.newPass,
+      });
+
+      // Kiểm tra và thông báo kết quả trả về
+      if (response) {
+        setErrorMessage("Đổi mật khẩu thành công"); // Lấy thông báo từ API
+        setOpenSnackbar(true);
+        setIsAccess(true);
+        setResetPass({
+          oldPass: "",
+          newPass: "",
+          confirmPass: "",
+        });
+      }
+    } catch (error) {
+      console.error("Lỗi:", error);
+
+      // Kiểm tra lỗi và hiển thị thông báo hợp lý
+      if (error.response && error.response.data) {
+        // Trường hợp lỗi từ server (response trả về)
+        setErrorMessage(error.response.data.message || "Có lỗi xảy ra.");
+      } else {
+        // Trường hợp lỗi không xác định (lỗi mạng, timeout...)
+        setErrorMessage("Có lỗi không xác định.");
+      }
+
+      setOpenSnackbar(true);
+      setIsAccess(false);
+    }
+  };
+
   return (
     <div className={cx("profile-container")}>
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+        >
+          {isAccess ? (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          )}
+        </Snackbar>
+      )}
       <div className={cx("sidebar")}>
         <div className={cx("card")}>
           <div className={cx("avatar")}>
@@ -449,6 +532,52 @@ const Profile = () => {
                   )}
                 </tbody>
               </table>
+            </div>
+          </div>
+        )}
+        {activeTab === "Mật khẩu" && (
+          <div className={cx("form-pass")}>
+            <div className={cx("form-group")} style={{ alignItems: "center" }}>
+              <label>Mật khẩu cũ</label>
+              <input
+                type="password"
+                name="oldPass"
+                style={{ width: "50%", marginBottom: "10px" }}
+                value={resetPass.oldPass}
+                onChange={handleChangePass}
+              />
+            </div>
+
+            <div className={cx("form-group")} style={{ alignItems: "center" }}>
+              <label>Mật khẩu mới</label>
+              <input
+                type="password"
+                name="newPass"
+                style={{ width: "50%", marginBottom: "10px" }}
+                value={resetPass.newPass}
+                onChange={handleChangePass}
+              />
+            </div>
+
+            <div className={cx("form-group")} style={{ alignItems: "center" }}>
+              <label>Xác lại mật khẩu</label>
+              <input
+                type="password"
+                name="confirmPass"
+                style={{ width: "50%", marginBottom: "10px" }}
+                value={resetPass.confirmPass}
+                onChange={handleChangePass}
+              />
+            </div>
+
+            <div style={{ display: " flex" }}>
+              <button
+                className={cx("save-button")}
+                style={{ alignItems: "center" }}
+                onClick={() => handleSavePass()}
+              >
+                Lưu
+              </button>
             </div>
           </div>
         )}
