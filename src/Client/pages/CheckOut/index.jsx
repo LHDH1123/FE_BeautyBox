@@ -373,8 +373,6 @@ const CheckoutPage = () => {
     }
   };
 
-  console.log(cartState);
-
   const handleOrder = async () => {
     try {
       const fullName = userEmail.fullName;

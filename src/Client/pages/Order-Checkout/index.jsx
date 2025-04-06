@@ -15,22 +15,28 @@ import { OrderSuccess } from "../../../services/checkout.service";
 
 const OrderSummary = () => {
   const location = useLocation();
-  const { orderId, sale } = location.state; // Nhận orderId từ location.state
+  const { orderDetail, orderId, sale } = location.state; // Nhận orderId từ location.state
   const [order, setOrder] = useState(null);
 
   useEffect(() => {
-    const fetchOrderSuccess = async () => {
-      try {
-        const response = await OrderSuccess(orderId.orderId);
-        if (response) {
-          setOrder(response.order);
+    if (orderId) {
+      const fetchOrderSuccess = async () => {
+        try {
+          const response = await OrderSuccess(orderId.orderId);
+          if (response) {
+            setOrder(response.order);
+          }
+        } catch (error) {
+          console.error("❌ Lỗi khi lấy đơn hàng:", error);
         }
-      } catch (error) {
-        console.error("❌ Lỗi khi lấy đơn hàng:", error);
-      }
-    };
+      };
 
-    fetchOrderSuccess();
+      fetchOrderSuccess();
+    }
+
+    if(orderDetail) {
+      
+    }
   }, [orderId]);
 
   if (!order) {

@@ -365,4 +365,91 @@
   cursor: pointer;
 }
 
+.content-order {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+}
 
+h2 {
+  margin-bottom: 16px;
+}
+.content-order {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  margin-bottom: 16px;
+}
+
+.order-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: left;
+}
+
+th {
+  background-color: #f8f9fa;
+}
+
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.status.pending {
+  background-color: #ffeb99;
+  color: #000;
+}
+
+.status.delivered {
+  background-color: #d4edda;
+  color: #000;
+}
+
+.status.cancelled {
+  background-color: #f8d7da;
+  color: #000;
+}
+
+.product-text {
+  display: block;
+  font-size: 14px;
+  color: #000;
+}
+
+.action-button {
+  padding: 4px 8px;
+  border: none;
+  background: linear-gradient(90deg, #ffd400, #c73130 50.52%, #663695 99.61%);
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+}
+
+.action-button:hover {
+  background-color: #0056b3;
+  transform: scale(1.05);
+}
+
+.action-button:active {
+  background-color: #004494;
+  transform: scale(1);
+}

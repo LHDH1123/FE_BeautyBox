@@ -1,11 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Profile.module.scss";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined";
 import SearchIcon from "@mui/icons-material/Search";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { Box, Dialog, DialogActions } from "@mui/material";
+import {
+  Avatar,
+  Box,
+  Card,
+  CardContent,
+  Dialog,
+  DialogActions,
+  Divider,
+  List,
+  ListItem,
+  ListItemText,
+  Typography,
+} from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { editUser } from "../../../services/user.service";
 
@@ -16,6 +28,8 @@ import {
   updateAddress,
 } from "../../../services/address.service";
 import { useAuth } from "../../Context/AuthContext";
+import { getOrderUser } from "../../../services/order.service";
+import { OrderSuccess } from "../../../services/checkout.service";
 
 const cx = classNames.bind(styles);
 
@@ -24,6 +38,9 @@ const Profile = () => {
   const listTab = ["Tài khoản", "Đơn hàng", "Địa chỉ giao nhận"];
   const [isModalAddress, setIsModalAddress] = useState(false);
   const [isModalAdd, setIsModalAdd] = useState(false);
+  const [isModalDetail, setIsModalDetail] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [orderDetail, setOrderDetail] = useState([]);
 
   // const [nameUser, setNameUser] = useState("");
   // const [address, setAddress] = useState([]);
@@ -53,6 +70,7 @@ const Profile = () => {
   });
 
   const {
+    user,
     updateUser,
     setUpdateUser,
     setUser,
@@ -74,12 +92,15 @@ const Profile = () => {
     setIsModalAdd((prev) => !prev);
   };
 
+  const handleModalDetail = () => {
+    setIsModalDetail((prev) => !prev);
+  };
+
   const handleChange = (e) => {
     setUpdateUser({ ...updateUser, [e.target.name]: e.target.value });
   };
 
   const handleSave = async () => {
-    console.log("Thông tin đã lưu:", updateUser);
     try {
       const response = await editUser(updateUser.id, {
         fullName: updateUser.fullName,
@@ -195,6 +216,41 @@ const Profile = () => {
       }
     } catch (error) {
       console.error("Lỗi khi thêm địa chỉ:", error);
+    }
+  };
+  const fetchOrders = async () => {
+    try {
+      const response = await getOrderUser(user._id);
+      if (response) {
+        setOrders(response);
+      }
+    } catch (error) {
+      console.error("Error fetching orders:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user?._id) {
+      fetchOrders();
+    }
+  }, [user?._id]); // Chỉ phụ thuộc vào user._id thay vì toàn bộ user object
+
+  const calculateTotal = (products) => {
+    return products.reduce(
+      (total, item) => total + item.price * item.quantity,
+      0
+    );
+  };
+
+  const handleDetail = async (orderDetail) => {
+    setIsModalDetail(true);
+    try {
+      const respone = await OrderSuccess(orderDetail);
+      if (respone) {
+        setOrderDetail(respone.order);
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -345,11 +401,54 @@ const Profile = () => {
               />
             </div>
 
-            <div className={cx("content-oder")}>
-              <div className={cx("noData")}>
-                <InventoryIcon fontSize="large" />
-                <div className={cx("title-noData")}>No Data</div>
-              </div>
+            <div className={cx("content-order")}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>ID đơn hàng</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.length > 0 ? (
+                    orders.map((order) => (
+                      <tr key={order._id}>
+                        <td>
+                          <strong>#{order._id.slice(-8)}</strong>
+                        </td>
+                        <td style={{ color: "#000" }}>
+                          {new Date(order.createdAt).toLocaleDateString(
+                            "vi-VN"
+                          )}
+                        </td>
+                        <td style={{ color: "#000" }}>
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(calculateTotal(order.products))}
+                        </td>
+                        <td>
+                          <button
+                            className={cx("action-button")}
+                            onClick={() => handleDetail(order._id)}
+                          >
+                            Chi tiết
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <div className={cx("noData")}>
+                        <InventoryIcon fontSize="large" />
+                        <div className={cx("title-noData")}>No Data</div>
+                      </div>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -669,6 +768,154 @@ const Profile = () => {
                 Lưu
               </button>
             </div>
+          </div>
+        </Box>
+      </Dialog>
+
+      <Dialog
+        open={isModalDetail}
+        onClose={handleModalDetail}
+        maxWidth={false}
+        PaperProps={{
+          style: {
+            marginTop: "-30px",
+            borderRadius: "16px",
+            // height: "800px",
+            width: "1000px",
+          },
+        }}
+      >
+        <Box>
+          <DialogActions>
+            <div className={cx("btn_exit")}>
+              <button
+                onClick={() => {
+                  handleModalDetail();
+                }}
+              >
+                <CloseIcon fontSize="small" style={{ color: "red" }} />
+              </button>
+            </div>
+          </DialogActions>
+
+          <div className={cx("modalContent")}>
+            <div className={cx("title")}>Chi tiết đơn hàng</div>
+
+            <Card
+              sx={{
+                maxWidth: 1050,
+                margin: "auto",
+                mt: 0,
+                p: 0,
+                border: "1px solid rgb(217, 217, 217)",
+                marginTop: "20px",
+              }}
+            >
+              <CardContent>
+                <Typography variant="h6" gutterBottom fontWeight="bold">
+                  Đơn hàng
+                </Typography>
+                <List>
+                  {orderDetail?.products?.map((item, index) => (
+                    <div key={index}>
+                      <ListItem sx={{ px: 3 }} style={{ padding: "10px 0px" }}>
+                        <Avatar
+                          src={item.productInfo.thumbnail[0]}
+                          alt={item.productInfo.title}
+                          sx={{ width: 50, height: 50, marginRight: 2 }}
+                        />
+                        <ListItemText
+                          primary={
+                            <span
+                              style={{
+                                textDecoration: "underline",
+                                cursor: "pointer",
+                              }}
+                            >
+                              {item.productInfo.title}
+                            </span>
+                          }
+                          secondary={
+                            <span style={{ color: "black" }}>
+                              x{item.quantity}
+                            </span>
+                          }
+                        />
+                        <Typography variant="body1" fontWeight="bold">
+                          {parseInt(item.priceNew).toLocaleString()}đ
+                        </Typography>
+                      </ListItem>
+                      {index < orderDetail.products.length - 1 && <Divider />}
+                    </div>
+                  ))}
+                </List>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  my={1}
+                  px={0}
+                >
+                  <Typography>Tạm tính</Typography>
+                  <Typography>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(orderDetail.total)}
+                  </Typography>
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  my={1}
+                  px={0}
+                >
+                  <Typography>Giảm giá</Typography>
+                  <Typography color="#0992d0">
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(orderDetail.total)}
+                  </Typography>
+                </Box>
+
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  my={1}
+                  px={0}
+                >
+                  <Typography>Shipping</Typography>
+                  <Typography>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(12000)}
+                  </Typography>
+                </Box>
+
+                <Divider sx={{ my: 2 }} />
+
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  my={1}
+                  fontWeight="bold"
+                  px={0}
+                >
+                  <Typography>Tổng</Typography>
+                  <Typography>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      fontWeight: "bold",
+                      currency: "VND",
+                    }).format(orderDetail.total)}
+                  </Typography>
+                </Box>
+              </CardContent>
+            </Card>
           </div>
         </Box>
       </Dialog>
