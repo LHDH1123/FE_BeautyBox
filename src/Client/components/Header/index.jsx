@@ -151,6 +151,9 @@ const Header = () => {
     if (label === "Thương hiệu") {
       navigate("/brands");
     }
+    if (label === "Sản phẩm mới") {
+      navigate(`/products/san-pham-moi`);
+    }
   };
 
   const handleNavigateStore = () => {

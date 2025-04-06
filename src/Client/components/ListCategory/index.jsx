@@ -65,21 +65,27 @@ function ListCategory({ slug, onTotalChange }) {
         }
 
         // Lọc sản phẩm theo danh mục trước
-        // let filteredProducts = allProducts.filter((product) =>
-        //   categorySet.has(product.category_id)
-        // );
         const detailNameBrand = await getDetailName(slug);
 
         let filteredProducts = [];
-        // Nếu có brandId, lọc theo thương hiệu
-        if (detailNameBrand && detailNameBrand._id) {
-          filteredProducts = allProducts.filter(
-            (product) => product.brand_id === detailNameBrand._id
-          );
+
+        if (slug === "san-pham-moi") {
+          // Lọc và sắp xếp sản phẩm theo ngày tạo mới nhất
+          filteredProducts = allProducts
+            .slice() // tạo bản sao để không làm thay đổi mảng gốc
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // sắp xếp theo ngày tạo
+            .slice(0, 30); // lấy 30 sản phẩm đầu tiên
         } else {
-          filteredProducts = allProducts.filter((product) =>
-            categorySet.has(product.category_id)
-          );
+          // Lọc sản phẩm theo danh mục hoặc thương hiệu
+          if (detailNameBrand && detailNameBrand._id) {
+            filteredProducts = allProducts.filter(
+              (product) => product.brand_id === detailNameBrand._id
+            );
+          } else {
+            filteredProducts = allProducts.filter((product) =>
+              categorySet.has(product.category_id)
+            );
+          }
         }
 
         // Tạo danh sách brand_id duy nhất

@@ -130,7 +130,7 @@ const Home = () => {
 
       <div className={cx("home_content")}>
         <ListProduct title="Sản phẩm mới" />
-        <ButtonAll />
+        <ButtonAll title="Sản phẩm mới"/>
       </div>
     </div>
   );
