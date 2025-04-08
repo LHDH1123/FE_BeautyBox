@@ -437,7 +437,7 @@ const Profile = () => {
         )}
         {activeTab === "Địa chỉ giao nhận" && (
           <div className={cx("form-address")}>
-            {address.map((data) => (
+            {address?.map((data) => (
               <div className={cx("info-form")} key={data._id}>
                 <div className={cx("addressShip")}>
                   <div className={cx("address")}>{data.titleAddress}</div>

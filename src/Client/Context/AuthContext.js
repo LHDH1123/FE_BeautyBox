@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }) => {
   const [nameUser, setNameUser] = useState("");
 
   const fetchAddress = async (userId) => {
+    if (!userId) return;
     try {
       const response = await getAllAddress(userId);
       if (response) {

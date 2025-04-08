@@ -13,7 +13,7 @@ import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { Dialog, Box, DialogActions } from "@mui/material";
+import { Dialog, Box, DialogActions, Snackbar, Alert } from "@mui/material";
 import Cart from "../Cart";
 import CartFav from "../CartFav";
 import { useNavigate } from "react-router-dom";
@@ -21,10 +21,13 @@ import Collection from "../Collection";
 import CategoryHeader from "../CategoryHeader";
 import { getCategorys } from "../../../services/category.service";
 import {
+  forgotPasswordPost,
   getUser,
   loginPost,
   logout,
+  otpPasswordPost,
   registerPost,
+  resetPasswordPost,
 } from "../../../services/user.service";
 import { jwtDecode } from "jwt-decode";
 import { AxiosInstance } from "../../../configs/axios";
@@ -32,6 +35,7 @@ import { deleteAllLike, getLike } from "../../../services/like.service";
 import { useAuth } from "../../Context/AuthContext";
 import { getCart } from "../../../services/cart.service";
 import { getDetailProduct } from "../../../services/product.service";
+import { MuiOtpInput } from "mui-one-time-password-input";
 
 const cx = classNames.bind(styles);
 
@@ -50,8 +54,23 @@ const Header = () => {
   const navigate = useNavigate();
   const [hoveredMenu, setHoveredMenu] = useState(null);
   const [isRegister, setIsRegister] = useState(false);
+  const [isLoginUser, setIsLoginUser] = useState(true);
+  const [isForgotPass, setIsForgotPass] = useState(false);
+  const [isModalOTP, setIsModalOTP] = useState(false);
+  const [isResetPass, setIsResetPass] = useState(false);
+  const [alertData, setAlertData] = useState("");
+  const [countdown, setCountdown] = useState(180); // 3 phút = 180 giây
+
+  const [emailForgot, setEmailForgot] = useState({
+    email: "",
+  });
+  const [otp, setOtp] = useState("");
   const [login, setLogin] = useState({
     email: "",
+    password: "",
+  });
+  const [resetPass, setResetPass] = useState({
+    confirmPass: "",
     password: "",
   });
 
@@ -77,6 +96,8 @@ const Header = () => {
     setLike,
   } = useAuth();
 
+  // Tự động ẩn cảnh báo sau 10 giây
+
   const menuHeaders = [
     { id: 1, label: "Thương hiệu", title: "collection" },
     { id: 2, label: "Khuyến mãi hot", title: "new" },
@@ -88,7 +109,39 @@ const Header = () => {
   const [totalPrice, setTotalPrice] = useState(0);
 
   const [isEmailPassword, setIsEmailPassword] = useState("");
-  const [isHaveAcc, setIsHaveAcc] = useState("");
+  const [isHaveAcc, setIsHaveAcc] = useState(false);
+  const [isDataRegister, setIsDataRegister] = useState(false);
+
+  // Tự động ẩn cảnh báo sau 10 giây
+  useEffect(() => {
+    if (
+      isEmailPassword !== null ||
+      isHaveAcc ||
+      isDataRegister ||
+      alertData !== ""
+    ) {
+      const timer = setTimeout(() => {
+        setIsEmailPassword(null);
+        setIsHaveAcc(false);
+        setIsDataRegister(false);
+        setAlertData("");
+      }, 2000); // 10s
+
+      return () => clearTimeout(timer);
+    }
+  }, [isEmailPassword, isHaveAcc, isDataRegister, alertData]);
+
+  useEffect(() => {
+    let timer;
+
+    if (isModalOTP && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    }
+
+    return () => clearInterval(timer);
+  }, [isModalOTP, countdown]);
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -225,11 +278,7 @@ const Header = () => {
   };
 
   const handleOpenModalLogin = () => {
-    if (isLogin === false) {
-      setIsLogin(true);
-    } else {
-      setIsLogin(false);
-    }
+    setIsLogin(!isLogin);
   };
 
   const handleModalLoginUser = () => {
@@ -238,6 +287,10 @@ const Header = () => {
 
   const handleCloseModalLogin = () => {
     setIsModalLogin(false);
+    setIsForgotPass(false);
+    setIsRegister(false);
+    setIsLoginUser(true);
+    setIsModalOTP(false);
   };
 
   const handleOpenModalCart = () => {
@@ -276,17 +329,24 @@ const Header = () => {
   const handleChange = (e) => {
     setLogin({ ...login, [e.target.name]: e.target.value });
     setRegister({ ...register, [e.target.name]: e.target.value });
+    setEmailForgot({ ...emailForgot, [e.target.name]: e.target.value });
+  };
+
+  const handleChangePass = (e) => {
+    setResetPass({ ...resetPass, [e.target.name]: e.target.value });
   };
 
   const handleLogin = async (isRegister) => {
     try {
       if (!login.email) {
         setIsEmailPassword(true);
+        setIsDataRegister(true);
         return;
       }
 
       if (!login.password) {
         setIsEmailPassword(false);
+        setIsDataRegister(true);
         return;
       }
 
@@ -330,6 +390,35 @@ const Header = () => {
           setIsModalLogin(false);
         }
       } else {
+        if (!register.fullName) {
+          setIsEmailPassword(true);
+          setIsDataRegister(true);
+          return;
+        }
+
+        if (!register.phone) {
+          setIsEmailPassword(true);
+          setIsDataRegister(true);
+          return;
+        }
+
+        if (!register.email) {
+          setIsEmailPassword(true);
+          setIsDataRegister(true);
+          return;
+        }
+
+        if (!register.password) {
+          setIsEmailPassword(false);
+          setIsDataRegister(true);
+          return;
+        }
+
+        if (!register.confirmPass) {
+          setIsEmailPassword(false);
+          setIsDataRegister(true);
+          return;
+        }
         // 🔵 Xử lý đăng ký
         if (register.password !== register.confirmPass) {
           alert("Password and Confirm Password must be the same");
@@ -396,6 +485,86 @@ const Header = () => {
       setIsModalCart(false);
     } else {
       console.log("không có sản phẩm nào trong giỏ hàng");
+    }
+  };
+
+  const handleModalForgot = () => {
+    setIsForgotPass(true);
+    setIsRegister(false);
+    setIsLoginUser(false);
+  };
+
+  const handleLoginUser = () => {
+    setIsForgotPass(false);
+    setIsRegister(false);
+    setIsLoginUser(true);
+  };
+
+  const handleModalRegister = () => {
+    setIsForgotPass(false);
+    setIsRegister(true);
+    setIsLoginUser(false);
+  };
+
+  const handleForgot = async () => {
+    if (!emailForgot.email) {
+      alert("Vui lòng nhập địa chỉ email");
+      return;
+    }
+
+    try {
+      const response = await forgotPasswordPost(emailForgot.email);
+      if (response) {
+        setIsForgotPass(false);
+        setIsModalOTP(true);
+      }
+    } catch (error) {
+      console.error(error);
+      setAlertData(error.response.data.message);
+    }
+  };
+
+  const handleOTP = async () => {
+    if (!otp) {
+      alert("Vui lòng nhập mã OTP");
+    }
+    try {
+      const response = await otpPasswordPost({
+        email: emailForgot.email,
+        otp: otp,
+      });
+      if (response) {
+        setIsModalOTP(false);
+        setIsResetPass(true);
+      }
+    } catch (error) {
+      console.log(error);
+      setAlertData(error.response.data.message);
+    }
+  };
+
+  const handleResetPass = async () => {
+    if (!resetPass.password && !resetPass.confirmPass) {
+      alert("Vui lòng nhập mật khẩu và xác nhận mật khẩu");
+    }
+
+    if (resetPass.password !== resetPass.confirmPass) {
+      alert("Mật khẩu và xác nhận mật khẩu không trùng nhau");
+    }
+
+    try {
+      const response = await resetPasswordPost({
+        email: emailForgot.email,
+        password: resetPass.password,
+      });
+      if (response) {
+        setIsResetPass(false);
+        setIsLoginUser(true);
+        console.log(response);
+      }
+    } catch (error) {
+      console.log(error);
+      setAlertData(error.response.data.message);
     }
   };
 
@@ -851,12 +1020,34 @@ const Header = () => {
             {/* Header */}
             <div className={cx("search-image")}>
               <div className={cx("title")}>
-                {isRegister ? "Đăng ký" : "Đăng nhập"}
+                {isRegister && "Đăng ký"}
+                {isLoginUser && "Đăng nhập "}
+                {isForgotPass && "Quên mật khẩu"}
+                {isModalOTP && "Nhập mã OTP"}
+                {isResetPass && "Cập nhật mật khẩu"}
               </div>
             </div>
 
             {/* Authentication Form */}
             <div className={cx("auth")}>
+              {isModalOTP && (
+                <div
+                  style={{
+                    margin: "0px 20px",
+                  }}
+                >
+                  <span
+                    style={{
+                      fontWeight: 500,
+                      fontSize: 14,
+                    }}
+                  >
+                    Mã xác thực (OTP) sẽ được gửi qua tin nhắn Zalo hoặc Gmail
+                    để cập nhật lại mật khẩu
+                  </span>
+                </div>
+              )}
+
               {/* Đăng ký: Họ và Tên */}
               {isRegister && (
                 <div className={cx("input-login")}>
@@ -865,14 +1056,14 @@ const Header = () => {
                 </div>
               )}
 
-              {!isRegister && (
+              {isLoginUser && (
                 <div className={cx("input-login")}>
                   <div className={cx("label-login")}>Email</div>
                   <input type="text" name="email" onChange={handleChange} />
                 </div>
               )}
 
-              {!isRegister && (
+              {isLoginUser && (
                 <div className={cx("input-login")}>
                   <div className={cx("label-login")}>Mật khẩu</div>
                   <input
@@ -880,16 +1071,18 @@ const Header = () => {
                     name="password"
                     onChange={handleChange}
                   />
-                  {isEmailPassword && (
+                  {isEmailPassword === true && (
                     <div className={cx("alert-login")}>
                       * Vui lòng nhập email
                     </div>
                   )}
+
                   {isEmailPassword === false && (
                     <div className={cx("alert-login")}>
                       * Vui lòng nhập password
                     </div>
                   )}
+
                   {isHaveAcc && (
                     <div className={cx("alert-login")}>
                       * Email, Mật khẩu không đúng
@@ -934,36 +1127,171 @@ const Header = () => {
                 </div>
               )}
 
+              {isForgotPass && (
+                <div className={cx("input-login")}>
+                  <div className={cx("label-login")}>Email</div>
+                  <input type="email" name="email" onChange={handleChange} />
+                </div>
+              )}
+
+              {isModalOTP && (
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginBottom: "30px",
+                    marginTop: "30px",
+                  }}
+                >
+                  <MuiOtpInput
+                    value={otp}
+                    onChange={(newValue) => {
+                      setOtp(newValue);
+                    }}
+                    length={6}
+                    type="number"
+                    TextFieldsProps={{
+                      sx: {
+                        width: "40px", // chiều rộng mỗi ô
+                        height: "40px", // chiều cao mỗi ô
+                        fontSize: "16px", // cỡ chữ
+                        mx: 0.5, // margin trái/phải giữa các ô
+                      },
+                    }}
+                  />
+                </div>
+              )}
+
+              {isResetPass && (
+                <div className={cx("input-login")}>
+                  <div className={cx("label-login")}>Mật khẩu mới</div>
+                  <input
+                    type="password"
+                    name="password"
+                    onChange={handleChangePass}
+                  />
+                </div>
+              )}
+              {isResetPass && (
+                <div className={cx("input-login")}>
+                  <div className={cx("label-login")}>Xác nhận lại mật khẩu</div>
+                  <input
+                    type="password"
+                    name="confirmPass"
+                    onChange={handleChangePass}
+                  />
+                </div>
+              )}
+
+              {isDataRegister && (
+                <div className={cx("alert-login")}>
+                  * Vui lòng nhập đầy đủ thông tin
+                </div>
+              )}
+
+              {isModalOTP && (
+                <span
+                  style={{
+                    fontWeight: 500,
+                    fontSize: 14,
+                    color: countdown === 0 ? "#007bff" : "gray",
+                    cursor: countdown === 0 ? "pointer" : "not-allowed",
+                  }}
+                  onClick={() => {
+                    if (countdown === 0) {
+                      handleForgot(); // hàm bạn viết để gọi lại API gửi OTP
+                      setCountdown(180); // reset lại timer
+                    }
+                  }}
+                >
+                  {countdown > 0 ? (
+                    <>
+                      <span
+                        style={{
+                          color: "#c73130",
+                          fontWeight: "bold",
+                          marginRight: "10px",
+                        }}
+                      >
+                        {Math.floor(countdown / 60)}:
+                        {(countdown % 60).toString().padStart(2, "0")}
+                      </span>
+                      Gửi lại mã OTP
+                    </>
+                  ) : (
+                    "Gửi lại mã OTP"
+                  )}
+                </span>
+              )}
+
+              {alertData && (
+                <div className={cx("alert-login")}>* {alertData}</div>
+              )}
+
               {/* Submit Button */}
-              {isRegister ? (
+              {isRegister && (
                 <button type="submit" onClick={() => handleLogin(isRegister)}>
                   Đăng ký
                 </button>
-              ) : (
+              )}
+              {isLoginUser && (
                 <button type="submit" onClick={() => handleLogin(isRegister)}>
                   Đăng nhập
+                </button>
+              )}
+              {isForgotPass && (
+                <button type="submit" onClick={() => handleForgot()}>
+                  Tiếp tục
+                </button>
+              )}
+
+              {isModalOTP && (
+                <div>
+                  <button type="submit" onClick={() => handleOTP()}>
+                    Tiếp tục
+                  </button>
+                </div>
+              )}
+
+              {isResetPass && (
+                <button type="submit" onClick={() => handleResetPass()}>
+                  Cập nhật
                 </button>
               )}
             </div>
 
             {/* Chuyển đổi giữa Đăng nhập & Đăng ký */}
             <div className={cx("text-register")}>
-              {isRegister ? (
+              {isRegister && (
                 <>
                   Bạn đã có tài khoản?{" "}
-                  <span onClick={() => setIsRegister(false)}>Đăng nhập</span>
+                  <span onClick={handleLoginUser}>Đăng nhập</span>
                 </>
-              ) : (
+              )}
+              {isLoginUser && (
                 <>
                   Bạn chưa có tài khoản?{" "}
-                  <span onClick={() => setIsRegister(true)}>Đăng ký</span>{" "}
-                  <span>Quên mật khẩu</span>
+                  <span onClick={handleModalRegister}>Đăng ký</span>{" "}
+                  <span onClick={handleModalForgot}>Quên mật khẩu</span>
+                </>
+              )}
+
+              {isForgotPass && (
+                <>
+                  Tôi đã nhớ mật khẩu!{" "}
+                  <span
+                    onClick={handleLoginUser}
+                    style={{ marginTop: " 20xp" }}
+                  >
+                    Đăng nhập
+                  </span>
                 </>
               )}
             </div>
 
             {/* Ghi chú khi đăng nhập */}
-            {!isRegister && (
+            {isLoginUser && (
               <div>
                 <div className={cx("text-login")}>
                   *Vui lòng không hủy đơn hàng khi đã thanh toán*

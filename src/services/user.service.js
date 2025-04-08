@@ -104,3 +104,36 @@ export async function refreshTokenUser() {
     return null;
   }
 }
+
+export async function forgotPasswordPost(email) {
+  try {
+    const response = await AxiosInstance.post(`/user/password/forgot`, { email }); // ✅ Bọc lại thành object
+    return response;
+  } catch (error) {
+    console.error("Lỗi khi nhập email thay đổi mật khẩu:", error);
+    throw error;
+  }
+}
+
+
+export async function otpPasswordPost(data) {
+  try {
+    const response = await AxiosInstance.post(`/user/password/otp`, data);
+    return response;
+  } catch (error) {
+    console.error("Lỗi otp:", error);
+    // Ném lỗi để hàm gọi có thể xử lý
+    throw error;
+  }
+}
+
+export async function resetPasswordPost(data) {
+  try {
+    const response = await AxiosInstance.post(`/user/password/reset`, data);
+    return response;
+  } catch (error) {
+    console.error("Lỗi khi thay đổi mật khẩu:", error);
+    // Ném lỗi để hàm gọi có thể xử lý
+    throw error;
+  }
+}

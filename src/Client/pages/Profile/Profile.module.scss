@@ -170,14 +170,16 @@
 }
 
 .form-address {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+  gap: 20px;
+
+  width: 100%;
 }
 
 .info-form {
   flex: 1;
-  width: 300px;
+  width: 270px;
   border: 1px solid #ddd;
   border-radius: 8px;
   padding: 10px;
