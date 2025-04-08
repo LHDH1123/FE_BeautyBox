@@ -8,16 +8,25 @@ import { getAllProducts } from "../../../services/product.service";
 import {
   getCategorys,
   getDetailSlug,
+  getNameCategory,
 } from "../../../services/category.service";
 import { getDetailName, getNameBrand } from "../../../services/brand.service";
 import { useNavigate } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
-function ListCategory({ slug, onTotalChange }) {
+function ListCategory({
+  slug,
+  onTotalChange,
+  selectedPriceRanges,
+  selectedBrands,
+  selectedCategories,
+}) {
   const scrollableRef = useRef(null);
   const [favoritedItems, setFavoritedItems] = useState([]);
   const [listProduct, setListProduct] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+
   const navigate = useNavigate();
 
   const handleClickTym = (index) => {
@@ -31,7 +40,6 @@ function ListCategory({ slug, onTotalChange }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Gọi API song song
         const [allCategories, allProducts] = await Promise.all([
           getCategorys(),
           getAllProducts(),
@@ -39,7 +47,6 @@ function ListCategory({ slug, onTotalChange }) {
 
         if (!allCategories || !allProducts) return;
 
-        // Dùng Map để truy vấn danh mục con nhanh hơn
         const categoryMap = new Map();
         allCategories.forEach((cat) => {
           categoryMap.set(cat._id, cat.parent_id);
@@ -49,8 +56,6 @@ function ListCategory({ slug, onTotalChange }) {
 
         const categorySet = new Set();
         if (detailSlug && detailSlug._id) {
-          // Kiểm tra `_id` tồn tại
-          // Lấy tất cả danh mục con của `id`
           const findCategories = (categoryId) => {
             if (!categorySet.has(categoryId)) {
               categorySet.add(categoryId);
@@ -64,19 +69,16 @@ function ListCategory({ slug, onTotalChange }) {
           findCategories(detailSlug._id);
         }
 
-        // Lọc sản phẩm theo danh mục trước
         const detailNameBrand = await getDetailName(slug);
 
         let filteredProducts = [];
 
         if (slug === "san-pham-moi") {
-          // Lọc và sắp xếp sản phẩm theo ngày tạo mới nhất
           filteredProducts = allProducts
-            .slice() // tạo bản sao để không làm thay đổi mảng gốc
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // sắp xếp theo ngày tạo
-            .slice(0, 30); // lấy 30 sản phẩm đầu tiên
+            .slice()
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            .slice(0, 30);
         } else {
-          // Lọc sản phẩm theo danh mục hoặc thương hiệu
           if (detailNameBrand && detailNameBrand._id) {
             filteredProducts = allProducts.filter(
               (product) => product.brand_id === detailNameBrand._id
@@ -88,27 +90,38 @@ function ListCategory({ slug, onTotalChange }) {
           }
         }
 
-        // Tạo danh sách brand_id duy nhất
         const brandIds = [...new Set(filteredProducts.map((p) => p.brand_id))];
+        const categoryIds = [
+          ...new Set(filteredProducts.map((p) => p.category_id)),
+        ];
 
-        // Gọi API lấy tên thương hiệu một lần cho tất cả brand_id
         const brandNames = await Promise.all(
           brandIds.map(async (brandId) => ({
             brandId,
             nameBrand: await getNameBrand(brandId),
           }))
         );
+        const categoryNames = await Promise.all(
+          categoryIds.map(async (categoryId) => ({
+            categoryId,
+            nameCategory: await getNameCategory(categoryId),
+          }))
+        );
 
-        // Tạo Map để tra cứu nhanh
         const brandMap = new Map();
         brandNames.forEach(({ brandId, nameBrand }) => {
           brandMap.set(brandId, nameBrand);
         });
 
-        // Gán tên thương hiệu vào sản phẩm
+        const categoryFilterMap = new Map();
+        categoryNames.forEach(({ categoryId, nameCategory }) => {
+          categoryFilterMap.set(categoryId, nameCategory); // ✅ đúng map
+        });
+
         const productsWithBrandNames = filteredProducts.map((product) => ({
           ...product,
           nameBrand: brandMap.get(product.brand_id),
+          categoryName: categoryFilterMap.get(product.category_id),
         }));
 
         setListProduct(productsWithBrandNames);
@@ -122,15 +135,53 @@ function ListCategory({ slug, onTotalChange }) {
     fetchData();
   }, [slug, onTotalChange]);
 
+  console.log(listProduct);
+
   const handleDetail = (slug) => {
     navigate(`/detailProduct/${slug}`);
   };
+
+  useEffect(() => {
+    const filtered = listProduct.filter((product) => {
+      const price = product.price;
+
+      const matchesPrice =
+        (selectedPriceRanges || []).length === 0
+          ? true
+          : selectedPriceRanges.some((range) => {
+              if (range === "Dưới 500.000₫") return price < 500000;
+              if (range === "500.000₫ - 1.000.000₫")
+                return price >= 500000 && price <= 1000000;
+              if (range === "1.000.000₫ - 1.500.000₫")
+                return price > 1000000 && price <= 1500000;
+              if (range === "1.500.000₫ - 2.000.000₫")
+                return price > 1500000 && price <= 2000000;
+              if (range === "Trên 2.000.000₫") return price > 2000000;
+              return true;
+            });
+
+      const matchesBrand =
+        (selectedBrands || []).length === 0
+          ? true
+          : selectedBrands.includes(product.nameBrand);
+
+      const matchesCategory =
+        (selectedCategories || []).length === 0
+          ? true
+          : selectedCategories.includes(product.categoryName);
+
+      return matchesPrice && matchesBrand && matchesCategory;
+    });
+
+    setFilteredProducts(filtered);
+    onTotalChange(filtered.length);
+  }, [listProduct, selectedPriceRanges, selectedBrands, selectedCategories]); // <-- sửa chỗ này
 
   return (
     <div className={cx("list")}>
       <div className={cx("scroll-list")}>
         <div className={cx("list_product")} ref={scrollableRef}>
-          {listProduct.map((product, index) => (
+          {filteredProducts.map((product, index) => (
             <div
               key={product._id}
               className={cx("product")}
