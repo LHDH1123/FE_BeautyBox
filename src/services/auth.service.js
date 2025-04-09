@@ -3,15 +3,25 @@ import { AxiosInstance } from "../configs/axios";
 export async function loginPost(data) {
   try {
     const response = await AxiosInstance.post("/auth/loginPost", data, {
-      withCredentials: true, // Đảm bảo cookies được gửi đi
+      withCredentials: true,
     });
     return response;
   } catch (error) {
-    console.error(
-      "Lỗi khi đăng nhập:",
-      error.response?.data?.error || error.message
-    );
-    return null;
+    console.error("❌ Lỗi khi đăng nhập:", error);
+    return {
+      error: error || "Lỗi không xác định",
+    };
+  }
+}
+
+export async function checkLogin() {
+  try {
+    const response = await AxiosInstance.get("/auth/login", {
+      withCredentials: true,
+    });
+    return response;
+  } catch (error) {
+    return { loggedIn: false, message: error };
   }
 }
 
@@ -20,10 +30,7 @@ export async function logout() {
     await AxiosInstance.get("/auth/logout", { withCredentials: true });
     return true;
   } catch (error) {
-    console.error(
-      "Lỗi khi đăng xuất:",
-      error.response?.data?.error || error.message
-    );
+    console.error("Lỗi khi đăng xuất:", error);
     return false;
   }
 }

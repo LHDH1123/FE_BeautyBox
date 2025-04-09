@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { TextField, Button, Typography, Grid, Paper, Box } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import { loginPost } from "../../../services/auth.service";
 import { useNavigate } from "react-router-dom";
+import classNames from "classnames/bind";
+import styles from "./Login.module.scss";
+import { checkLogin, loginPost } from "../../../services/auth.service";
 
-const theme = createTheme();
+const cx = classNames.bind(styles);
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [token, setToken] = useState([]);
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -21,123 +17,69 @@ const Login = () => {
     });
   };
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await loginPost(formData); // Gọi API để đăng nhập
+  const handleLogin = async () => {
+    const response = await loginPost(formData);
 
-      if (response) {
-        console.log(response.token);
-        setToken(response.token);
-
-        // Sử dụng navigate từ React Router để chuyển hướng
-        navigate("/adminbb"); // Chuyển đến trang admin sau khi đăng nhập thành công
-      }
-    } catch (err) {
-      console.log(err);
+    if (response?.loggedIn) {
+      console.log("✅ Login thành công");
+      navigate("/adminbb");
+    } else {
+      console.error(
+        "❌ Đăng nhập thất bại:",
+        response?.error || "Không xác định"
+      );
     }
   };
 
   useEffect(() => {
-    // if (token) {
-    //   navigate("/adminbb"); // Nếu có token, chuyển đến trang admin
-    // }
-  });
+    const checkAuth = async () => {
+      const res = await checkLogin();
+      if (res?.loggedIn) {
+        navigate("/adminbb");
+      }
+    };
+    checkAuth();
+  }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Grid container sx={{ height: "100vh" }}>
-        {/* Left Side - Login Form */}
-        <Grid
-          item
-          xs={12}
-          md={6}
-          component={Paper}
-          elevation={6}
-          square
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            padding: 4,
-          }}
-        >
-          <img
-            src="https://image.hsv-tech.io/300x0/bbx/common/50a26167-9341-4be8-8aba-9682d3b4a916.webp"
-            alt="Logo"
-            width={200}
-          />
-          <Typography variant="h5" sx={{ mt: 2, mb: 2, fontWeight: "bold" }}>
-            We are the Beauty Box
-          </Typography>
-          <Box
-            component="form"
-            noValidate
-            sx={{ mt: 3, width: "100%", maxWidth: 360 }}
-            onSubmit={handleLogin}
-          >
-            <TextField
-              fullWidth
-              label="UserName"
-              name="email"
-              margin="normal"
-              value={formData.email}
-              onChange={handleChange}
-            />
-            <TextField
-              fullWidth
-              label="Password"
-              type="password"
-              name="password"
-              margin="normal"
-              value={formData.password}
-              onChange={handleChange}
-            />
-            <Button
-              fullWidth
-              variant="contained"
-              type="submit"
-              sx={{
-                mt: 3,
-                mb: 2,
-                background:
-                  "linear-gradient(90deg, #ffd400, #c73130 50.52%, #663695 99.61%)",
-              }}
-            >
-              LOG IN
-            </Button>
-          </Box>
-        </Grid>
+    <div className={cx("container")}>
+      <div className={cx("left")}>
+        <img
+          src="https://image.hsv-tech.io/300x0/bbx/common/50a26167-9341-4be8-8aba-9682d3b4a916.webp"
+          alt="Logo"
+          className={cx("logo")}
+        />
+        <div className={cx("title")}>We are the Beauty Box</div>
 
-        {/* Right Side - Information Panel */}
-        <Grid
-          item
-          xs={12}
-          md={6}
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            background:
-              "linear-gradient(90deg, #ffd400, #c73130 50.52%, #663695 99.61%)",
-            color: "white",
-            textAlign: "center",
-            padding: 4,
-          }}
-        >
-          <Box>
-            <Typography variant="h4" fontWeight="bold">
-              We are more than just a company
-            </Typography>
-            <Typography sx={{ mt: 2 }}>
-              We are committed to delivering true value, continuously innovating
-              and growing to create better things.
-            </Typography>
-          </Box>
-        </Grid>
-      </Grid>
-    </ThemeProvider>
+        <div className={cx("form")}>
+          <input
+            type="text"
+            name="email"
+            placeholder="UserName"
+            value={formData.email}
+            onChange={handleChange}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Password"
+            value={formData.password}
+            onChange={handleChange}
+          />
+          <button onClick={handleLogin}>LOG IN</button>
+        </div>
+      </div>
+
+      <div className={cx("right")}>
+        <div>
+          <h2>We are more than just a company</h2>
+          <p>
+            We are committed to delivering true value, continuously innovating
+            and growing to create better things.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -13,7 +13,7 @@ const modules = [
   "Thương hiệu",
   "Tài khoản",
   "Vai trò",
-  "Banner",
+  "Voucher",
   "Đơn hàng",
 ];
 const permissions = ["Tất cả", "Xem", "Cập nhật", "Thêm mới", "Xóa"];
@@ -31,7 +31,7 @@ const Permissions = () => {
     "Thương hiệu": "brands",
     "Tài khoản": "accounts",
     "Vai trò": "roles",
-    Banner: "banners",
+    Voucher: "vouchers",
     "Đơn hàng": "orders",
   };
 
@@ -154,7 +154,7 @@ const Permissions = () => {
 
   useEffect(() => {
     fetchRole();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleRole = () => {

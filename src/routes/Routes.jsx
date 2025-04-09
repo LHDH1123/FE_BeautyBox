@@ -1,5 +1,6 @@
 import { Route, Routes } from "react-router-dom";
-import PrivateRoute from "./privateRoute"; // Import PrivateRoute
+import PrivateRoute from "./privateRoute";
+
 import Home from "../Client/pages/Home";
 import LayoutDefault from "../Client/Layouts/LayoutDefault";
 import LayoutDefaultAdmin from "../Admin/layouts/LayoutDefault";
@@ -12,6 +13,7 @@ import Error404 from "../Client/pages/Error404";
 import Detail from "../Client/pages/Detail";
 import Checkout from "../Client/pages/CheckOut";
 import OrderCheckout from "../Client/pages/Order-Checkout";
+
 import ProductAdmin from "../Admin/pages/Product";
 import BrandAdmin from "../Admin/pages/Brand";
 import CategoryAdmin from "../Admin/pages/Category";
@@ -45,7 +47,7 @@ export default function Router() {
       {/* Admin Login */}
       <Route path="/adminbb/login" element={<LoginAdmin />} />
 
-      {/* Admin Routes (Protected by PrivateRoute) */}
+      {/* Admin Protected Routes */}
       <Route
         path="/adminbb"
         element={

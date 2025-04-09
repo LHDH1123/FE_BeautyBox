@@ -41,7 +41,6 @@ const Dashboard = () => {
   const [listUser, setListUser] = useState([]);
   const [listOrder, setListOrder] = useState([]);
   const [total, setTotal] = useState([]);
-  console.log(listProduct);
   const fetchProduct = async () => {
     try {
       const response = await getAllProducts();
