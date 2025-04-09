@@ -14,6 +14,7 @@ import {
   Dialog,
   DialogActions,
   Divider,
+  Grid,
   List,
   ListItem,
   ListItemText,
@@ -247,13 +248,6 @@ const Profile = () => {
       fetchOrders();
     }
   }, [user?._id]); // Chỉ phụ thuộc vào user._id thay vì toàn bộ user object
-
-  const calculateTotal = (products) => {
-    return products.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
-  };
 
   const handleDetail = async (orderDetail) => {
     setIsModalDetail(true);
@@ -510,7 +504,7 @@ const Profile = () => {
                           {new Intl.NumberFormat("vi-VN", {
                             style: "currency",
                             currency: "VND",
-                          }).format(calculateTotal(order.products))}
+                          }).format(order.total)}
                         </td>
                         <td>
                           <button
@@ -930,6 +924,64 @@ const Profile = () => {
           <div className={cx("modalContent")}>
             <div className={cx("title")}>Chi tiết đơn hàng</div>
 
+            <Grid container spacing={2} mt={2}>
+              <Grid item xs={12} md={6}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    borderRadius: "5px",
+                    height: "100%", // đảm bảo full height trong grid
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <CardContent sx={{ flex: 1 }}>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom>
+                      Thông tin nhận hàng
+                    </Typography>
+                    {orderDetail.userInfo && (
+                      <>
+                        <Typography>{orderDetail.userInfo.fullName}</Typography>
+                        <Typography>{orderDetail.userInfo.phone}</Typography>
+                        <Typography>{orderDetail.userInfo.address}</Typography>
+                      </>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              <Grid item xs={12} md={6}>
+                <Card
+                  variant="outlined"
+                  sx={{
+                    borderRadius: "5px",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <CardContent sx={{ flex: 1 }}>
+                    <Typography variant="h6" fontWeight="bold" gutterBottom>
+                      Phương thức thanh toán
+                    </Typography>
+                    <Typography>
+                      {orderDetail.isCheckout
+                        ? "Zalopay & Chuyển khoản Ngân Hàng"
+                        : "Trả tiền mặt khi nhận hàng (COD)"}
+                    </Typography>
+                    {orderDetail.isCheckout ? (
+                      <Typography>Đã thanh toán</Typography>
+                    ) : (
+                      <Typography>
+                        Quý khách vui lòng thanh toán{" "}
+                        {parseInt(21233).toLocaleString()}đ khi nhận hàng
+                      </Typography>
+                    )}
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+
             <Card
               sx={{
                 maxWidth: 1050,
@@ -1006,7 +1058,9 @@ const Profile = () => {
                     {new Intl.NumberFormat("vi-VN", {
                       style: "currency",
                       currency: "VND",
-                    }).format(orderDetail.total)}
+                    }).format(
+                      -(orderDetail.total * orderDetail.discount) / 100
+                    )}
                   </Typography>
                 </Box>
 
@@ -1040,7 +1094,7 @@ const Profile = () => {
                       style: "currency",
                       fontWeight: "bold",
                       currency: "VND",
-                    }).format(orderDetail.total)}
+                    }).format(orderDetail.totalVoucher)}
                   </Typography>
                 </Box>
               </CardContent>

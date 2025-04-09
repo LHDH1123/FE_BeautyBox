@@ -379,10 +379,15 @@ const CheckoutPage = () => {
       const phone = userEmail.phone;
       const address = `${defaultddress.address}, ${defaultddress.ward}, ${defaultddress.districts}, ${defaultddress.city}`;
       const orderCart = cartState.products;
+      const voucher_id = selectedVoucher;
+      const isCheckout = selectedPayment === "ZaloPay";
+
       const response = await createOrder(userId, {
         fullName,
         phone,
         address,
+        voucher_id,
+        isCheckout,
         cart: orderCart,
       });
       if (response) {

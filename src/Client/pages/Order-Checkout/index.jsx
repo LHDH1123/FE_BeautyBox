@@ -9,6 +9,7 @@ import {
   Divider,
   Box,
   Avatar,
+  Grid,
 } from "@mui/material";
 import { useLocation } from "react-router-dom";
 import { OrderSuccess } from "../../../services/checkout.service";
@@ -34,8 +35,7 @@ const OrderSummary = () => {
       fetchOrderSuccess();
     }
 
-    if(orderDetail) {
-      
+    if (orderDetail) {
     }
   }, [orderId]);
 
@@ -49,6 +49,67 @@ const OrderSummary = () => {
         Order#
         <span>{order._id}</span>
       </h1>
+
+      <Box sx={{ maxWidth: 1050, margin: "auto", mt: 2 }}>
+        <Grid container spacing={2}>
+          <Grid item xs={12} md={6}>
+            <Card
+              variant="outlined"
+              sx={{
+                borderRadius: "5px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <CardContent sx={{ flex: 1 }}>
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                  Thông tin nhận hàng
+                </Typography>
+                {order.userInfo && (
+                  <>
+                    <Typography>{order.userInfo.fullName}</Typography>
+                    <Typography>{order.userInfo.phone}</Typography>
+                    <Typography>{order.userInfo.address}</Typography>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+
+          <Grid item xs={12} md={6}>
+            <Card
+              variant="outlined"
+              sx={{
+                borderRadius: "5px",
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <CardContent sx={{ flex: 1 }}>
+                <Typography variant="h6" fontWeight="bold" gutterBottom>
+                  Phương thức thanh toán
+                </Typography>
+                <Typography>
+                  {order.isCheckout
+                    ? "Zalopay & Chuyển khoản Ngân Hàng"
+                    : "Trả tiền mặt khi nhận hàng (COD)"}
+                </Typography>
+                {order.isCheckout ? (
+                  <Typography>Đã thanh toán</Typography>
+                ) : (
+                  <Typography>
+                    Quý khách vui lòng thanh toán{" "}
+                    {parseInt(21233).toLocaleString()}đ khi nhận hàng
+                  </Typography>
+                )}
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      </Box>
+
       <Card
         sx={{
           maxWidth: 1050,
