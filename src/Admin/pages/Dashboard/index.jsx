@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Dashboard.module.scss";
-import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
-import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
+// import ReplayOutlinedIcon from "@mui/icons-material/ReplayOutlined";
+// import CalendarTodayOutlinedIcon from "@mui/icons-material/CalendarTodayOutlined";
 import iconOder from "../../../assets/images/file-text-icon-01.svg";
 import iconSale from "../../../assets/images/weekly-earning.svg";
 import iconUser from "../../../assets/images/user-svgrepo-com.svg";
@@ -20,27 +20,54 @@ import {
 import { getAllProducts } from "../../../services/product.service";
 import { getAllUser } from "../../../services/user.service";
 import { getAllOrder } from "../../../services/order.service";
-const data = [
-  { name: "Jan", Sales: 300 },
-  { name: "Feb", Sales: 200 },
-  { name: "Mar", Sales: 400 },
-  { name: "Apr", Sales: 300 },
-  { name: "May", Sales: 200 },
-  { name: "Jun", Sales: 100 },
-  { name: "Jul", Sales: 350 },
-  { name: "Aug", Sales: 400 },
-  { name: "Sep", Sales: 300 },
-  { name: "Oct", Sales: 200 },
-  { name: "Nov", Sales: 100 },
-  { name: "Dec", Sales: 350 },
-];
+// const data = [
+//   { name: "Jan", Sales: 300 },
+//   { name: "Feb", Sales: 200 },
+//   { name: "Mar", Sales: 400 },
+//   { name: "Apr", Sales: 300 },
+//   { name: "May", Sales: 200 },
+//   { name: "Jun", Sales: 100 },
+//   { name: "Jul", Sales: 350 },
+//   { name: "Aug", Sales: 400 },
+//   { name: "Sep", Sales: 300 },
+//   { name: "Oct", Sales: 200 },
+//   { name: "Nov", Sales: 100 },
+//   { name: "Dec", Sales: 350 },
+// ];
 const cx = classNames.bind(styles);
 
 const Dashboard = () => {
   const [listProduct, setListProduct] = useState([]);
   const [listUser, setListUser] = useState([]);
   const [listOrder, setListOrder] = useState([]);
-  const [total, setTotal] = useState([]);
+  const [chartData, setChartData] = useState([]);
+  const [totalMonth, setTotalMonth] = useState([]);
+
+  const formatRevenueData = (orders) => {
+    const revenueByMonth = {};
+
+    orders.forEach((order) => {
+      const month = new Date(order.createdAt).getMonth() + 1;
+
+      order.products.forEach((product) => {
+        const { price, discountPercentage, quantity } = product;
+        const discountedPrice = price * (1 - discountPercentage / 100);
+        const total = discountedPrice * quantity;
+        revenueByMonth[month] = (revenueByMonth[month] || 0) + total;
+      });
+    });
+
+    const chartData = Array.from({ length: 12 }, (_, i) => {
+      const month = i + 1;
+      return {
+        name: `Tháng ${month}`,
+        Sales: Math.round(revenueByMonth[month] || 0),
+      };
+    });
+
+    return chartData;
+  };
+
   const fetchProduct = async () => {
     try {
       const response = await getAllProducts();
@@ -92,9 +119,27 @@ const Dashboard = () => {
           }, 0);
         };
 
-        // Gọi hàm để tính tổng
-        const totalPrice = calculateTotalPrice(response);
-        setTotal(totalPrice.toLocaleString("vi-VN"));
+        // Tổng doanh thu toàn bộ đơn hàng
+
+        // 👉 Doanh thu tháng hiện tại (KHÔNG cần kiểm tra isCheckout)
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        const ordersThisMonth = response.filter((order) => {
+          const createdAt = new Date(order.createdAt);
+          return (
+            createdAt.getMonth() === currentMonth &&
+            createdAt.getFullYear() === currentYear
+          );
+        });
+
+        const totalMonthRevenue = calculateTotalPrice(ordersThisMonth);
+        setTotalMonth(totalMonthRevenue.toLocaleString("vi-VN"));
+
+        // Dữ liệu biểu đồ
+        const data = formatRevenueData(response);
+        setChartData(data);
       }
     } catch (error) {
       console.error(error);
@@ -116,7 +161,7 @@ const Dashboard = () => {
             Đây là những gì đang xảy ra với cửa hàng của bạn ngày hôm nay.
           </div>
         </div>
-
+        {/* 
         <div className={cx("filter-calender")}>
           <div className={cx("calendar")}>
             <div className={cx("icon")}>
@@ -137,16 +182,16 @@ const Dashboard = () => {
               <ReplayOutlinedIcon />
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className={cx("sales-cards")}>
         <div className={cx("total-sale")}>
           <div className={cx("card")}>
-            <h6>Doanh Thu</h6>
+            <h6>Doanh Thu Tháng Này</h6>
             <h3>
               <span className={cx("counters")} data-count="95000.45">
-                {total}
+                {totalMonth}
               </span>
               VNĐ
             </h3>
@@ -176,7 +221,6 @@ const Dashboard = () => {
               p: 2,
               border: "1px solid #ddd",
               borderRadius: "8px",
-              // boxShadow: "0 2px 5px rgba(0,0,0,0.1)",
               backgroundColor: "#fff",
             }}
           >
@@ -184,10 +228,10 @@ const Dashboard = () => {
               variant="h6"
               mb={2}
               sx={{
-                color: "#333", // Thay đổi màu chữ
-                fontWeight: "700", // Đặt font-weight
-                fontSize: "18px", // Thay đổi kích thước font
-                letterSpacing: "1px", // Thêm khoảng cách giữa các ký tự
+                color: "#333",
+                fontWeight: "700",
+                fontSize: "18px",
+                letterSpacing: "1px",
                 paddingBottom: "15px",
                 borderBottom: "solid 1px #ddd",
               }}
@@ -197,7 +241,7 @@ const Dashboard = () => {
             <BarChart
               width={700}
               height={400}
-              data={data}
+              data={chartData}
               margin={{
                 top: 20,
                 right: 30,
@@ -207,8 +251,21 @@ const Dashboard = () => {
             >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="name" />
-              <YAxis />
-              <Tooltip />
+              <YAxis
+                tickFormatter={(value) => {
+                  if (value >= 1_000_000)
+                    return `${(value / 1_000_000).toFixed(1)}tr`;
+                  if (value >= 1_000) return `${(value / 1_000).toFixed(0)}k`;
+                  return value;
+                }}
+              />
+
+              <Tooltip
+                formatter={(value) => [
+                  `${value.toLocaleString("vi-VN")}₫`,
+                  "Doanh thu",
+                ]}
+              />
               <Legend />
               <Bar dataKey="Sales" fill="#82ca9d" />
             </BarChart>

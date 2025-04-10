@@ -21,7 +21,6 @@ const Sidebar = () => {
   const [activePath, setActivePath] = useState(location.pathname);
   const { permissions } = useAuth();
 
-  console.log(permissions);
 
   const hasPermission = (key) => {
     return permissions?.includes(key);
