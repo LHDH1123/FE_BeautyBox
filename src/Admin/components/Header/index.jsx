@@ -18,6 +18,7 @@ import { createCategorySelect } from "../../../helper/select-tree";
 import { addRole, getAllRoles } from "../../../services/role.service";
 import { addAccount } from "../../../services/account.service";
 import { createVoucher } from "../../../services/voucher.service";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
@@ -74,6 +75,18 @@ const Header = ({
   const navigate = useNavigate();
 
   const label = { inputProps: { "aria-label": "Switch demo" } };
+  const createPermissionMap = {
+    "Sản Phẩm": "products_create",
+    "Danh Mục": "products-category_create",
+    "Thương Hiệu": "brands_create",
+    "Người Dùng": "accounts_create",
+    "Vai Trò & Quyền": "roles_create",
+    "Giảm Giá": "vouchers_create",
+    "Đơn hàng": "orders_create",
+  };
+
+  const { permissions } = useAuth();
+  const canCreate = permissions?.includes(createPermissionMap[title]);
 
   const fetchAllCategorys = async () => {
     const response = await getCategorys();
@@ -449,7 +462,7 @@ const Header = ({
         </Snackbar>
       )}
 
-      {title !== "Chi tiết sản phẩm" && title !== "Quyền hạn" && (
+      {title !== "Chi tiết sản phẩm" && title !== "Quyền hạn" && canCreate && (
         <div className={cx("btn-add")} onClick={handleCloseModalAdd}>
           <AddCircleOutlineIcon />
           <button>

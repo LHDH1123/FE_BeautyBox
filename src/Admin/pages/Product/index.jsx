@@ -28,6 +28,7 @@ import {
   DialogTitle,
   Snackbar,
 } from "@mui/material";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
@@ -47,6 +48,9 @@ const Product = () => {
   const [selectedId, setSelectedId] = useState(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
+
+  const { permissions } = useAuth();
 
   const handleSelectAll = () => {
     const newCheckedState = !isAllChecked;
@@ -145,6 +149,12 @@ const Product = () => {
   };
 
   const handleChangeStatus = async (id, currentStatus) => {
+    if (!permissions?.includes("products_edit")) {
+      setErrorMessage("Bạn không có quyền truy cập");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
     try {
       const newStatus = !currentStatus;
 
@@ -179,6 +189,7 @@ const Product = () => {
         setListProducts(updatedProducts);
         setErrorMessage("Xóa sản phẩm thành công");
         setOpenSnackbar(true);
+        setIsAccess(true)
       }
     } catch (error) {
       console.error(error);
@@ -259,9 +270,15 @@ const Product = () => {
           onClose={() => setOpenSnackbar(false)}
           anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
         >
-          <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
-            {errorMessage}
-          </Alert>
+          {isAccess ? (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          )}
         </Snackbar>
       )}
 
@@ -420,20 +437,24 @@ const Product = () => {
                       >
                         <RemoveRedEyeOutlinedIcon />
                       </div>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleForwardEdit(product._id)}
-                      >
-                        <ModeEditOutlineOutlinedIcon
-                          style={{ color: "#3577f1" }}
-                        />
-                      </div>
-                      <div className={cx("icon")}>
-                        <DeleteOutlineOutlinedIcon
-                          style={{ color: "red" }}
-                          onClick={() => handleDelete(product._id)}
-                        />
-                      </div>
+                      {permissions?.includes("products_edit") && (
+                        <div
+                          className={cx("icon")}
+                          onClick={() => handleForwardEdit(product._id)}
+                        >
+                          <ModeEditOutlineOutlinedIcon
+                            style={{ color: "#3577f1" }}
+                          />
+                        </div>
+                      )}
+                      {permissions?.includes("products_edit") && (
+                        <div className={cx("icon")}>
+                          <DeleteOutlineOutlinedIcon
+                            style={{ color: "red" }}
+                            onClick={() => handleDelete(product._id)}
+                          />
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>

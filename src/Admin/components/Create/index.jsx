@@ -25,6 +25,7 @@ import {
   getDetailProduct,
   updateProduct,
 } from "../../../services/product.service";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
@@ -70,6 +71,7 @@ const Create = ({ title, productId }) => {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [isAccess, setIsAccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const { permissions } = useAuth();
 
   const fileInputRef = useRef(null);
 
@@ -163,6 +165,13 @@ const Create = ({ title, productId }) => {
   };
 
   const handleAdd = async () => {
+    if (!permissions?.includes("products_edit")) {
+      setErrorMessage("Bạn không có quyền truy cập");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+
     if (title === "Chỉnh sửa sản phẩm") {
       if (!editProduct.title) {
         setErrorMessage("Vui lòng nhập tên sản phẩm");
@@ -263,6 +272,12 @@ const Create = ({ title, productId }) => {
         console.error("❌ Lỗi:", error);
       }
     } else {
+      if (!permissions?.includes("products_create")) {
+        setErrorMessage("Bạn không có quyền truy cập");
+        setOpenSnackbar(true);
+        setIsAccess(false);
+        return;
+      }
       if (!product.title) {
         setErrorMessage("Vui lòng nhập tên sản phẩm");
         setOpenSnackbar(true);

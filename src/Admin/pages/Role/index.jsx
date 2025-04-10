@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
@@ -37,6 +38,7 @@ const Role = () => {
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
   const navigate = useNavigate();
+  const { permissions } = useAuth();
 
   const fetchRoles = async () => {
     const response = await getAllRoles();
@@ -50,6 +52,12 @@ const Role = () => {
   }, []);
 
   const handleChangeStatus = async (id, currentStatus) => {
+    if (!permissions?.includes("roles_edit")) {
+      setErrorMessage("Bạn không có quyền truy cập");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
     try {
       const newStatus = !currentStatus;
 
@@ -217,20 +225,25 @@ const Role = () => {
                           onClick={() => handlePermission(role._id)}
                         />
                       </div>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleEdit(role)}
-                      >
-                        <ModeEditOutlineOutlinedIcon
-                          style={{ color: "rgb(46 109 27)" }}
-                        />
-                      </div>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleDelete(role._id)}
-                      >
-                        <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
-                      </div>
+                      {permissions?.includes("roles_edit") && (
+                        <div
+                          className={cx("icon")}
+                          onClick={() => handleEdit(role)}
+                        >
+                          <ModeEditOutlineOutlinedIcon
+                            style={{ color: "rgb(46 109 27)" }}
+                          />
+                        </div>
+                      )}
+
+                      {permissions?.includes("roles_delete") && (
+                        <div
+                          className={cx("icon")}
+                          onClick={() => handleDelete(role._id)}
+                        >
+                          <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>

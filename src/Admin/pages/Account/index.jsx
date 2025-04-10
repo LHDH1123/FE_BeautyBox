@@ -23,12 +23,14 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
 const User = () => {
   const [allAccount, setAllAccount] = useState([]);
   const [allRole, setAllRole] = useState([]);
+  const { permissions } = useAuth();
 
   const [editAccount, setEditAccount] = useState({
     avatar: "",
@@ -81,6 +83,13 @@ const User = () => {
   }, []);
 
   const handleChangeStatus = async (id, currentStatus) => {
+    if (!permissions?.includes("accounts_edit")) {
+      setErrorMessage("Bạn không có quyền truy cập");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    
     try {
       const newStatus = !currentStatus;
       await changeStatusAccount(id, newStatus);
@@ -357,20 +366,24 @@ const User = () => {
                   </td>
                   <td className={cx("action-table-data")}>
                     <div className={cx("edit-delete-action")}>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handlEdit(account)}
-                      >
-                        <ModeEditOutlineOutlinedIcon
-                          style={{ color: "#3577f1" }}
-                        />
-                      </div>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleDelete(account._id)}
-                      >
-                        <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
-                      </div>
+                      {permissions?.includes("accounts_edit") && (
+                        <div
+                          className={cx("icon")}
+                          onClick={() => handlEdit(account)}
+                        >
+                          <ModeEditOutlineOutlinedIcon
+                            style={{ color: "#3577f1" }}
+                          />
+                        </div>
+                      )}
+                      {permissions?.includes("accounts_delete") && (
+                        <div
+                          className={cx("icon")}
+                          onClick={() => handleDelete(account._id)}
+                        >
+                          <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -389,7 +402,7 @@ const User = () => {
           },
         }}
       >
-        <DialogTitle>Bạn có muốn xóa voucher này?</DialogTitle>
+        <DialogTitle>Bạn có muốn xóa tài khoản này?</DialogTitle>
 
         <DialogActions>
           <button

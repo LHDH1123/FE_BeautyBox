@@ -4,6 +4,7 @@ import styles from "./Permissions.module.scss";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { useNavigate, useParams } from "react-router-dom";
 import { getRole, updateRole } from "../../../../services/role.service";
+import { useAuth } from "../../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
@@ -16,7 +17,7 @@ const modules = [
   "Voucher",
   "Đơn hàng",
 ];
-const permissions = ["Tất cả", "Xem", "Cập nhật", "Thêm mới", "Xóa"];
+const permissionsMenu = ["Tất cả", "Xem", "Cập nhật", "Thêm mới", "Xóa"];
 
 const Permissions = () => {
   const { id } = useParams();
@@ -24,6 +25,7 @@ const Permissions = () => {
   const [role, setRole] = useState({});
   const navigate = useNavigate();
   const [initialPermissions, setInitialPermissions] = useState([]); // Lưu trạng thái ban đầu
+  const { permissions } = useAuth();
 
   const moduleMapping = {
     "Sản phẩm": "products",
@@ -48,7 +50,7 @@ const Permissions = () => {
 
       if (isSelectAll) {
         // Chọn tất cả hoặc bỏ chọn tất cả quyền trong cùng một module
-        const newPermissions = permissions.reduce((acc, perm) => {
+        const newPermissions = permissionsMenu.reduce((acc, perm) => {
           acc[perm] = !prev[module]?.[permission] || false;
           return acc;
         }, {});
@@ -65,7 +67,7 @@ const Permissions = () => {
         };
 
         // Kiểm tra xem có phải tất cả quyền (trừ "Tất cả") đều đã được chọn không
-        const allChecked = permissions
+        const allChecked = permissionsMenu
           .slice(1)
           .every((perm) => updatedModulePermissions[perm]);
 
@@ -90,7 +92,7 @@ const Permissions = () => {
         if (!moduleKey) return;
 
         newChecked[module] = {};
-        permissions.forEach((perm) => {
+        permissionsMenu.forEach((perm) => {
           if (perm === "Tất cả") return;
 
           const permissionKey = permissionMapping[perm];
@@ -121,6 +123,10 @@ const Permissions = () => {
 
   // Hàm cập nhật quyền lên API
   const handleSavePermissions = async () => {
+    if (!permissions?.includes("roles_edit")) {
+      handleRole();
+      return;
+    }
     const updatedPermissions = [];
 
     Object.keys(checked).forEach((module) => {
@@ -196,7 +202,7 @@ const Permissions = () => {
               >
                 Trang
               </th>
-              {permissions.map((perm) => (
+              {permissionsMenu.map((perm) => (
                 <th
                   style={{
                     border: "1px solid #e0e0e0",
@@ -226,7 +232,7 @@ const Permissions = () => {
                 >
                   {module}
                 </td>
-                {permissions.map((perm) => (
+                {permissionsMenu.map((perm) => (
                   <td
                     key={perm}
                     className={cx("checkbox-cell")}

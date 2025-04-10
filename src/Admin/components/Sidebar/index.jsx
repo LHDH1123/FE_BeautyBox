@@ -12,12 +12,20 @@ import ShieldIcon from "@mui/icons-material/Shield";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { logout } from "../../../services/auth.service";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
 const Sidebar = () => {
   const location = useLocation();
   const [activePath, setActivePath] = useState(location.pathname);
+  const { permissions } = useAuth();
+
+  console.log(permissions);
+
+  const hasPermission = (key) => {
+    return permissions?.includes(key);
+  };
 
   // Hàm để thay đổi trạng thái active
   const handleActive = (path) => {
@@ -58,58 +66,66 @@ const Sidebar = () => {
             <span>Quản lý sản phẩm</span>
           </div>
           <ul>
-            <li
-              className={cx("submenu", {
-                active: activePath === "/adminbb/product-list",
-              })}
-            >
-              <Link
-                to="/adminbb/product-list"
-                onClick={() => handleActive("/adminbb/product-list")}
+            {hasPermission("products_view") && (
+              <li
+                className={cx("submenu", {
+                  active: activePath === "/adminbb/product-list",
+                })}
               >
-                <InventoryIcon fontSize="small" />
-                <span>Sản phẩm</span>
-              </Link>
-            </li>
-            <li
-              className={cx("submenu", {
-                active: activePath === "/adminbb/category",
-              })}
-            >
-              <Link
-                to="/adminbb/category"
-                onClick={() => handleActive("/adminbb/category")}
+                <Link
+                  to="/adminbb/product-list"
+                  onClick={() => handleActive("/adminbb/product-list")}
+                >
+                  <InventoryIcon fontSize="small" />
+                  <span>Sản phẩm</span>
+                </Link>
+              </li>
+            )}
+            {hasPermission("products-category_view") && (
+              <li
+                className={cx("submenu", {
+                  active: activePath === "/adminbb/category",
+                })}
               >
-                <CategoryIcon fontSize="small" />
-                <span>Danh mục</span>
-              </Link>
-            </li>
-            <li
-              className={cx("submenu", {
-                active: activePath === "/adminbb/brand-list",
-              })}
-            >
-              <Link
-                to="/adminbb/brand-list"
-                onClick={() => handleActive("/adminbb/brand-list")}
+                <Link
+                  to="/adminbb/category"
+                  onClick={() => handleActive("/adminbb/category")}
+                >
+                  <CategoryIcon fontSize="small" />
+                  <span>Danh mục</span>
+                </Link>
+              </li>
+            )}
+            {hasPermission("brands_view") && (
+              <li
+                className={cx("submenu", {
+                  active: activePath === "/adminbb/brand-list",
+                })}
               >
-                <LocalOfferIcon fontSize="small" />
-                <span>Thương hiệu</span>
-              </Link>
-            </li>
-            <li
-              className={cx("submenu", {
-                active: activePath === "/adminbb/flashsale",
-              })}
-            >
-              <Link
-                to="/adminbb/flashsale"
-                onClick={() => handleActive("/adminbb/flashsale")}
+                <Link
+                  to="/adminbb/brand-list"
+                  onClick={() => handleActive("/adminbb/brand-list")}
+                >
+                  <LocalOfferIcon fontSize="small" />
+                  <span>Thương hiệu</span>
+                </Link>
+              </li>
+            )}
+            {hasPermission("vouchers_view") && (
+              <li
+                className={cx("submenu", {
+                  active: activePath === "/adminbb/flashsale",
+                })}
               >
-                <TrendingDownIcon fontSize="small" />
-                <span>Giảm giá</span>
-              </Link>
-            </li>
+                <Link
+                  to="/adminbb/flashsale"
+                  onClick={() => handleActive("/adminbb/flashsale")}
+                >
+                  <TrendingDownIcon fontSize="small" />
+                  <span>Giảm giá</span>
+                </Link>
+              </li>
+            )}
           </ul>
         </li>
         <div className={cx("separate")}></div>
@@ -118,32 +134,36 @@ const Sidebar = () => {
             <span>Quản lý người dùng</span>
           </div>
           <ul>
-            <li
-              className={cx("submenu", {
-                active: activePath === "/adminbb/user",
-              })}
-            >
-              <Link
-                to="/adminbb/user"
-                onClick={() => handleActive("/adminbb/user")}
+            {hasPermission("accounts_view") && (
+              <li
+                className={cx("submenu", {
+                  active: activePath === "/adminbb/user",
+                })}
               >
-                <PersonIcon fontSize="small" />
-                <span>Người dùng</span>
-              </Link>
-            </li>
-            <li
-              className={cx("submenu", {
-                active: activePath === "/adminbb/role",
-              })}
-            >
-              <Link
-                to="/adminbb/role"
-                onClick={() => handleActive("/adminbb/role")}
+                <Link
+                  to="/adminbb/user"
+                  onClick={() => handleActive("/adminbb/user")}
+                >
+                  <PersonIcon fontSize="small" />
+                  <span>Người dùng</span>
+                </Link>
+              </li>
+            )}
+            {hasPermission("roles_view") && (
+              <li
+                className={cx("submenu", {
+                  active: activePath === "/adminbb/role",
+                })}
               >
-                <ShieldIcon fontSize="small" />
-                <span>Vai trò & Quyền</span>
-              </Link>
-            </li>
+                <Link
+                  to="/adminbb/role"
+                  onClick={() => handleActive("/adminbb/role")}
+                >
+                  <ShieldIcon fontSize="small" />
+                  <span>Vai trò & Quyền</span>
+                </Link>
+              </li>
+            )}
           </ul>
         </li>
         <div className={cx("separate")}></div>

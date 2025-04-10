@@ -21,6 +21,7 @@ import {
   Switch,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
@@ -39,6 +40,7 @@ const Voucher = () => {
   const [isAccess, setIsAccess] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const { permissions } = useAuth();
 
   // Fetch danh sách voucher
   const fetchVoucher = async () => {
@@ -85,6 +87,12 @@ const Voucher = () => {
 
   // Thay đổi trạng thái voucher
   const handleChangeStatus = async (id, currentStatus) => {
+    if (!permissions?.includes("vouchers_edit")) {
+      setErrorMessage("Bạn không có quyền truy cập");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
     try {
       const newStatus = !currentStatus;
       setVouchers((prevVouchers) =>
@@ -222,20 +230,24 @@ const Voucher = () => {
                   </td>
                   <td className={cx("action-table-data")}>
                     <div className={cx("edit-delete-action")}>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleOpenModal(voucher._id)}
-                      >
-                        <ModeEditOutlineOutlinedIcon
-                          style={{ color: "#3577f1" }}
-                        />
-                      </div>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleDelete(voucher._id)}
-                      >
-                        <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
-                      </div>
+                      {permissions?.includes("vouchers_edit") && (
+                        <div
+                          className={cx("icon")}
+                          onClick={() => handleOpenModal(voucher._id)}
+                        >
+                          <ModeEditOutlineOutlinedIcon
+                            style={{ color: "#3577f1" }}
+                          />
+                        </div>
+                      )}
+                      {permissions?.includes("vouchers_edit") && (
+                        <div
+                          className={cx("icon")}
+                          onClick={() => handleDelete(voucher._id)}
+                        >
+                          <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>

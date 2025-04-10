@@ -23,6 +23,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { createCategorySelect } from "../../../helper/select-tree";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
@@ -44,6 +45,7 @@ const Category = () => {
   const [isAccess, setIsAccess] = useState(false);
   const [open, setOpen] = useState(false);
   const [selectedId, setSelectedId] = useState(null);
+  const { permissions } = useAuth();
 
   const fetchCategorys = async () => {
     const response = await getCategorys();
@@ -82,6 +84,12 @@ const Category = () => {
   };
 
   const handleChangeStatus = async (id, currentStatus) => {
+    if (!permissions?.includes("products-category_edit")) {
+      setErrorMessage("Bạn không có quyền truy cập");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
     try {
       const newStatus = !currentStatus;
       const response = await changeStatus(id, newStatus);
@@ -267,18 +275,22 @@ const Category = () => {
           </td>
           <td className={cx("action-table-data")}>
             <div className={cx("edit-delete-action")}>
-              <div
-                className={cx("icon")}
-                onClick={() => handleOpenModal(category._id)}
-              >
-                <ModeEditOutlineOutlinedIcon style={{ color: "#3577f1" }} />
-              </div>
-              <div
-                className={cx("icon")}
-                onClick={() => handleDeleteCategory(category._id)}
-              >
-                <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
-              </div>
+              {permissions?.includes("products-category_edit") && (
+                <div
+                  className={cx("icon")}
+                  onClick={() => handleOpenModal(category._id)}
+                >
+                  <ModeEditOutlineOutlinedIcon style={{ color: "#3577f1" }} />
+                </div>
+              )}
+              {permissions?.includes("products-category_edit") && (
+                <div
+                  className={cx("icon")}
+                  onClick={() => handleDeleteCategory(category._id)}
+                >
+                  <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
+                </div>
+              )}
             </div>
           </td>
         </tr>
@@ -290,7 +302,7 @@ const Category = () => {
 
   return (
     <div className={cx("table")}>
-      <Header title="Danh mục" fetchCategorys={fetchCategorys} />
+      <Header title="Danh Mục" fetchCategorys={fetchCategorys} />
       {errorMessage && (
         <Snackbar
           open={openSnackbar}

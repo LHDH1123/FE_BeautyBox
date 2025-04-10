@@ -24,6 +24,7 @@ import {
 } from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import CloseIcon from "@mui/icons-material/Close";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
@@ -55,6 +56,8 @@ const Brand = () => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentBrands = brands.slice(indexOfFirstItem, indexOfLastItem);
+  const { permissions } = useAuth();
+
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
@@ -112,6 +115,12 @@ const Brand = () => {
   };
 
   const handleChangeStatus = async (id, currentStatus) => {
+    if (!permissions?.includes("brands_edit")) {
+      setErrorMessage("Bạn không có quyền truy cập");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
     try {
       const newStatus = !currentStatus;
       setBrands((prevBrands) =>
@@ -332,20 +341,24 @@ const Brand = () => {
                   </td>
                   <td className={cx("action-table-data")}>
                     <div className={cx("edit-delete-action")}>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleOpenModal(brand._id)}
-                      >
-                        <ModeEditOutlineOutlinedIcon
-                          style={{ color: "#3577f1" }}
-                        />
-                      </div>
-                      <div
-                        className={cx("icon")}
-                        onClick={() => handleDelete(brand._id)}
-                      >
-                        <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
-                      </div>
+                      {permissions?.includes("brands_edit") && (
+                        <div
+                          className={cx("icon")}
+                          onClick={() => handleOpenModal(brand._id)}
+                        >
+                          <ModeEditOutlineOutlinedIcon
+                            style={{ color: "#3577f1" }}
+                          />
+                        </div>
+                      )}
+                      {permissions?.includes("brands_edit") && (
+                        <div
+                          className={cx("icon")}
+                          onClick={() => handleDelete(brand._id)}
+                        >
+                          <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
