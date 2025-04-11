@@ -89,7 +89,7 @@ const User = () => {
       setIsAccess(false);
       return;
     }
-    
+
     try {
       const newStatus = !currentStatus;
       await changeStatusAccount(id, newStatus);

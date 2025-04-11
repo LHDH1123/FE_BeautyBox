@@ -55,7 +55,7 @@ const Login = () => {
           <input
             type="text"
             name="email"
-            placeholder="UserName"
+            placeholder="Email"
             value={formData.email}
             onChange={handleChange}
           />
@@ -66,7 +66,9 @@ const Login = () => {
             value={formData.password}
             onChange={handleChange}
           />
-          <button onClick={handleLogin}>LOG IN</button>
+          <div className={cx("btn")} onClick={handleLogin}>
+            LOG IN
+          </div>
         </div>
       </div>
 

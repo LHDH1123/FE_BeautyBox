@@ -249,3 +249,101 @@
   text-overflow: ellipsis;
   max-width: 200px; /* Điều chỉnh độ rộng tối đa nếu cần */
 }
+
+@media (max-width: 1200px) {
+  .sales-cards {
+    // flex-wrap: wrap;
+    justify-content: space-between;
+
+    .total-sale,
+    .total-oder {
+      width: 48% !important;
+      margin-bottom: 20px;
+    }
+  }
+
+  .content {
+    flex-direction: column;
+  }
+
+  .recharts,
+  .best-seller {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .sales-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    @media (max-width: 768px) {
+      width: 100% !important;
+    }
+
+    .total-sale,
+    .total-oder,
+    .total-user {
+      width: 100% !important;
+    }
+  }
+
+  .calendar input {
+    width: 100%;
+  }
+
+  .product-title {
+    max-width: 150px;
+  }
+
+  .card-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .view-all-link {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .table th,
+  .table td {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .product-img img {
+    width: 30px;
+    height: 30px;
+  }
+
+  .product-title {
+    max-width: 120px;
+    -webkit-line-clamp: 1;
+  }
+
+  .calendar input {
+    font-size: 12px;
+  }
+
+  .card h3 {
+    font-size: 20px;
+  }
+
+  .card h6 {
+    font-size: 14px;
+  }
+
+  .icon {
+    font-size: 16px;
+  }
+}

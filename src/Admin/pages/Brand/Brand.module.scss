@@ -276,3 +276,168 @@
   margin-top: 10px;
   justify-content: flex-end;
 }
+@media (max-width: 1024px) {
+  .table-list {
+    padding: 16px;
+  }
+
+  .d-flex img {
+    width: 80px;
+    height: 40px;
+  }
+
+  .edit-delete-action a {
+    width: 28px;
+    height: 28px;
+  }
+
+  .btn_exit {
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    top: 10px;
+    right: 6px;
+  }
+
+  .title {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+
+  .btn-cancel,
+  .btn-submit,
+  .btn-change {
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+
+  .preview-img {
+    width: 100px;
+    height: 70px;
+  }
+}
+@media screen and (max-width: 768px) {
+  .table-list {
+    padding: 10px;
+  }
+
+  .card {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px 5px 0 5px;
+  }
+
+  .tag-filter,
+  .tag-filterCategory {
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .btn-search {
+    height: 36px;
+    font-size: 13px;
+  }
+
+  .select-tag,
+  .select-tagCategory {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .name {
+    max-width: 120px;
+    font-size: 13px;
+  }
+
+  .table {
+    thead th,
+    tbody td {
+      padding: 10px;
+      font-size: 13px;
+    }
+  }
+
+  .badge {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+
+  .edit-delete-action {
+    gap: 6px;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .table-list {
+    overflow-x: auto;
+  }
+
+  .table {
+    min-width: 800px;
+  }
+
+  .card {
+    padding: 10px 5px 0 5px;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .tag-filter,
+  .tag-filterCategory,
+  .btn-search,
+  .select-tag,
+  .select-tagCategory,
+  .btn-cancel,
+  .btn-submit {
+    width: 100%;
+    font-size: 13px;
+  }
+
+  .edit-delete-action {
+    flex-direction: column;
+
+    a {
+      width: 30px;
+      height: 30px;
+
+      i {
+        font-size: 14px;
+      }
+    }
+  }
+
+  .name {
+    max-width: 100px;
+    font-size: 13px;
+  }
+
+  td {
+    font-size: 12px;
+  }
+
+  .title-tag,
+  .title-tagCategory {
+    font-size: 13px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .d-flex img {
+    width: 35px;
+    height: 35px;
+  }
+
+  .name {
+    -webkit-line-clamp: 1;
+  }
+}

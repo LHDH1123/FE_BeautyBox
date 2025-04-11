@@ -2,7 +2,7 @@ import React from "react";
 import classNames from "classnames/bind";
 import styles from "./TableHeader.module.scss";
 import SearchIcon from "@mui/icons-material/Search";
-import TuneIcon from "@mui/icons-material/Tune";
+// import TuneIcon from "@mui/icons-material/Tune";
 import Apply from "../Apply";
 
 const cx = classNames.bind(styles);
@@ -50,20 +50,20 @@ const TableHeader = ({
             fetchAccount={fetchAccount}
           />
         )}
-        {title !== "Vai Trò & Quyền" && (
-          <div className={cx("filter")}>
-            <div className={cx("form-sort")}>
-              <TuneIcon />
-              <select className={cx("select")}>
-                <option>Sắp xếp</option>
-                <option>Mới nhất</option>
-                <option>Cũ nhất</option>
-                <option>A - Z</option>
-                <option>Z - A</option>
-              </select>
-            </div>
-          </div>
-        )}
+        {/* {title !== "Vai Trò & Quyền" && (
+          // <div className={cx("filter")}>
+          //   <div className={cx("form-sort")}>
+          //     <TuneIcon />
+          //     <select className={cx("select")}>
+          //       <option>Sắp xếp</option>
+          //       <option>Mới nhất</option>
+          //       <option>Cũ nhất</option>
+          //       <option>A - Z</option>
+          //       <option>Z - A</option>
+          //     </select>
+          //   </div>
+          // </div>
+        )} */}
       </div>
     </div>
   );

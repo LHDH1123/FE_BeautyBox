@@ -20,6 +20,7 @@ import {
 import { getAllProducts } from "../../../services/product.service";
 import { getAllUser } from "../../../services/user.service";
 import { getAllOrder } from "../../../services/order.service";
+import { ResponsiveContainer } from "recharts"; // nhớ thêm import nếu chưa có
 // const data = [
 //   { name: "Jan", Sales: 300 },
 //   { name: "Feb", Sales: 200 },
@@ -222,6 +223,7 @@ const Dashboard = () => {
               border: "1px solid #ddd",
               borderRadius: "8px",
               backgroundColor: "#fff",
+              width: "100%", // quan trọng để container mở rộng
             }}
           >
             <Typography
@@ -238,37 +240,40 @@ const Dashboard = () => {
             >
               Doanh thu năm
             </Typography>
-            <BarChart
-              width={700}
-              height={400}
-              data={chartData}
-              margin={{
-                top: 20,
-                right: 30,
-                left: 0,
-                bottom: 0,
-              }}
-            >
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="name" />
-              <YAxis
-                tickFormatter={(value) => {
-                  if (value >= 1_000_000)
-                    return `${(value / 1_000_000).toFixed(1)}tr`;
-                  if (value >= 1_000) return `${(value / 1_000).toFixed(0)}k`;
-                  return value;
-                }}
-              />
 
-              <Tooltip
-                formatter={(value) => [
-                  `${value.toLocaleString("vi-VN")}₫`,
-                  "Doanh thu",
-                ]}
-              />
-              <Legend />
-              <Bar dataKey="Sales" fill="#82ca9d" />
-            </BarChart>
+            <div style={{ width: "100%", height: 400 }}>
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={chartData}
+                  margin={{
+                    top: 20,
+                    right: 30,
+                    left: 0,
+                    bottom: 0,
+                  }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis
+                    tickFormatter={(value) => {
+                      if (value >= 1_000_000)
+                        return `${(value / 1_000_000).toFixed(1)}tr`;
+                      if (value >= 1_000)
+                        return `${(value / 1_000).toFixed(0)}k`;
+                      return value;
+                    }}
+                  />
+                  <Tooltip
+                    formatter={(value) => [
+                      `${value.toLocaleString("vi-VN")}₫`,
+                      "Doanh thu",
+                    ]}
+                  />
+                  <Legend />
+                  <Bar dataKey="Sales" fill="#82ca9d" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </Box>
         </div>
 

@@ -189,7 +189,7 @@ const Product = () => {
         setListProducts(updatedProducts);
         setErrorMessage("Xóa sản phẩm thành công");
         setOpenSnackbar(true);
-        setIsAccess(true)
+        setIsAccess(true);
       }
     } catch (error) {
       console.error(error);

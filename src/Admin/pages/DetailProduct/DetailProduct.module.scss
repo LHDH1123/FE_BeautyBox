@@ -85,3 +85,62 @@
   font-size: 14px;
   margin-top: 5px;
 }
+@media screen and (max-width: 768px) {
+  .productDetailContainer {
+    flex-direction: column;
+    padding: 15px;
+  }
+
+  .leftSection {
+    width: 100%;
+    gap: 10px;
+  }
+
+  .productTable td {
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .productTable .label {
+    width: 100px;
+    font-size: 13px;
+  }
+
+  .rightSection {
+    width: 100%;
+    margin-top: 15px;
+  }
+
+  .productImageSection {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .productImage {
+    width: 100%;
+    max-width: 300px;
+    height: auto;
+  }
+
+  .imageInfo {
+    font-size: 13px;
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .productTable td {
+    font-size: 12px;
+    padding: 6px;
+  }
+
+  .productTable .label {
+    font-size: 12px;
+    width: 90px;
+  }
+
+  .imageInfo {
+    font-size: 12px;
+  }
+}

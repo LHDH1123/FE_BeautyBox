@@ -283,88 +283,92 @@ const Brand = () => {
           handleSearchChange={handleSearchChange}
         />
         <div className={cx("brand-list")}>
-          <table className={cx("table", "datanew")}>
-            <thead>
-              <tr>
-                <th className={cx("cb-all")}>
-                  <input
-                    type="checkbox"
-                    checked={selectAll}
-                    onChange={handleSelectAll}
-                  />
-                </th>
-                <th>Thương hiệu</th>
-                <th>Logo</th>
-                <th>Ngày tạo</th>
-                <th>Trạng thái</th>
-                <th className={cx("no-sort")}>Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              {displayedBrands.map((brand) => (
-                <tr key={brand._id}>
-                  <td>
-                    <label className={cx("checkboxs")}>
-                      <input
-                        type="checkbox"
-                        checked={selectedBrands.includes(brand._id)}
-                        onChange={() => handleSelectOne(brand._id)}
-                      />
-                      <span className={cx("checkmarks")}></span>
-                    </label>
-                  </td>
-                  <td style={{ fontWeight: "600", color: "#333" }}>
-                    {brand.name}
-                  </td>
-                  <td>
-                    <span className={cx("d-flex")}>
-                      <img src={brand.thumbnail} alt={brand.name} />
-                    </span>
-                  </td>
-                  <td>
-                    {new Date(brand.createdBy.createAt).toLocaleDateString(
-                      "vi-VN"
-                    )}
-                  </td>
-                  <td>
-                    <span
-                      className={cx(
-                        "badge",
-                        brand.status ? "badge-linesuccess" : "badge-linered"
-                      )}
-                      onClick={() =>
-                        handleChangeStatus(brand._id, brand.status)
-                      }
-                    >
-                      {brand.status ? "Hoạt động" : "Không hoạt động"}
-                    </span>
-                  </td>
-                  <td className={cx("action-table-data")}>
-                    <div className={cx("edit-delete-action")}>
-                      {permissions?.includes("brands_edit") && (
-                        <div
-                          className={cx("icon")}
-                          onClick={() => handleOpenModal(brand._id)}
-                        >
-                          <ModeEditOutlineOutlinedIcon
-                            style={{ color: "#3577f1" }}
-                          />
-                        </div>
-                      )}
-                      {permissions?.includes("brands_edit") && (
-                        <div
-                          className={cx("icon")}
-                          onClick={() => handleDelete(brand._id)}
-                        >
-                          <DeleteOutlineOutlinedIcon style={{ color: "red" }} />
-                        </div>
-                      )}
-                    </div>
-                  </td>
+          <div className="table-wrapper">
+            <table className={cx("table", "datanew")}>
+              <thead>
+                <tr>
+                  <th className={cx("cb-all")}>
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                    />
+                  </th>
+                  <th>Thương hiệu</th>
+                  <th>Logo</th>
+                  <th>Ngày tạo</th>
+                  <th>Trạng thái</th>
+                  <th className={cx("no-sort")}>Hành động</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {displayedBrands.map((brand) => (
+                  <tr key={brand._id}>
+                    <td>
+                      <label className={cx("checkboxs")}>
+                        <input
+                          type="checkbox"
+                          checked={selectedBrands.includes(brand._id)}
+                          onChange={() => handleSelectOne(brand._id)}
+                        />
+                        <span className={cx("checkmarks")}></span>
+                      </label>
+                    </td>
+                    <td style={{ fontWeight: "600", color: "#333" }}>
+                      {brand.name}
+                    </td>
+                    <td>
+                      <span className={cx("d-flex")}>
+                        <img src={brand.thumbnail} alt={brand.name} />
+                      </span>
+                    </td>
+                    <td>
+                      {new Date(brand.createdBy.createAt).toLocaleDateString(
+                        "vi-VN"
+                      )}
+                    </td>
+                    <td>
+                      <span
+                        className={cx(
+                          "badge",
+                          brand.status ? "badge-linesuccess" : "badge-linered"
+                        )}
+                        onClick={() =>
+                          handleChangeStatus(brand._id, brand.status)
+                        }
+                      >
+                        {brand.status ? "Hoạt động" : "Không hoạt động"}
+                      </span>
+                    </td>
+                    <td className={cx("action-table-data")}>
+                      <div className={cx("edit-delete-action")}>
+                        {permissions?.includes("brands_edit") && (
+                          <div
+                            className={cx("icon")}
+                            onClick={() => handleOpenModal(brand._id)}
+                          >
+                            <ModeEditOutlineOutlinedIcon
+                              style={{ color: "#3577f1" }}
+                            />
+                          </div>
+                        )}
+                        {permissions?.includes("brands_edit") && (
+                          <div
+                            className={cx("icon")}
+                            onClick={() => handleDelete(brand._id)}
+                          >
+                            <DeleteOutlineOutlinedIcon
+                              style={{ color: "red" }}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
         {!searchQuery && (
           <Pagination

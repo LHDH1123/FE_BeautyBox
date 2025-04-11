@@ -1,13 +1,13 @@
+// ===================
+// General Styles
+// ===================
 .header {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   background: #fafafa;
-  padding-bottom: 20px;
-}
-
-.btn-add {
-  margin-left: auto;
-  cursor: pointer;
+  padding: 20px;
+  flex-wrap: wrap;
 }
 
 .title-page {
@@ -26,43 +26,48 @@
 .btn-add {
   display: flex;
   align-items: center;
-  -ms-flex-align: center;
   background: #092c4c;
-  padding: 8px 11px;
+  padding: 8px 16px;
   color: #ffffff;
   border-radius: 8px;
-  height: 21px;
+  font-weight: 700;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  height: 40px;
+  transition: background 0.3s;
+
+  &:hover {
+    background: #0b3e65;
+  }
 }
 
 .btn-add button {
-  border: none;
   background: #092c4c;
-  padding: 8px 5px;
+  border: none;
   color: #ffffff;
-  font-weight: 700;
-  font-size: 14px;
-  border-radius: 8px;
-  cursor: pointer;
 }
 
 .content {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 24px;
   background-color: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+// ===================
+// Section Header
+// ===================
 .header-content {
   display: flex;
   align-items: center;
-  margin: 0 0 20px 0px;
-  padding: 0 0 20px 0;
-  border-bottom: 1px solid rgba(145, 158, 171, 0.3);
-  display: flex;
   justify-content: space-between;
-  width: 100%;
+  padding-bottom: 20px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid rgba(145, 158, 171, 0.3);
   cursor: pointer;
 }
 
@@ -76,15 +81,19 @@
   margin-left: auto;
 }
 
+// ===================
+// Form Info Section
+// ===================
 .info {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Ba cột có chiều rộng bằng nhau */
-  gap: 16px; /* Khoảng cách giữa các mục */
-  margin-bottom: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 32px;
 }
 
 .info-item {
-  flex: 1 1 calc(33.33% - 10px); /* Mỗi mục chiếm 1/3 chiều rộng */
+  display: flex;
+  flex-direction: column;
 }
 
 .title-item {
@@ -94,39 +103,29 @@
   margin-bottom: 8px;
 }
 
-.form-control {
-  width: 100%; /* Make the input field take full width of its parent */
+.form-control,
+.form-select,
+.desc-input {
+  width: 100%;
   box-sizing: border-box;
   border-radius: 5px;
-  padding: 8px 16px;
+  padding: 10px 16px;
   border: solid 1px #cfcfcf;
   outline: none;
   color: #585757;
+  font-size: 14px;
 }
 
 .desc-input {
-  width: 100%; /* Make the input field take full width of its parent */
-  box-sizing: border-box;
-  border-radius: 5px;
-  padding: 8px 16px;
-  border: solid 1px #cfcfcf;
-  outline: none;
-  color: #585757;
   height: 150px;
-  cursor: pointer;
+  resize: none;
 }
 
-.title-length {
-  font-size: 12px;
-  font-weight: 600;
-  color: #5b6670;
-  margin: 8px 0px;
-  margin-bottom: 20px;
-}
-
+// ===================
+// Upload Section
+// ===================
 .input-blocks {
-  margin-bottom: 0;
-  width: 137px;
+  width: 140px;
   height: 123px;
   border: 1px dashed rgba(145, 158, 171, 0.32);
   border-radius: 5px;
@@ -137,57 +136,57 @@
 }
 
 .img-upload {
-  width: 137px;
+  width: 140px;
   height: 123px;
-  border-radius: 10px;
+  border-radius: 8px;
   border: 1px solid rgba(145, 158, 171, 0.3);
   position: relative;
+  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow: hidden; /* Cắt phần ảnh thừa */
-}
 
-.img-upload img {
-  width: 100%; /* Chiếm toàn bộ chiều rộng của .img-upload */
-  height: 100%; /* Chiếm toàn bộ chiều cao */
-  object-fit: cover; /* Giữ tỷ lệ ảnh và lấp đầy khung */
-  border-radius: 5px;
-}
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 5px;
+  }
 
-.img-upload button {
-  position: absolute;
-  top: 2px; /* Điều chỉnh vị trí icon xóa từ trên */
-  right: 2px; /* Điều chỉnh vị trí icon xóa từ bên phải */
-  padding: 5px; /* Khoảng cách xung quanh icon */
-  cursor: pointer; /* Thêm hiệu ứng khi hover */
-  border: none;
-  background: transparent;
+  button {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+  }
 }
 
 .info-image {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
-  margin: 30px 0px;
+  margin: 30px 0;
 }
 
-///
-///
-.checkbox {
-  margin-right: 8px; /* Khoảng cách giữa checkbox và nhãn */
-  //   accent-color: #ff9f43; /* Thay đổi màu checkbox */
-  color: #5b6670;
-  cursor: pointer;
-}
-
+// ===================
+// Checkbox Section
+// ===================
 .checkbox-input {
   display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.checkbox {
+  margin-right: 8px;
+  cursor: pointer;
 }
 
 .input-status {
   display: flex;
-  justify-content: center;
   align-items: center;
   margin-right: 40px;
 }
@@ -202,41 +201,81 @@
   color: #5b6670;
 }
 
+// ===================
+// Buttons
+// ===================
 .btn-addproduct {
-  float: right;
-  padding: 30px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-top: 20px;
+}
+
+.btn-cancel,
+.btn-submit {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .btn-cancel {
   background: #67748e;
   color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
 }
 
 .btn-submit {
   background: #ff9f43;
   color: #ffffff;
-  font-size: 14px;
-  font-weight: 700;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 3px;
-  margin-left: 15px;
-  cursor: pointer;
 }
 
-.form-select {
-  width: 100%; /* Make the input field take full width of its parent */
-  box-sizing: border-box;
-  border-radius: 5px;
-  padding: 8px 16px;
-  border: solid 1px #cfcfcf;
-  outline: none;
-  color: #585757;
-  cursor: pointer;
+// ===================
+// Responsive
+// ===================
+@media (max-width: 1024px) {
+  .info {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .header {
+    // flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .info {
+    grid-template-columns: 1fr;
+  }
+
+  .btn-addproduct {
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: 30px;
+  }
+
+  .btn-cancel,
+  .btn-submit {
+    width: 100%;
+  }
+
+  .img-upload,
+  .input-blocks {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .info-image {
+    justify-content: center;
+  }
+
+  .header-content {
+    align-items: flex-start;
+    gap: 10px;
+  }
 }
