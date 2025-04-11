@@ -13,13 +13,13 @@ import Error404 from "../Client/pages/Error404";
 import Detail from "../Client/pages/Detail";
 import Checkout from "../Client/pages/CheckOut";
 import OrderCheckout from "../Client/pages/Order-Checkout";
-
 import ProductAdmin from "../Admin/pages/Product";
 import BrandAdmin from "../Admin/pages/Brand";
 import CategoryAdmin from "../Admin/pages/Category";
 import AccountAdmin from "../Admin/pages/Account";
 import LoginAdmin from "../Admin/pages/Login";
 import RoleAdmin from "../Admin/pages/Role";
+import ProfileAdmin from "../Admin/pages/Profile";
 import Dashboard from "../Admin/pages/Dashboard";
 import Voucher from "../Admin/pages/Voucher";
 import CreateProduct from "../Admin/pages/Product/CreateProduct";
@@ -63,6 +63,7 @@ export default function Router() {
         <Route path="user" element={<AccountAdmin />} />
         <Route path="role" element={<RoleAdmin />} />
         <Route path="flashsale" element={<Voucher />} />
+        <Route path="profile" element={<ProfileAdmin />} />
         <Route path="create-product" element={<CreateProduct />} />
         <Route path="detail-product/:id" element={<DetailProduct />} />
         <Route path="edit-product/:id" element={<EditProduct />} />

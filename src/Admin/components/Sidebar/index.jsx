@@ -13,6 +13,7 @@ import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { logout } from "../../../services/auth.service";
 import { useAuth } from "../../Context/Auth.context";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 
 const cx = classNames.bind(styles);
 
@@ -20,7 +21,6 @@ const Sidebar = () => {
   const location = useLocation();
   const [activePath, setActivePath] = useState(location.pathname);
   const { permissions } = useAuth();
-
 
   const hasPermission = (key) => {
     return permissions?.includes(key);
@@ -171,6 +171,19 @@ const Sidebar = () => {
             <span>Cài đặt</span>
           </div>
           <ul>
+            <li
+              className={cx("submenu", {
+                active: activePath === "/adminbb/profile",
+              })}
+            >
+              <Link
+                to="/adminbb/profile"
+                onClick={() => handleActive("/adminbb/profile")}
+              >
+                <AssignmentIndIcon fontSize="small" />
+                <span>Trang cá nhân</span>
+              </Link>
+            </li>
             <li
               className={cx("submenu", {
                 active: activePath === "/adminbb/login",
