@@ -2,7 +2,7 @@ import { AxiosInstance } from "../configs/axios";
 
 export async function getCategorys() {
   try {
-    const response = await AxiosInstance.get("/categorys");
+    const response = await AxiosInstance.get("/client/categorys");
     return response;
   } catch (error) {
     console.error("Error fetching categorys:", error);
@@ -12,7 +12,7 @@ export async function getCategorys() {
 
 export async function getDetail(id) {
   try {
-    const response = await AxiosInstance.get(`/categorys/${id}`);
+    const response = await AxiosInstance.get(`/client/categorys/${id}`);
     return response;
   } catch (error) {
     console.error("Error fetching categorys:", error);
@@ -22,7 +22,7 @@ export async function getDetail(id) {
 
 export async function getDetailSlug(slug) {
   try {
-    const response = await AxiosInstance.get(`/categorys/slug/${slug}`);
+    const response = await AxiosInstance.get(`/client/categorys/slug/${slug}`);
     return response;
   } catch (error) {
     console.error("Error fetching categorys:", error);
@@ -84,7 +84,7 @@ export async function changeMultiCategory(data) {
 
 export async function getNameCategory(id) {
   try {
-    const response = await AxiosInstance.get(`/categorys/${id}`);
+    const response = await AxiosInstance.get(`/client/categorys/${id}`);
     return response.title;
   } catch (error) {
     console.error("Error fetching categorys:", error);

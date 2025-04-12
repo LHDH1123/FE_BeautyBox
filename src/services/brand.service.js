@@ -2,7 +2,7 @@ import { AxiosInstance } from "../configs/axios";
 
 export async function getBrands() {
   try {
-    const response = await AxiosInstance.get("/brands");
+    const response = await AxiosInstance.get("/client/brands");
     return response;
   } catch (error) {
     console.error("Error fetching brands:", error);
@@ -12,7 +12,7 @@ export async function getBrands() {
 
 export async function getDetail(id) {
   try {
-    const response = await AxiosInstance.get(`/brands/${id}`);
+    const response = await AxiosInstance.get(`/client/brands/${id}`);
     return response;
   } catch (error) {
     console.error("Error fetching brands:", error);
@@ -22,7 +22,7 @@ export async function getDetail(id) {
 
 export async function getDetailName(name) {
   try {
-    const response = await AxiosInstance.get(`/brands/name/${name}`);
+    const response = await AxiosInstance.get(`/client/brands/name/${name}`);
     return response;
   } catch (error) {
     console.error("Error fetching brands:", error);
@@ -84,7 +84,7 @@ export async function changeMulti(data) {
 
 export async function getNameBrand(id) {
   try {
-    const response = await AxiosInstance.get(`/brands/${id}`);
+    const response = await AxiosInstance.get(`/client/brands/${id}`);
     return response.name;
   } catch (error) {
     console.error("Error fetching brands:", error);

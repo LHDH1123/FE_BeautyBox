@@ -2,7 +2,7 @@ import { AxiosInstance } from "../configs/axios";
 
 export async function getAllProducts() {
   try {
-    const response = await AxiosInstance.get("/products");
+    const response = await AxiosInstance.get("/client/products");
     return response;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -12,7 +12,7 @@ export async function getAllProducts() {
 
 export async function getDetailProduct(id) {
   try {
-    const response = await AxiosInstance.get(`/products/${id}`);
+    const response = await AxiosInstance.get(`/client/products/${id}`);
     return response;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -22,7 +22,7 @@ export async function getDetailProduct(id) {
 
 export async function getDetailProductSlug(slug) {
   try {
-    const response = await AxiosInstance.get(`/products/slug/${slug}`);
+    const response = await AxiosInstance.get(`/client/products/slug/${slug}`);
     return response;
   } catch (error) {
     console.error("Error fetching products:", error);
