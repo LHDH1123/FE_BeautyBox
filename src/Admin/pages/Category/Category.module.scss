@@ -248,6 +248,67 @@
   cursor: pointer;
 }
 
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 30px;
+}
+
+.label {
+  font-size: 16px;
+  font-weight: 500;
+  color: #5b6670;
+  margin-bottom: 10px;
+}
+
+.input {
+  width: 100%; /* Make the input field take full width of its parent */
+  box-sizing: border-box;
+  border-radius: 5px;
+  padding: 8px 16px;
+  border: solid 1px #cfcfcf;
+  outline: none;
+  color: #585757;
+  margin-bottom: 16px;
+}
+
+.status {
+  display: flex;
+  margin-bottom: 16px;
+  align-items: center;
+}
+
+.switch {
+  margin-left: auto;
+  margin-right: 18px;
+}
+.modalContent {
+  padding: 24px;
+}
+
+.btn_exit {
+  width: 80px;
+  height: 80px;
+  line-height: 80px;
+  text-align: center;
+  position: absolute;
+  top: 14px;
+  right: 6px;
+  cursor: pointer;
+}
+
+.buttons {
+  display: flex;
+  justify-content: end;
+}
+
+.btn_exit button {
+  border: none;
+  background-color: #fff;
+  font-weight: 600;
+  color: #959595;
+  cursor: pointer;
+}
 //
 // Responsive
 //

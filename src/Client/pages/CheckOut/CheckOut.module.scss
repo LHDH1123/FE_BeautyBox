@@ -504,3 +504,158 @@
   margin-bottom: 16px;
   font-size: 16px;
 }
+
+/* Responsive cho màn hình nhỏ hơn hoặc bằng 1024px */
+@media (max-width: 1024px) {
+  .checkout-container {
+    grid-template-columns: 1fr; /* Chuyển thành một cột */
+    gap: 16px;
+  }
+
+  /* Các phần tử bên trái */
+  .left-section .title {
+    font-size: 22px; /* Giảm kích thước font */
+    margin-bottom: 16px;
+  }
+
+  /* Các phần tử bên phải */
+  .right-section {
+    margin-top: 16px;
+    padding: 12px;
+  }
+
+  .btn-order {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(90deg, #ffd400, #c73130 50.52%, #663695 99.61%);
+    color: #fff;
+    font-weight: 700;
+    border-radius: 25px;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  .note {
+    font-size: 12px;
+    color: #333;
+    font-weight: 600;
+    text-align: center;
+    margin-top: 14px;
+  }
+
+  .product {
+    flex-direction: column; /* Chuyển sản phẩm về dạng cột */
+    margin-top: 12px;
+  }
+
+  .info-product {
+    flex-direction: column;
+    padding: 8px;
+  }
+
+  .title-product {
+    font-size: 12px; /* Giảm kích thước font */
+  }
+
+  .price-product {
+    // flex-direction: column;
+    margin-left: auto;
+  }
+
+  .totalProduct {
+    flex-direction: column;
+  }
+
+  .address-item {
+    flex-direction: column;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .title-header {
+    flex-direction: column;
+  }
+
+  .input {
+    width: 100%; /* Đảm bảo input chiếm hết chiều rộng */
+    box-sizing: border-box;
+    margin-bottom: 12px;
+  }
+
+  .btn_exit {
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
+
+  /* Đảm bảo các button hoặc link responsive */
+  .save {
+    width: 100%; /* Đảm bảo button chiếm hết chiều rộng */
+    margin-left: 0;
+  }
+
+  .add-save {
+    flex-direction: column;
+  }
+
+  .add {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+}
+
+/* Responsive cho màn hình nhỏ hơn 768px */
+@media (max-width: 768px) {
+  .checkout-container {
+    padding: 8px;
+  }
+
+  .title {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .left-section .title {
+    font-size: 18px;
+  }
+
+  .right-section {
+    margin-top: 16px;
+  }
+
+  .btn-order {
+    padding: 12px;
+  }
+
+  .note {
+    font-size: 10px;
+  }
+
+  .product {
+    font-size: 12px;
+  }
+
+  .title-product {
+    font-size: 12px;
+  }
+
+  .number-product {
+    display: flex;
+    font-size: 12px;
+    align-items: center;
+  }
+
+  .totalProduct {
+    display: flex;
+    font-size: 14px;
+    flex-direction: row;
+  }
+
+  .address-item {
+    padding: 8px 0;
+  }
+}

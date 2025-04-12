@@ -171,7 +171,7 @@ const Header = ({
   };
 
   const handleCloseModalAdd = () => {
-    if (title === "Danh mục") {
+    if (title === "Danh Mục") {
       setIsModalAdd(!isModalAdd);
     }
     if (title === "Thương Hiệu") {

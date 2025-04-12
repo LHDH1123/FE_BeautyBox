@@ -32,7 +32,7 @@ export async function getDetailName(name) {
 
 export async function addBrand(brand) {
   try {
-    const response = await AxiosInstance.post("/brands/create", brand);
+    const response = await AxiosInstance.post("/admin/brands/create", brand);
     return response;
   } catch (error) {
     console.error("Error adding brand:", error);
@@ -42,7 +42,7 @@ export async function addBrand(brand) {
 
 export async function deletebrand(id) {
   try {
-    const response = await AxiosInstance.delete(`/brands/delete/${id}`);
+    const response = await AxiosInstance.delete(`/admin/brands/delete/${id}`);
     return response;
   } catch (error) {
     console.error("Error deleting brand:", error);
@@ -52,7 +52,7 @@ export async function deletebrand(id) {
 
 export async function updateBrand(id, brand) {
   try {
-    const response = await AxiosInstance.patch(`/brands/edit/${id}`, brand);
+    const response = await AxiosInstance.patch(`/admin/brands/edit/${id}`, brand);
     return response;
   } catch (error) {
     console.error("Error editing brand:", error);
@@ -74,7 +74,7 @@ export async function changeStatus(id, status) {
 
 export async function changeMulti(data) {
   try {
-    const response = await AxiosInstance.patch(`/brands/change-multi`, data);
+    const response = await AxiosInstance.patch(`/admin/brands/change-multi`, data);
     return response;
   } catch (error) {
     console.error("Error editing brand:", error);

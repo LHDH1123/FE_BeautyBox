@@ -5,3 +5,15 @@
 .sidebar {
   width: 280px;
 }
+
+@media screen and (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .sidebar {
+    display: none;
+  }
+}

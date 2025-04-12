@@ -32,7 +32,7 @@ export async function getDetailSlug(slug) {
 
 export async function addCategory(data) {
   try {
-    const response = await AxiosInstance.post("/categorys/create", data);
+    const response = await AxiosInstance.post("/admin/categorys/create", data);
     return response;
   } catch (error) {
     console.error("Error adding category:", error);
@@ -42,7 +42,9 @@ export async function addCategory(data) {
 
 export async function deleteCategory(id) {
   try {
-    const response = await AxiosInstance.delete(`/categorys/delete/${id}`);
+    const response = await AxiosInstance.delete(
+      `/admin/categorys/delete/${id}`
+    );
     return response;
   } catch (error) {
     console.error("Error deleting category:", error);
@@ -52,7 +54,10 @@ export async function deleteCategory(id) {
 
 export async function updateCategory(id, data) {
   try {
-    const response = await AxiosInstance.patch(`/categorys/edit/${id}`, data);
+    const response = await AxiosInstance.patch(
+      `/admin/categorys/edit/${id}`,
+      data
+    );
     return response;
   } catch (error) {
     console.error("Error editing category:", error);
@@ -63,7 +68,7 @@ export async function updateCategory(id, data) {
 export async function changeStatus(id, status) {
   try {
     const response = await AxiosInstance.patch(
-      `/categorys/change-status/${id}/${status}`
+      `/admin/categorys/change-status/${id}/${status}`
     );
     return response;
   } catch (error) {

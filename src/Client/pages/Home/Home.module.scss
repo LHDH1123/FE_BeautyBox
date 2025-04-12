@@ -40,6 +40,10 @@
 .banner_exta {
   width: 40%;
   padding: 8px;
+  display: flex;
+  flex-direction: column; /* Stack images vertically */
+  justify-content: space-between; /* Space images evenly */
+  height: 100%;
 }
 
 .banner_exta img {
@@ -47,8 +51,13 @@
   height: auto;
   border-radius: 10px;
   margin-bottom: 15px;
-  max-height: calc(50% - 15px);
+  max-height: calc(50% - 15px); /* Adjust max height */
   object-fit: contain;
+}
+
+/* Remove bottom margin on the last image */
+.banner_exta img:last-child {
+  margin-bottom: 0;
 }
 
 .scroll-button-banner {
@@ -264,4 +273,117 @@
   height: 20px;
   left: 0px;
   top: 16%;
+}
+
+@media (max-width: 1024px) {
+  /* Adjust Banner */
+  .banner_major {
+    width: 70%; /* Make the main banner take up less space on tablets */
+  }
+
+  .banner_exta {
+    width: 32.7%; /* Adjust the size of extra banner images */
+  }
+
+  .banner-images img {
+    height: 40%; /* Adjust banner image height */
+  }
+}
+
+@media (max-width: 768px) {
+  /* Make Banner Section Stack for Tablets and smaller screens */
+  .banner {
+    flex-direction: column;
+  }
+
+  .banner_major,
+  .banner_exta {
+    width: 100%;
+  }
+
+  .banner-images img {
+    height: 30%;
+  }
+
+  .banner_exta img {
+    display: none;
+    height: auto;
+  }
+
+  /* Adjust Buttons */
+  .scroll-button-banner {
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Mobile adjustments */
+  .banner-images img {
+    height: 25%; /* Reduce the height of the banner images */
+  }
+
+  .banner_exta img {
+    height: auto;
+    max-height: 40%; /* Adjust the height of extra banner images */
+  }
+
+  /* Header adjustments */
+  .header-sale {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px 10px;
+  }
+
+  .list-sale {
+    padding: 10px;
+  }
+
+  .logo-sale img {
+    max-width: 250px; /* Smaller logo size on mobile */
+  }
+
+  .time-sale {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .time {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .countdown-number {
+    font-size: 20px; /* Smaller countdown numbers for mobile */
+  }
+
+  .btn-sale button {
+    font-size: 14px; /* Adjust button text size */
+    padding: 10px 15px; /* Smaller button padding */
+  }
+}
+
+@media (max-width: 320px) {
+  /* Extra small devices */
+  .banner-images img {
+    height: 20%; /* Make the banner image height even smaller */
+  }
+
+  .genuine img {
+    width: 100%;
+    height: 200px; /* Limit image size on small screens */
+  }
+
+  .content_genuine {
+    flex-direction: column;
+  }
+
+  .genuine {
+    margin-bottom: 20px;
+  }
+
+  .flash-sale {
+    padding-top: 20px; /* Reduce padding for small screens */
+  }
 }

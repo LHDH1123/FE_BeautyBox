@@ -1,4 +1,18 @@
 .main_content {
   margin-top: 153px;
   padding: 0px 75px;
+  overflow-x: hidden;
+  // Responsive styling for tablets
+  @media (max-width: 768px) {
+    margin-top: 120px; // Adjust top margin for smaller screens
+    padding: 0px 40px; // Adjust padding for better fit
+    overflow-x: hidden;
+  }
+
+  // Responsive styling for mobile
+  @media (max-width: 480px) {
+    margin-top: 100px; // Further adjust top margin for mobile
+    padding: 0px 20px; // Reduce padding for smaller screens
+    overflow-x: hidden;
+  }
 }

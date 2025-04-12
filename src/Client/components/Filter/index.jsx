@@ -19,7 +19,6 @@ function Filter({ total }) {
     handleClearAll,
     handleClearTag,
   } = useFilterContext() || {};
-  
 
   const hasAnyFilter =
     selectedPriceRanges.length > 0 ||
@@ -76,13 +75,6 @@ function Filter({ total }) {
 
       <div className={cx("filter-results")}>
         <span>{total} Kết quả</span>
-        <span style={{ marginLeft: "15px" }}>Lọc theo</span>
-        <select className={cx("filter-select")}>
-          <option value="all">Tất cả</option>
-          <option value="increase">Giá tăng dần</option>
-          <option value="decrease">Giá giảm dần</option>
-          <option value="percent">% giảm</option>
-        </select>
       </div>
     </div>
   );

@@ -32,7 +32,7 @@ export async function getDetailProductSlug(slug) {
 
 export async function addProduct(data) {
   try {
-    const response = await AxiosInstance.post("/products/create", data);
+    const response = await AxiosInstance.post("/admin/products/create", data);
     return response;
   } catch (error) {
     console.error("Error adding product:", error.response.data.error);
@@ -42,7 +42,7 @@ export async function addProduct(data) {
 
 export async function deleteProduct(id) {
   try {
-    const response = await AxiosInstance.delete(`/products/delete/${id}`);
+    const response = await AxiosInstance.delete(`/admin/products/delete/${id}`);
     return response;
   } catch (error) {
     console.error("Error deleting product:", error);
@@ -52,7 +52,7 @@ export async function deleteProduct(id) {
 
 export async function updateProduct(id, data) {
   try {
-    const response = await AxiosInstance.patch(`/products/edit/${id}`, data);
+    const response = await AxiosInstance.patch(`/admin/products/edit/${id}`, data);
     return response;
   } catch (error) {
     console.error("Error editing product:", error);
@@ -63,7 +63,7 @@ export async function updateProduct(id, data) {
 export async function changeStatusProduct(id, status) {
   try {
     const response = await AxiosInstance.patch(
-      `/products/change-status/${id}/${status}`
+      `/admin/products/change-status/${id}/${status}`
     );
     return response;
   } catch (error) {
@@ -74,7 +74,7 @@ export async function changeStatusProduct(id, status) {
 
 export async function changeMultiProduct(data) {
   try {
-    const response = await AxiosInstance.patch(`/products/change-multi`, data);
+    const response = await AxiosInstance.patch(`/admin/products/change-multi`, data);
     return response;
   } catch (error) {
     console.error("Error editing product:", error);

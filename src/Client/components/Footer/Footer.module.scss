@@ -138,3 +138,123 @@
 .input-email.show-container {
   box-shadow: 0 0 0 2px rgb(204, 203, 203);
 }
+@media (max-width: 1200px) {
+  .footer_container {
+    flex-direction: column;
+    gap: 10px;
+    padding: 24px 40px; /* Adjust padding */
+  }
+
+  .input-email {
+    width: 100%; /* Make the input and button take up full width */
+    margin-bottom: 20px;
+  }
+
+  .info {
+    flex-direction: column; /* Stack items vertically */
+    align-items: center;
+  }
+
+  .info-bbox {
+    margin-left: 0;
+    justify-content: center; /* Center the info items */
+  }
+
+  .info-title {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+  }
+
+  .social_footer {
+    display: flex;
+    justify-content: center;
+    margin-top: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .footer {
+    padding: 15px 20px;
+  }
+
+  .footer_container {
+    padding: 20px;
+  }
+
+  .input-email {
+    width: 100%;
+  }
+
+  .info-title {
+    width: 100%;
+    padding: 10px;
+  }
+
+  .info {
+    flex-direction: column; /* Stack items vertically */
+    align-items: center;
+  }
+
+  .info-bbox {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr); /* 2 equal-width columns */
+    gap: 20px; /* Space between columns */
+    margin-left: 0;
+    justify-content: center;
+  }
+
+  .logo-img {
+    width: 160px;
+    height: auto;
+  }
+  .title {
+    font-size: 20px; /* Adjust font size */
+    display: flex;
+    justify-content: center;
+  }
+
+  .sub-title {
+    font-size: 14px; /* Adjust font size */
+    display: flex;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer {
+    padding: 10px;
+  }
+
+  .footer_container {
+    padding: 15px;
+  }
+
+  .info-title {
+    font-size: 12px; /* Adjust font size */
+  }
+
+  .title {
+    font-size: 20px; /* Adjust font size */
+    display: flex;
+    justify-content: center;
+  }
+
+  .sub-title {
+    font-size: 14px; /* Adjust font size */
+    display: flex;
+    justify-content: center;
+  }
+
+  .info_chil {
+    font-size: 12px; /* Adjust font size */
+  }
+
+  .social_footer {
+    justify-content: space-between; /* Space out social icons */
+    margin-top: 20px;
+  }
+  .btn_fllow {
+    font-size: 14px;
+  }
+}

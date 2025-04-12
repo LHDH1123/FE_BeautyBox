@@ -10,6 +10,8 @@
 
 .header_container {
   display: flex;
+  width: 100%;
+  height: auto;
   background: linear-gradient(
     90deg,
     rgb(255, 212, 0) 0%,
@@ -65,6 +67,7 @@
   background-color: #f5f5f5;
   border-radius: 25px;
   width: 400px;
+  margin-left: 40px;
   height: 40px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); /* Tạo độ sâu */
 }
@@ -151,16 +154,6 @@
   font-weight: 780;
 }
 
-.scroll-container {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin: 0px 50px;
-  padding-bottom: 10px;
-}
-
 .main_header {
   display: flex;
   position: relative;
@@ -219,35 +212,104 @@
   cursor: default;
 }
 
-.scroll-button {
-  position: absolute;
-  top: 37%;
-  transform: translateY(-50%);
-  background-color: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
+.scroll-container {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  z-index: 10;
-  transition: background-color 0.3s ease;
+  gap: 10px;
+  margin: 0;
+  margin: 0px 50px;
+  padding-bottom: 10px;
+
+  .scroll-button {
+    position: absolute;
+    top: 37%;
+    transform: translateY(-50%);
+    z-index: 10;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+
+    &.left {
+      left: 0;
+    }
+
+    &.right {
+      right: 0;
+    }
+  }
+
+  // Responsive settings
+  @media screen and (max-width: 768px) {
+    .scroll-button {
+      padding: 6px;
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    .scrollable {
+      overflow-x: auto;
+      scroll-behavior: smooth;
+    }
+
+    .menu-header {
+      min-width: max-content;
+    }
+  }
 }
 
-.scroll-button:hover {
-  background-color: rgba(0, 0, 0, 0.8);
-}
+// .scroll-container {
+//   position: relative;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   gap: 10px;
+//   margin: 0;
+//   margin: 0px 50px;
+//   padding-bottom: 10px;
+// }
 
-.scroll-button.left {
-  left: -20px; /* Đặt vị trí nút trái */
-}
+// .scroll-button {
+//   position: absolute;
+//   top: 37%;
+//   transform: translateY(-50%);
+//   background-color: rgba(0, 0, 0, 0.5);
+//   color: white;
+//   border: none;
+//   border-radius: 50%;
+//   width: 20px;
+//   height: 20px;
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   cursor: pointer;
+//   z-index: 10;
+//   transition: background-color 0.3s ease;
+// }
 
-.scroll-button.right {
-  right: -20px; /* Đặt vị trí nút phải */
-}
+// .scroll-button:hover {
+//   background-color: rgba(0, 0, 0, 0.8);
+// }
+
+// .scroll-button.left {
+//   left: -20px; /* Đặt vị trí nút trái */
+// }
+
+// .scroll-button.right {
+//   right: -20px; /* Đặt vị trí nút phải */
+// }
 
 .content {
   width: 500px;
@@ -601,4 +663,66 @@
   text-align: right;
   margin: 0px 95px;
   margin-top: 5px;
+}
+@media (max-width: 1024px) {
+  .menu-section p,
+  .icon-section p,
+  .respone {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .header_content {
+    flex-direction: column;
+    margin: 0;
+  }
+
+  .logo-img {
+    width: 150px;
+    height: auto;
+    margin-top: 20px;
+  }
+
+  .search-bar {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .search-input {
+    font-size: 12px;
+  }
+
+  .right-header {
+    flex-direction: column;
+    margin-top: 10px;
+  }
+
+  .menu-section {
+    flex-direction: column;
+    margin-left: 0;
+  }
+
+  .content-login,
+  .content {
+    width: 100%;
+  }
+
+  .cart-btn {
+    font-size: 12px;
+  }
+
+  .btn-checkout {
+    font-size: 14px;
+  }
+
+  .more {
+    top: 60px;
+    right: 15px;
+  }
+
+  .main_header,
+  .respone {
+    display: none;
+  }
 }
