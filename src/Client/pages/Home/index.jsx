@@ -114,23 +114,21 @@ const Home = () => {
         </div>
       </div>
 
-      <div className={cx("list_genuine")}>
-        <div className={cx("content_genuine")}>
-          <div className={cx("genuine")}>
-            <img src={ch1} alt="ch 1" />
-          </div>
-          <div className={cx("genuine")}>
-            <img src={ch2} alt="ch 2" />
-          </div>
-          <div className={cx("genuine")}>
-            <img src={ch3} alt="ch 3" />
-          </div>
+      <div className={cx("content_genuine")}>
+        <div className={cx("genuine")}>
+          <img src={ch1} alt="ch 1" />
+        </div>
+        <div className={cx("genuine")}>
+          <img src={ch2} alt="ch 2" />
+        </div>
+        <div className={cx("genuine")}>
+          <img src={ch3} alt="ch 3" />
         </div>
       </div>
 
       <div className={cx("home_content")}>
         <ListProduct title="Sản phẩm mới" />
-        <ButtonAll title="Sản phẩm mới"/>
+        <ButtonAll title="Sản phẩm mới" />
       </div>
     </div>
   );

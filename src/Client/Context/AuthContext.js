@@ -5,6 +5,8 @@ import { getLike } from "../../services/like.service";
 import { getAllAddress } from "../../services/address.service";
 import { jwtDecode } from "jwt-decode";
 import { AxiosInstance } from "../../configs/axios";
+import { getBrands } from "../../services/brand.service";
+import { getCategorys } from "../../services/category.service";
 
 const AuthContext = createContext();
 
@@ -13,7 +15,11 @@ export const AuthProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
   const [selectCart, setSelectCart] = useState(null);
   const [like, setLike] = useState(null);
+  const [brands, setBrands] = useState(null);
   const [address, setAddress] = useState(null);
+  const [listChildCategorys, setListChildCategorys] = useState([]);
+  const [props, setProps] = useState(null);
+
   const [updateUser, setUpdateUser] = useState({
     id: "",
     fullName: "",
@@ -59,6 +65,48 @@ export const AuthProvider = ({ children }) => {
       console.error("❌ Lỗi khi tải giỏ thích:", error);
     }
   };
+
+  const fetchBrands = async () => {
+    try {
+      const response = await getBrands();
+      if (response) {
+        setBrands(response);
+      }
+    } catch (error) {
+      console.error("❌ Lỗi khi tải giỏ thích:", error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchCategorys = async () => {
+      try {
+        const response = await getCategorys();
+        if (response) {
+          // Lọc danh mục cha (các danh mục có parent_id === props)
+          const filteredCategories = response.filter(
+            (category) => category.parent_id === props
+          );
+
+          // Lấy danh sách danh mục con tương ứng với từng danh mục cha
+          const childCategories = filteredCategories.map((parent) => ({
+            parent_id: parent._id,
+            title: parent.title, // Lưu title của danh mục cha
+            slug: parent.slug,
+            children: response.filter(
+              (category) => category.parent_id === parent._id
+            ),
+          }));
+
+          setListChildCategorys(childCategories);
+        }
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+
+    fetchCategorys();
+  }, [props]);
+
   useEffect(() => {
     const fetchUser = async () => {
       const token = await refreshTokenUser();
@@ -84,6 +132,7 @@ export const AuthProvider = ({ children }) => {
           fetchCart(userData.user._id);
           fetchLike(userData.user._id);
           fetchAddress(userData.user._id);
+          fetchBrands();
         } catch (error) {
           console.error("❌ Lỗi giải mã token:", error);
           setUser(null);
@@ -95,6 +144,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     fetchUser();
+    fetchBrands();
   }, []);
 
   return (
@@ -112,8 +162,14 @@ export const AuthProvider = ({ children }) => {
         setSelectCart,
         like,
         setLike,
+        brands,
+        setBrands,
         address,
         setAddress,
+        props,
+        setProps,
+        listChildCategorys,
+        setListChildCategorys,
       }}
     >
       {children}

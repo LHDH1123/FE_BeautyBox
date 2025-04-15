@@ -123,12 +123,17 @@
 
 .content_genuine {
   display: flex;
-  padding: 10px 0px;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+  padding: 10px 0;
 }
 
 .genuine {
-  margin-right: 20px;
+  flex: 1 1 calc(33.333% - 10px); // 3 ảnh 1 dòng trên desktop
+  max-width: calc(33.333% - 10px);
   cursor: pointer;
+  transition: transform 0.3s ease;
 }
 
 .genuine:hover {
@@ -136,10 +141,26 @@
 }
 
 .genuine img {
-  height: 100%;
-  width: 446px;
+  width: 100%;
+  height: auto;
   border-radius: 6px;
-  overflow: hidden;
+  object-fit: cover;
+}
+
+/* Tablet: 2 ảnh mỗi dòng */
+@media screen and (max-width: 768px) {
+  .genuine {
+    flex: 1 1 calc(50% - 10px);
+    max-width: calc(50% - 10px);
+  }
+}
+
+/* Mobile: 1 ảnh mỗi dòng */
+@media screen and (max-width: 480px) {
+  .genuine {
+    flex: 1 1 100%;
+    max-width: 100%;
+  }
 }
 
 .scroll-button {

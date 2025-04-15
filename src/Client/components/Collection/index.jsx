@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import classNames from "classnames/bind";
 import styles from "./Collection.module.scss";
 import img1 from "../../../assets/images/menu-image-brand.webp";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import PropTypes from "prop-types";
-import { getBrands } from "../../../services/brand.service";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
 
 const cx = classNames.bind(styles);
 
@@ -14,23 +14,27 @@ Collection.propTypes = {
 };
 
 function Collection({ props }) {
-  const [listBrand, setListBrand] = useState([]);
+  // const [listBrand, setListBrand] = useState([]);
   const navigate = useNavigate();
+  const {
+    brands,
+    // setBrands,
+  } = useAuth();
 
-  useEffect(() => {
-    const fetchBrand = async () => {
-      try {
-        const response = await getBrands();
-        if (response) {
-          setListBrand(response);
-        }
-      } catch (error) {
-        console.error("Error fetching brands:", error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchBrand = async () => {
+  //     try {
+  //       const response = await getBrands();
+  //       if (response) {
+  //         setListBrand(response);
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching brands:", error);
+  //     }
+  //   };
 
-    fetchBrand();
-  }, []);
+  //   fetchBrand();
+  // }, []);
 
   const handleListProductBrand = (name) => {
     navigate(`/products/${name}`);
@@ -53,7 +57,7 @@ function Collection({ props }) {
           </div>
         </div>
         <div className={cx("infos")}>
-          {listBrand.slice(0, 10).map((brand) => (
+          {brands.slice(0, 10).map((brand) => (
             <div
               key={brand._id}
               className={cx("title-info")}
