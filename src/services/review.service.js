@@ -33,13 +33,13 @@ export async function creatReview(userId, productId, data) {
   }
 }
 
-export async function getProductFeedback(productId) {
+export async function getProductFeedback(id) {
   try {
-    const response = await AxiosInstance.get(`/review/${productId}`);
+    const response = await AxiosInstance.get(`/review/feedback/${id}`);
     return response;
   } catch (error) {
     console.error("Error feedback:", error);
-    throw new Error(error.response.data.error);
+    throw new Error(error);
   }
 }
 

@@ -619,7 +619,6 @@ const Header = () => {
     setActiveIndexCategory((prev) => (prev === index ? null : index)); // Toggle mở / đóng
   };
 
-  console.log(listChildCategorys);
   return (
     <div className={cx("header")}>
       <div className={cx("header_container")}>
