@@ -13,6 +13,7 @@ import {
 import { getDetailName, getNameBrand } from "../../../services/brand.service";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
+import { addToLike, removeFromLike } from "../../../services/like.service";
 
 const cx = classNames.bind(styles);
 
@@ -24,23 +25,32 @@ function ListCategory({
   selectedCategories,
 }) {
   const scrollableRef = useRef(null);
-  const [favoritedItems, setFavoritedItems] = useState([]);
+  // const [favoritedItems, setFavoritedItems] = useState([]);
   const [listProduct, setListProduct] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const { user, setIsModalLogin } = useAuth();
+  const { user, like, setLike, setIsModalLogin } = useAuth();
 
   const navigate = useNavigate();
 
-  const handleClickTym = (index) => {
-    if (user === null) {
+  const handleClickTym = async (productId) => {
+    if (!user) {
       setIsModalLogin(true);
       return;
     }
-    setFavoritedItems((prev) => {
-      const updatedFavoritedItems = [...prev];
-      updatedFavoritedItems[index] = !updatedFavoritedItems[index];
-      return updatedFavoritedItems;
-    });
+
+    const isLiked = like?.products?.some((item) => item._id === productId);
+
+    try {
+      if (isLiked) {
+        const response = await removeFromLike(user._id, productId);
+        if (response) setLike(response.like);
+      } else {
+        const response = await addToLike(user._id, productId);
+        if (response) setLike(response.like);
+      }
+    } catch (error) {
+      console.error("❌ Lỗi yêu thích:", error.response?.data || error.message);
+    }
   };
 
   useEffect(() => {
@@ -132,7 +142,7 @@ function ListCategory({
 
         setListProduct(productsWithBrandNames);
         onTotalChange(productsWithBrandNames.length);
-        setFavoritedItems(Array(productsWithBrandNames.length).fill(false));
+        // setFavoritedItems(Array(productsWithBrandNames.length).fill(false));
       } catch (error) {
         console.error("Error fetching categories or products:", error);
       }
@@ -140,8 +150,6 @@ function ListCategory({
 
     fetchData();
   }, [slug, onTotalChange]);
-
-  console.log(listProduct);
 
   const handleDetail = (slug) => {
     navigate(`/detailProduct/${slug}`);
@@ -205,10 +213,10 @@ function ListCategory({
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleClickTym(index);
+                    handleClickTym(product._id);
                   }}
                 >
-                  {favoritedItems[index] ? (
+                  {like?.products?.some((p) => p._id === product._id) ? (
                     <FavoriteIcon style={{ color: "red" }} />
                   ) : (
                     <FavoriteBorderIcon />

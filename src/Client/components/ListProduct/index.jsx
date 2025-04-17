@@ -12,6 +12,7 @@ import { getNameBrand } from "../../../services/brand.service";
 import { getNameCategory } from "../../../services/category.service";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
+import { addToLike, removeFromLike } from "../../../services/like.service";
 
 const cx = classNames.bind(styles);
 
@@ -27,10 +28,10 @@ function ListProduct({ title }) {
   const scrollableRef = useRef(null);
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(false);
-  const [favoritedItems, setFavoritedItems] = useState([]);
+  // const [favoritedItems, setFavoritedItems] = useState([]);
   const [listProducts, setListProducts] = useState([]);
   const navigate = useNavigate();
-  const { user, setIsModalLogin } = useAuth();
+  const { user, like, setLike, setIsModalLogin } = useAuth();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -53,7 +54,7 @@ function ListProduct({ title }) {
 
           const products = sortedProducts.slice(0, 20);
           setListProducts(products);
-          setFavoritedItems(Array(productsWithBrand.length).fill(false));
+          // setFavoritedItems(Array(productsWithBrand.length).fill(false));
         }
       } catch (error) {
         console.error("Error fetching products:", error);
@@ -103,14 +104,49 @@ function ListProduct({ title }) {
     }
   };
 
-  const handleClickTym = (index) => {
+  const handleAddLike = async (productId) => {
+    if (!user._id || !productId) {
+      console.warn("⚠️ Không thể thêm vào giỏ hàng vì thiếu thông tin!");
+      return;
+    }
+
+    try {
+      const response = await addToLike(user._id, productId);
+
+      if (response) {
+        console.log(response);
+        setLike(response.like);
+      }
+    } catch (error) {
+      console.error(
+        "❌ Lỗi khi gọi API:",
+        error.response?.data || error.message
+      );
+    }
+  };
+
+  const handleRemoveLike = async (id) => {
+    const response = await removeFromLike(like.user_id, id);
+    if (response) {
+      console.log("Xóa sản phẩm thành công", response);
+
+      setLike(response.like);
+    }
+  };
+
+  const handleClickTym = (productId) => {
     if (user === null) {
       setIsModalLogin(true);
       return;
     }
-    setFavoritedItems((prev) =>
-      prev.map((item, idx) => (idx === index ? !item : item))
-    );
+
+    const isLiked = like.products.some((item) => item._id === productId);
+    if (isLiked) {
+      handleRemoveLike(productId);
+    } else {
+      handleAddLike(productId);
+      // call API to like
+    }
   };
 
   const handleDetail = (slug) => {
@@ -130,13 +166,19 @@ function ListProduct({ title }) {
         <div className={cx("list_product")} ref={scrollableRef}>
           {listProducts.map((product, index) => (
             <div key={product._id} className={cx("product")}>
-              <div className={cx("tym")} onClick={() => handleClickTym(index)}>
-                {favoritedItems[index] ? (
+              <div
+                className={cx("tym")}
+                onClick={() => handleClickTym(product._id)}
+              >
+                {like?.products.some(
+                  (likedProduct) => likedProduct._id === product._id
+                ) ? (
                   <FavoriteIcon style={{ color: "red" }} />
                 ) : (
                   <FavoriteBorderIcon />
                 )}
               </div>
+
               <div
                 className={cx("productList-img")}
                 onClick={() => handleDetail(product.slug)}
