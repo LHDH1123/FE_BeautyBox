@@ -16,6 +16,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { logout } from "../../../services/auth.service";
 import { useAuth } from "../../Context/Auth.context";
+import CommentIcon from "@mui/icons-material/Comment";
 
 const cx = classNames.bind(styles);
 
@@ -141,6 +142,21 @@ const Sidebar = () => {
               <span>Quản lý người dùng</span>
             </div>
             <ul>
+              {hasPermission("reviews_view") && (
+                <li
+                  className={cx("submenu", {
+                    active: activePath === "/adminbb/review",
+                  })}
+                >
+                  <Link
+                    to="/adminbb/review"
+                    onClick={() => handleActive("/adminbb/review")}
+                  >
+                    <CommentIcon fontSize="small" />
+                    <span>Đánh giá</span>
+                  </Link>
+                </li>
+              )}
               {hasPermission("accounts_view") && (
                 <li
                   className={cx("submenu", {

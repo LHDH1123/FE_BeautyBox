@@ -6,15 +6,13 @@ import {
   changePublic,
   edit,
   getAllReviews,
-  updateReview,
 } from "../../../services/review.service"; // assuming updateReview exists
 import { getUser } from "../../../services/user.service";
 import { getDetailProduct } from "../../../services/product.service";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import { useAuth } from "../../Context/Auth.context";
-import { Alert, Snackbar, TextField, Button } from "@mui/material";
+import { Alert, Snackbar, TextField } from "@mui/material";
 import Rating from "@mui/material/Rating";
-import Stack from "@mui/material/Stack";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
@@ -114,6 +112,7 @@ const Review = () => {
         prev.map((review) =>
           review._id === selectedReview._id
             ? {
+                ...review,
                 rating: editedRating,
                 comment: editedComment,
                 thumbnail: editedImages,
@@ -295,13 +294,15 @@ const Review = () => {
                 >
                   Hủy
                 </button>
-                <button
-                  type="button"
-                  className={cx("btn-submit")}
-                  onClick={handleEditReview}
-                >
-                  Lưu đánh giá
-                </button>
+                {permissions?.includes("reviews_edit") && (
+                  <button
+                    type="button"
+                    className={cx("btn-submit")}
+                    onClick={handleEditReview}
+                  >
+                    Lưu đánh giá
+                  </button>
+                )}
               </div>
             </div>
           )}

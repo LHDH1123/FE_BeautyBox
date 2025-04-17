@@ -15,7 +15,7 @@ const modules = [
   "Tài khoản",
   "Vai trò",
   "Voucher",
-  "Đơn hàng",
+  "Đánh giá",
 ];
 const permissionsMenu = ["Tất cả", "Xem", "Cập nhật", "Thêm mới", "Xóa"];
 
@@ -34,7 +34,7 @@ const Permissions = () => {
     "Tài khoản": "accounts",
     "Vai trò": "roles",
     Voucher: "vouchers",
-    "Đơn hàng": "orders",
+    "Đánh giá": "reviews",
   };
 
   const permissionMapping = {

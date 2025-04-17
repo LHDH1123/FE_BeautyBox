@@ -2,11 +2,18 @@ import React, { useState, useRef, useEffect } from "react";
 import classNames from "classnames/bind";
 import styles from "./Apply.module.scss";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import { Dialog, DialogTitle, DialogActions } from "@mui/material";
+import {
+  Dialog,
+  DialogTitle,
+  DialogActions,
+  Snackbar,
+  Alert,
+} from "@mui/material";
 import { changeMulti } from "../../../services/brand.service";
 import { changeMultiCategory } from "../../../services/category.service";
 import { changeMultiProduct } from "../../../services/product.service";
 import { changeMultiAccount } from "../../../services/account.service";
+import { useAuth } from "../../Context/Auth.context";
 
 const cx = classNames.bind(styles);
 
@@ -24,6 +31,10 @@ const Apply = ({
   const [selectedTag, setSelectedTag] = useState("Tất cả");
   const [openConfirmDialog, setOpenConfirmDialog] = useState(false);
   const dropdownRef = useRef(null);
+  const { permissions } = useAuth();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
 
   const tags = ["Xóa tất cả", "Hoạt động", "Không hoạt động"];
 
@@ -88,32 +99,95 @@ const Apply = ({
     }
 
     try {
+      let hasUpdated = false;
+
       if (selectedBrands?.length) {
+        if (!permissions?.includes("brands_edit")) {
+          setErrorMessage("Bạn không có quyền chỉnh sửa thương hiệu.");
+          setOpenSnackbar(true);
+          setIsAccess(false);
+          return;
+        }
         await changeMulti(data);
         await fetchBrands();
+        hasUpdated = true;
       }
 
       if (selectedCategorys?.length) {
+        if (!permissions?.includes("products-category_edit")) {
+          setErrorMessage("Bạn không có quyền chỉnh sửa danh mục.");
+          setOpenSnackbar(true);
+          setIsAccess(false);
+          return;
+        }
         await changeMultiCategory(dataCategory);
         await fetchCategorys();
+        hasUpdated = true;
       }
 
       if (selectedProducts?.length) {
+        if (!permissions?.includes("products_edit")) {
+          setErrorMessage("Bạn không có quyền chỉnh sửa sản phẩm.");
+          setOpenSnackbar(true);
+          setIsAccess(false);
+          return;
+        }
         await changeMultiProduct(dataProduct);
         await fetchProducts();
+        hasUpdated = true;
       }
 
       if (selectedAccounts?.length) {
+        if (!permissions?.includes("accounts_edit")) {
+          setErrorMessage("Bạn không có quyền chỉnh sửa tài khoản.");
+          setOpenSnackbar(true);
+          setIsAccess(false);
+          return;
+        }
         await changeMultiAccount(dataAccount);
         await fetchAccount();
+        hasUpdated = true;
+      }
+
+      if (hasUpdated) {
+        setErrorMessage("Câph nhật thành công.");
+        setIsAccess(true);
+        setOpenSnackbar(true);
+      } else {
+        setErrorMessage("Vui lòng chọn ít nhất một mục để cập nhật.");
+        setIsAccess(false);
+        setOpenSnackbar(true);
       }
     } catch (error) {
       console.error("Lỗi khi cập nhật:", error);
+      setErrorMessage(
+        "Đã xảy ra lỗi trong quá trình cập nhật. Vui lòng thử lại."
+      );
+      setIsAccess(false);
+      setOpenSnackbar(true);
     }
   };
 
   return (
     <div className={cx("apply")} ref={dropdownRef}>
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+        >
+          {isAccess ? (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          )}
+        </Snackbar>
+      )}
       <div className={cx("select")}>
         <div
           className={cx("tag-filter")}

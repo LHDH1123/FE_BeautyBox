@@ -322,6 +322,7 @@ const Category = () => {
         </Snackbar>
       )}
       <div className={cx("table-list")}>
+   
         <TableHeader
           selectedCategorys={selectedCategorys}
           fetchCategorys={fetchCategorys}

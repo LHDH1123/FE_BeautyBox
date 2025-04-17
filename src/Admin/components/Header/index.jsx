@@ -82,7 +82,7 @@ const Header = ({
     "Người Dùng": "accounts_create",
     "Vai Trò & Quyền": "roles_create",
     "Giảm Giá": "vouchers_create",
-    "Đơn hàng": "orders_create",
+    "Đánh giá": "reviews_create",
   };
 
   const { permissions } = useAuth();
