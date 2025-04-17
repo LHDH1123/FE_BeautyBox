@@ -12,6 +12,7 @@ import {
 } from "../../../services/category.service";
 import { getDetailName, getNameBrand } from "../../../services/brand.service";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
 
 const cx = classNames.bind(styles);
 
@@ -26,10 +27,15 @@ function ListCategory({
   const [favoritedItems, setFavoritedItems] = useState([]);
   const [listProduct, setListProduct] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const { user, setIsModalLogin } = useAuth();
 
   const navigate = useNavigate();
 
   const handleClickTym = (index) => {
+    if (user === null) {
+      setIsModalLogin(true);
+      return;
+    }
     setFavoritedItems((prev) => {
       const updatedFavoritedItems = [...prev];
       updatedFavoritedItems[index] = !updatedFavoritedItems[index];
@@ -182,11 +188,7 @@ function ListCategory({
       <div className={cx("scroll-list")}>
         <div className={cx("list_product")} ref={scrollableRef}>
           {filteredProducts.map((product, index) => (
-            <div
-              key={product._id}
-              className={cx("product")}
-              onClick={() => handleDetail(product.slug)}
-            >
+            <div key={product._id} className={cx("product")}>
               <div className={cx("productList-img")}>
                 <img
                   src={
@@ -196,10 +198,15 @@ function ListCategory({
                       : product.thumbnail
                   }
                   alt="Product"
+                  onClick={() => handleDetail(product.slug)}
                 />
                 <div
                   className={cx("tym")}
-                  onClick={() => handleClickTym(index)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleClickTym(index);
+                  }}
                 >
                   {favoritedItems[index] ? (
                     <FavoriteIcon style={{ color: "red" }} />
@@ -208,7 +215,10 @@ function ListCategory({
                   )}
                 </div>
               </div>
-              <div className={cx("product_info")}>
+              <div
+                className={cx("product_info")}
+                onClick={() => handleDetail(product.slug)}
+              >
                 <a
                   href={`/products/${product.nameBrand}`}
                   onClick={(e) => e.stopPropagation()}

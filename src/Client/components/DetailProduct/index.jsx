@@ -57,7 +57,7 @@ const DetailProduct = ({ setLike, setCart }) => {
   const [commentText, setCommentText] = useState("");
   const [feedback, setFeedback] = useState([]);
 
-  const { user } = useAuth();
+  const { user, setIsModalLogin } = useAuth();
 
   const triggerFileInput = () => {
     if (fileInputRef.current) {
@@ -144,6 +144,10 @@ const DetailProduct = ({ setLike, setCart }) => {
   };
 
   const handleLike = () => {
+    if (user === null) {
+      setIsModalLogin(true);
+      return;
+    }
     if (isLike === false) {
       handleAddLike();
       setIsLike(true);
@@ -249,30 +253,6 @@ const DetailProduct = ({ setLike, setCart }) => {
   const handleOpenCloseModal = () => {
     setIsModalOpen(!isModalOpen);
   };
-
-  const reviews = [
-    {
-      id: "trang20001111",
-      rating: 5,
-      date: "12/03/2025 12:00",
-      comment:
-        "Cảm ơn bạn đã đánh giá sản phẩm của Dear Dahlia 5 sao! Chúng tôi rất vui vì bạn đã có trải nghiệm tốt với sản phẩm.Cảm ơn bạn đã đánh giá sản phẩm của Dear Dahlia 5 sao! Chúng tôi rất vui vì bạn đã có trải nghiệm tốt với sản phẩm.",
-    },
-    {
-      id: "vn9775_53133",
-      rating: 3,
-      date: "10/03/2025 11:11",
-      comment:
-        "Cảm ơn bạn đã đánh giá sản phẩm của Dear Dahlia 5 sao! Chúng tôi rất vui vì bạn đã có trải nghiệm tốt với sản phẩm.",
-    },
-    {
-      id: "asapsoup",
-      rating: 4,
-      date: "21/02/2025 16:53",
-      comment:
-        "Cảm ơn bạn đã đánh giá sản phẩm của Dear Dahlia 5 sao! Chúng tôi rất vui vì bạn đã có trải nghiệm tốt với sản phẩm.",
-    },
-  ];
 
   const handleCreateReview = async () => {
     const formData = new FormData();

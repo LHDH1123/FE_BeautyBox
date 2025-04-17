@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }) => {
   const [address, setAddress] = useState(null);
   const [listChildCategorys, setListChildCategorys] = useState([]);
   const [props, setProps] = useState(null);
+  const [isModalLogin, setIsModalLogin] = useState(false);
 
   const [updateUser, setUpdateUser] = useState({
     id: "",
@@ -170,6 +171,8 @@ export const AuthProvider = ({ children }) => {
         setProps,
         listChildCategorys,
         setListChildCategorys,
+        isModalLogin,
+        setIsModalLogin,
       }}
     >
       {children}

@@ -48,7 +48,6 @@ const Header = () => {
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(true);
   const [isModalUpload, setIsModalUpload] = useState(false);
-  const [isModalLogin, setIsModalLogin] = useState(false);
   const [isModalCart, setIsModalCart] = useState(false);
   const [isModalLike, setIsModalLike] = useState(false);
   const [isMore, setIsMore] = useState(false);
@@ -100,8 +99,9 @@ const Header = () => {
     brands,
     setProps,
     listChildCategorys,
+    isModalLogin,
+    setIsModalLogin,
   } = useAuth();
-
   // Tự động ẩn cảnh báo sau 10 giây
 
   const menuHeaders = [
@@ -225,6 +225,10 @@ const Header = () => {
   };
 
   const handleNavigateProfile = () => {
+    if (user === null) {
+      setIsModalLogin(true);
+      return;
+    }
     navigate("/profile");
     setIsMore(false);
   };
@@ -489,6 +493,10 @@ const Header = () => {
   };
 
   const handleProfile = () => {
+    if (user === null) {
+      setIsModalLogin(true);
+      return;
+    }
     navigate("/profile");
     setIsLogin(false);
     setIsMore(false);
@@ -965,14 +973,38 @@ const Header = () => {
               className={cx("icon-section", "respone")}
               style={{ borderLeft: "groove" }}
             >
-              <UserIcon
-                fontSize="medium"
-                style={{ color: "#4b4b4b", marginLeft: "16px" }}
-              />
               {user ? (
-                <p onClick={() => handleOpenModalLogin()}>{nameUser}</p>
+                <div
+                  className={cx("user-trigger")}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                  onClick={handleOpenModalLogin}
+                >
+                  <UserIcon
+                    fontSize="medium"
+                    style={{ color: "#4b4b4b", marginLeft: "16px" }}
+                  />
+                  <p style={{ marginLeft: "8px" }}>{nameUser}</p>
+                </div>
               ) : (
-                <p onClick={() => handleModalLoginUser()}>Đăng nhập</p>
+                <div
+                  className={cx("user-trigger")}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    cursor: "pointer",
+                  }}
+                  onClick={handleModalLoginUser}
+                >
+                  <UserIcon
+                    fontSize="medium"
+                    style={{ color: "#4b4b4b", marginLeft: "16px" }}
+                  />
+                  <p style={{ marginLeft: "8px" }}>Đăng nhập</p>
+                </div>
               )}
 
               {isLogin && (

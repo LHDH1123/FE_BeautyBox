@@ -11,6 +11,7 @@ import { getAllProducts } from "../../../services/product.service";
 import { getNameBrand } from "../../../services/brand.service";
 import { getNameCategory } from "../../../services/category.service";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
 
 const cx = classNames.bind(styles);
 
@@ -29,6 +30,7 @@ function ListProduct({ title }) {
   const [favoritedItems, setFavoritedItems] = useState([]);
   const [listProducts, setListProducts] = useState([]);
   const navigate = useNavigate();
+  const { user, setIsModalLogin } = useAuth();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -102,6 +104,10 @@ function ListProduct({ title }) {
   };
 
   const handleClickTym = (index) => {
+    if (user === null) {
+      setIsModalLogin(true);
+      return;
+    }
     setFavoritedItems((prev) =>
       prev.map((item, idx) => (idx === index ? !item : item))
     );
@@ -123,11 +129,7 @@ function ListProduct({ title }) {
         )}
         <div className={cx("list_product")} ref={scrollableRef}>
           {listProducts.map((product, index) => (
-            <div
-              key={product._id}
-              className={cx("product")}
-              onClick={() => handleDetail(product.slug)}
-            >
+            <div key={product._id} className={cx("product")}>
               <div className={cx("tym")} onClick={() => handleClickTym(index)}>
                 {favoritedItems[index] ? (
                   <FavoriteIcon style={{ color: "red" }} />
@@ -135,10 +137,16 @@ function ListProduct({ title }) {
                   <FavoriteBorderIcon />
                 )}
               </div>
-              <div className={cx("productList-img")}>
+              <div
+                className={cx("productList-img")}
+                onClick={() => handleDetail(product.slug)}
+              >
                 <img src={product.thumbnail[0]} alt="Product" />
               </div>
-              <div className={cx("product_info")}>
+              <div
+                className={cx("product_info")}
+                onClick={() => handleDetail(product.slug)}
+              >
                 <a href={`/products/${product.nameBrand}`}>
                   {product.nameBrand}
                 </a>
