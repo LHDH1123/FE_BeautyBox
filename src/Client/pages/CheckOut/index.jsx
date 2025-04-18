@@ -53,7 +53,8 @@ const CheckoutPage = () => {
     status: true,
   });
   const location = useLocation();
-  const selectCart = location.state;
+  const { selectCart, selectedOption } = location.state || {};
+
   const [isModalAddress, setIsModalAddress] = useState(false);
   const [isModalAllAddress, setIsModalAllAddress] = useState(false);
   // const [address, setAddress] = useState([]);
@@ -61,6 +62,8 @@ const CheckoutPage = () => {
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
   const { cart, setCart } = useAuth();
+
+  console.log(selectedOption);
 
   const fetchVoucherDiscount = async () => {
     try {
@@ -76,6 +79,7 @@ const CheckoutPage = () => {
   };
 
   const fetchAddress = async () => {
+    if (!userId) return;
     try {
       if (userId) {
         const response = await getAllAddress(userId);
@@ -135,6 +139,7 @@ const CheckoutPage = () => {
       }
     };
 
+    setSelectedPayment(selectedOption);
     fetchUser();
   }, []);
 

@@ -85,7 +85,6 @@
 
 .shopping-options {
   padding: 20px;
-  padding-bottom: 0px;
   border: 2px solid transparent;
   background: linear-gradient(white, white) padding-box padding-box,
     linear-gradient(
@@ -122,6 +121,9 @@
   font-weight: 700;
   color: black;
   font-family: "SVNMont", sans-serif;
+}
+.shopping-options label:hover {
+  cursor: pointer;
 }
 
 .title-shopping h4 {
@@ -373,7 +375,7 @@
   color: rgb(255, 255, 255) !important;
   padding: 4px 3px 3px 0px !important;
   position: absolute;
-  top: -0.5px;
+  top: 0px;
   left: 0;
   z-index: 2;
   background-color: rgb(199, 49, 48);
@@ -694,4 +696,36 @@
   font-weight: 600;
   color: #959595;
   cursor: pointer;
+}
+.default {
+  padding: 20px 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px 20px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.item {
+  display: flex;
+  align-items: center;
+}
+
+.icon {
+  margin-right: 10px;
+  font-size: 18px;
+
+  svg {
+    width: 1em;
+    height: 1em;
+  }
+}
+
+.bold {
+  font-weight: 700;
 }

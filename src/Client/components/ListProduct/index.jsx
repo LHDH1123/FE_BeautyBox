@@ -140,7 +140,10 @@ function ListProduct({ title }) {
       return;
     }
 
-    const isLiked = like?.products?.some((item) => item._id === productId);
+    const isLiked = (like?.products ?? []).some(
+      (item) => item._id === productId
+    );
+
     if (isLiked) {
       handleRemoveLike(productId);
     } else {
@@ -170,7 +173,7 @@ function ListProduct({ title }) {
                 className={cx("tym")}
                 onClick={() => handleClickTym(product._id)}
               >
-                {like?.products.some(
+                {(like?.products ?? []).some(
                   (likedProduct) => likedProduct._id === product._id
                 ) ? (
                   <FavoriteIcon style={{ color: "red" }} />

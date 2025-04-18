@@ -335,10 +335,6 @@ const Header = () => {
     setIsMore((prev) => !prev);
   };
 
-  const handleButtonCart = (buttonId) => {
-    setSelectedCart(buttonId);
-  };
-
   const handleListProduct = (slug, title) => {
     navigate(`/products/${slug}`, { state: { title } });
     setIsMore(false);
@@ -503,8 +499,13 @@ const Header = () => {
   };
 
   const handleNavigateCheckout = () => {
+    if (user === null) {
+      setIsModalLogin(true);
+      return;
+    }
     if (cart) {
       if (selectCart.products.length === 0) {
+        setIsLogin(true);
         return;
       }
       navigate("/check-out", { state: selectCart });
@@ -1162,7 +1163,7 @@ const Header = () => {
               onClick={handleOpenModalCart}
             >
               <ShoppingBagOutlinedIcon fontSize="medium" />
-              {cart?.products.length > 0 && (
+              {cart?.products?.length > 0 && (
                 <span className={cx("badgeCart")}>{cart.products.length}</span>
               )}
             </div>
@@ -1697,7 +1698,7 @@ const Header = () => {
           </div>
 
           <div className={cx("body-cart")}>
-            <div className={cx("page-cart")}>
+            {/* <div className={cx("page-cart")}>
               <div
                 className={classNames(cx("cart-btn"), {
                   selected: selectedCart === "delivery", // Kiểm tra nếu nút giao hàng được chọn
@@ -1722,7 +1723,7 @@ const Header = () => {
               >
                 Lấy tại cửa hàng (0)
               </div>
-            </div>
+            </div> */}
 
             <div>
               {selectedCart === "delivery" && (
@@ -1740,7 +1741,7 @@ const Header = () => {
               {selectedCart === "delivery" && (
                 <div className={cx("checkout")}>
                   <div className={cx("shipment")}>
-                    <div className={cx("title-checkout")}>Giao hàng</div>
+                    <div className={cx("title-checkout")}>Tổng</div>
                     <div className={cx("price")}>
                       {new Intl.NumberFormat("vi-VN", {
                         style: "currency",
@@ -1749,17 +1750,9 @@ const Header = () => {
                     </div>
                   </div>
 
-                  <div
-                    className={cx("shipment")}
-                    style={{ marginBottom: "16px", color: "rgb(182 182 182)" }}
-                  >
-                    <div className={cx("title-checkout")}>Click & Collect</div>
-                    <div className={cx("price")}>0đ</div>
-                  </div>
-
                   <div className={cx("btn-checkout")}>
                     <button type="submit" onClick={handleNavigateCheckout}>
-                      Tiếp tục với hình thức giao hàng
+                      Đặt hàng
                     </button>
                   </div>
                 </div>
@@ -1773,33 +1766,33 @@ const Header = () => {
                 </div>
               )}
 
-              {selectedCart === "pickup" && (
-                <div className={cx("checkout")}>
-                  <div className={cx("shipment")}>
-                    <div className={cx("title-checkout")}>Giao hàng</div>
-                    <div className={cx("price")}>
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(totalPrice)}
+              {/* {selectedCart === "pickup" && (
+                  <div className={cx("checkout")}>
+                    <div className={cx("shipment")}>
+                      <div className={cx("title-checkout")}>Giao hàng</div>
+                      <div className={cx("price")}>
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(totalPrice)}
+                      </div>
+                    </div>
+
+                    <div
+                      className={cx("shipment")}
+                      style={{ marginBottom: "16px", color: "rgb(182 182 182)" }}
+                    >
+                      <div className={cx("title-checkout")}>Click & Collect</div>
+                      <div className={cx("price")}>0đ</div>
+                    </div>
+
+                    <div className={cx("btn-checkout")}>
+                      <button type="submit">
+                        Tiếp tục với hình thức giao hàng Click & Collect
+                      </button>
                     </div>
                   </div>
-
-                  <div
-                    className={cx("shipment")}
-                    style={{ marginBottom: "16px", color: "rgb(182 182 182)" }}
-                  >
-                    <div className={cx("title-checkout")}>Click & Collect</div>
-                    <div className={cx("price")}>0đ</div>
-                  </div>
-
-                  <div className={cx("btn-checkout")}>
-                    <button type="submit">
-                      Tiếp tục với hình thức giao hàng Click & Collect
-                    </button>
-                  </div>
-                </div>
-              )}
+                )} */}
             </div>
           </div>
         </Box>

@@ -35,6 +35,9 @@ import {
   getProductFeedback,
 } from "../../../services/review.service";
 import { useAuth } from "../../Context/AuthContext";
+import CheckIcon from "@mui/icons-material/Check";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import AutorenewIcon from "@mui/icons-material/Autorenew";
 
 const cx = classNames.bind(styles);
 
@@ -58,6 +61,11 @@ const DetailProduct = ({ setLike, setCart }) => {
   const [feedback, setFeedback] = useState([]);
 
   const { user, setIsModalLogin } = useAuth();
+  const [selectedOption, setSelectedOption] = useState("COD");
+
+  const handleChange = (e) => {
+    setSelectedOption(e.target.value);
+  };
 
   const triggerFileInput = () => {
     if (fileInputRef.current) {
@@ -298,7 +306,12 @@ const DetailProduct = ({ setLike, setCart }) => {
       ],
       user_id: userId,
     };
-    navigate("/check-out", { state: selectCart });
+    navigate("/check-out", {
+      state: {
+        selectCart,
+        selectedOption,
+      },
+    });
   };
 
   const handleOpenCloseModal = () => {
@@ -432,22 +445,40 @@ const DetailProduct = ({ setLike, setCart }) => {
             </div>
             <ul>
               <li>
-                <input type="radio" id="option1" name="gift" />
-                <label htmlFor="option1">Giao hàng</label>
+                <input
+                  type="radio"
+                  id="option1"
+                  name="gift"
+                  value="COD"
+                  checked={selectedOption === "COD"}
+                  onChange={handleChange}
+                />
+                <label htmlFor="option1">
+                  Trả tiền mặt khi nhận hàng (COD)
+                </label>
               </li>
               <li>
-                <input type="radio" id="option2" name="gift" />
-                <label htmlFor="option2">Click & Collect</label>
+                <input
+                  type="radio"
+                  id="option2"
+                  name="gift"
+                  value="ZaloPay"
+                  checked={selectedOption === "ZaloPay"}
+                  onChange={handleChange}
+                />
+                <label htmlFor="option2">
+                  ZaloPay & Chuyển khoản Ngân Hàng
+                </label>
               </li>
             </ul>
-            <div className={cx("note")}>
+            {/* <div className={cx("note")}>
               <span className={cx("soldOut")}>Hết hàng</span> tại{" "}
               <span className={cx("storeName")}>BEAUTY BOX NGUYÊN GIA TRÍ</span>
               .<span className={cx("suggestion")}>Chọn cửa hàng khác</span>
             </div>
             <div className={cx("store")}>
               <a href="/stores"> Xem tất cả các cửa hàng</a>
-            </div>
+            </div> */}
           </div>
           <div className={cx("checkout")}>
             <div className={cx("div-quantity")}>
@@ -488,6 +519,34 @@ const DetailProduct = ({ setLike, setCart }) => {
                   <FavoriteBorderIcon />
                 )}
               </button>
+            </div>
+          </div>
+
+          <div className={cx("default")}>
+            <div className={cx("grid")}>
+              <div className={cx("item")}>
+                <CheckIcon />
+
+                <div style={{ marginLeft: "5px" }}>
+                  Cam kết <b className={cx("bold")}>hàng chính hãng</b>
+                </div>
+              </div>
+
+              <div className={cx("item")}>
+                <LocalShippingIcon />
+
+                <div style={{ marginLeft: "5px" }}>
+                  <b className={cx("bold")}>Miễn phí giao hàng</b> 24h
+                </div>
+              </div>
+
+              <div className={cx("item")}>
+                <AutorenewIcon />
+
+                <div style={{ marginLeft: "5px" }}>
+                  Đổi/trả hàng trong <b className={cx("bold")}>7 ngày</b>
+                </div>
+              </div>
             </div>
           </div>
         </div>
