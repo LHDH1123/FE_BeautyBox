@@ -155,7 +155,7 @@ const Header = () => {
 
       try {
         const productDetails = await Promise.all(
-          cart.products.map(async (item) => {
+          cart?.products.map(async (item) => {
             const product = await getDetailProduct(item.product_id);
             return {
               id: product[0]._id,
@@ -504,6 +504,9 @@ const Header = () => {
 
   const handleNavigateCheckout = () => {
     if (cart) {
+      if (selectCart.products.length === 0) {
+        return;
+      }
       navigate("/check-out", { state: selectCart });
       setIsModalCart(false);
     } else {
@@ -626,6 +629,50 @@ const Header = () => {
 
     setActiveIndexCategory((prev) => (prev === index ? null : index)); // Toggle mở / đóng
   };
+
+  const fetchCartGuest = async () => {
+    const guestCart = localStorage.getItem("guest_cart");
+    const parsedGuestCart = guestCart ? JSON.parse(guestCart) : [];
+
+    if (parsedGuestCart.length > 0) {
+      const productDetails = await Promise.all(
+        parsedGuestCart.map(async (item) => {
+          try {
+            const product = await getDetailProduct(item.product_id);
+
+            return {
+              product_id: product[0]._id,
+              SKU: product[0].SKU,
+              title: product[0].title,
+              price: product[0].price,
+              discountPercentage: product[0].discountPercentage,
+              quantity: item.quantity,
+            };
+          } catch (error) {
+            console.error("❌ Lỗi khi lấy chi tiết sản phẩm:", error);
+            return null;
+          }
+        })
+      );
+
+      const filteredProductDetails = productDetails.filter(
+        (item) => item !== null
+      ); // Lọc bỏ các sản phẩm không hợp lệ
+      setCart({
+        user_id: null,
+        products: filteredProductDetails,
+      });
+    } else {
+      setCart({
+        user_id: null,
+        products: [],
+      });
+    }
+  };
+
+  useEffect(() => {
+    fetchCartGuest();
+  }, []);
 
   return (
     <div className={cx("header")}>
@@ -1115,7 +1162,7 @@ const Header = () => {
               onClick={handleOpenModalCart}
             >
               <ShoppingBagOutlinedIcon fontSize="medium" />
-              {cart && cart.products && cart.products.length > 0 && (
+              {cart?.products.length > 0 && (
                 <span className={cx("badgeCart")}>{cart.products.length}</span>
               )}
             </div>

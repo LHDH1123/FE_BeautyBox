@@ -367,6 +367,21 @@
   border-radius: 3px;
 }
 
+.tag {
+  font-weight: 700 !important;
+  font-size: 12px !important;
+  color: rgb(255, 255, 255) !important;
+  padding: 4px 3px 3px 0px !important;
+  position: absolute;
+  top: -0.5px;
+  left: 0;
+  z-index: 2;
+  background-color: rgb(199, 49, 48);
+  border-radius: 3px 4px 4px 3px;
+  padding: 0px 2px;
+  letter-spacing: 0.7px;
+}
+
 .reviewsSection {
   display: flex;
   padding: 16px 0px;

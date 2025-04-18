@@ -80,7 +80,7 @@ const Home = () => {
       {/* Trademark Section */}
       <Trademark />
 
-      <div className={cx("flash-sale")}>
+      {/* <div className={cx("flash-sale")}>
         <div className={cx("header-sale")}>
           <div className={cx("logo-sale")}>
             <img src={logoSale} alt="" />
@@ -112,6 +112,11 @@ const Home = () => {
         <div className={cx("list-sale")}>
           <ListProduct />
         </div>
+      </div> */}
+
+      <div className={cx("home_content")}>
+        <ListProduct title="Sản phẩm mới" />
+        <ButtonAll title="Sản phẩm mới" />
       </div>
 
       <div className={cx("content_genuine")}>
@@ -124,11 +129,6 @@ const Home = () => {
         <div className={cx("genuine")}>
           <img src={ch3} alt="ch 3" />
         </div>
-      </div>
-
-      <div className={cx("home_content")}>
-        <ListProduct title="Sản phẩm mới" />
-        <ButtonAll title="Sản phẩm mới" />
       </div>
     </div>
   );

@@ -105,7 +105,7 @@ const DetailProduct = ({ setLike, setCart }) => {
 
   useEffect(() => {
     fetchReviewProduct();
-  }, [product._id]);
+  }, [product?._id]);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -195,9 +195,60 @@ const DetailProduct = ({ setLike, setCart }) => {
     fetchUserId();
   }, []);
 
+  const handleAddToGuestCart = () => {
+    const guestCart = JSON.parse(localStorage.getItem("guest_cart")) || [];
+
+    const existingProductIndex = guestCart.findIndex(
+      (item) => item.product_id === product._id
+    );
+
+    if (existingProductIndex !== -1) {
+      // Nếu sản phẩm đã có trong giỏ, cập nhật số lượng
+      guestCart[existingProductIndex].quantity += quantity;
+    } else {
+      // Nếu sản phẩm chưa có, thêm mới
+      guestCart.push({
+        product_id: product._id,
+        quantity,
+        title: product.title,
+        thumbnail: Array.isArray(product.thumbnail)
+          ? product.thumbnail[0]
+          : product.thumbnail,
+        price: product.price,
+        discountPercentage: product.discountPercentage,
+      });
+    }
+
+    // ✅ Lưu lại localStorage
+    localStorage.setItem("guest_cart", JSON.stringify(guestCart));
+
+    // ✅ Đồng bộ lại với context để UI re-render
+    setCart({
+      user_id: null,
+      products: guestCart.map((item) => ({
+        product_id: item.product_id,
+        title: item.title,
+        SKU: item.SKU,
+        price: item.price,
+        discountPercentage: item.discountPercentage,
+        quantity: item.quantity,
+      })),
+    });
+
+    console.log("🛒 Đã thêm sản phẩm vào giỏ hàng (guest)", guestCart);
+  };
+
   const handleAddCart = async () => {
-    if (!userId || !product._id) {
-      console.warn("⚠️ Không thể thêm vào giỏ hàng vì thiếu thông tin!");
+    if (!product._id) {
+      console.warn(
+        "⚠️ Không thể thêm vào giỏ hàng vì thiếu thông tin sản phẩm!"
+      );
+      return;
+    }
+
+    if (!user) {
+      // Nếu chưa đăng nhập thì thêm vào localStorage
+      handleAddToGuestCart();
       return;
     }
 

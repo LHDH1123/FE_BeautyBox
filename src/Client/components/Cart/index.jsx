@@ -9,6 +9,7 @@ import {
   updateCartQuantity,
 } from "../../../services/cart.service";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../Context/AuthContext";
 
 const cx = classNames.bind(styles);
 
@@ -17,6 +18,7 @@ function Cart({ cart, setCart, selectCart, setSelectCart }) {
   const [selectAll, setSelectAll] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   // Lấy thông tin sản phẩm từ API
   useEffect(() => {
@@ -51,8 +53,51 @@ function Cart({ cart, setCart, selectCart, setSelectCart }) {
     fetchProductDetails();
   }, [cart]);
 
+  useEffect(() => {
+    const loadGuestCart = async () => {
+      const guestCart = JSON.parse(localStorage.getItem("guest_cart")) || [];
+
+      // Gọi API lấy chi tiết từng sản phẩm
+      const productDetails = await Promise.all(
+        guestCart.map(async (item) => {
+          const product = await getDetailProduct(item.product_id);
+          return {
+            id: product[0]._id,
+            thumbnail: Array.isArray(product[0].thumbnail)
+              ? product[0].thumbnail[0]
+              : product[0].thumbnail,
+            SKU: product[0].SKU,
+            title: product[0].title,
+            price: product[0].price,
+            slug: product[0].slug,
+            discountPercentage: product[0].discountPercentage,
+            quantity: item.quantity,
+          };
+        })
+      );
+
+      setProducts(productDetails);
+
+      // ✅ Cập nhật lại cart sau khi lấy đủ chi tiết
+      setCart({
+        ...cart,
+        user_id: null,
+        products: productDetails.map((p) => ({
+          product_id: p.id,
+          quantity: p.quantity,
+          price: p.price,
+          discountPercentage: p.discountPercentage,
+        })),
+      });
+    };
+
+    if (!user?._id) {
+      loadGuestCart();
+    }
+  }, [user]);
+
   const handleUpdateQuantity = async (id, newQuantity) => {
-    if (newQuantity < 1) return; // Không cho giảm số lượng dưới 1
+    if (newQuantity < 1) return;
 
     setProducts((prevProducts) =>
       prevProducts.map((product) =>
@@ -60,22 +105,52 @@ function Cart({ cart, setCart, selectCart, setSelectCart }) {
       )
     );
 
-    const response = await updateCartQuantity(cart.user_id, id, newQuantity);
-    if (!response) {
-      console.error("❌ Cập nhật số lượng thất bại");
+    if (user?._id) {
+      const response = await updateCartQuantity(cart.user_id, id, newQuantity);
+      if (!response) {
+        console.error("❌ Cập nhật số lượng thất bại");
+      } else {
+        setCart(response.cart);
+      }
     } else {
-      setCart(response.cart);
+      // Guest → cập nhật localStorage + setCart giả định
+      const guestCart = JSON.parse(localStorage.getItem("guest_cart")) || [];
+      const updatedCart = guestCart.map((item) =>
+        item.product_id === id ? { ...item, quantity: newQuantity } : item
+      );
+      localStorage.setItem("guest_cart", JSON.stringify(updatedCart));
+
+      // Giả lập object `cart` để setCart
+      const guestCartData = {
+        user_id: null,
+        products: updatedCart,
+      };
+      setCart(guestCartData);
     }
   };
 
   const handleRemoveCart = async (id) => {
-    const response = await removeFromCart(cart.user_id, id);
-    if (response) {
-      console.log("Xóa sản phẩm thành công", response);
+    if (user?._id) {
+      const response = await removeFromCart(cart.user_id, id);
+      if (response) {
+        setProducts((prevProducts) =>
+          prevProducts.filter((product) => product.id !== id)
+        );
+        setCart(response.cart);
+      }
+    } else {
+      const guestCart = JSON.parse(localStorage.getItem("guest_cart")) || [];
+      const updatedCart = guestCart.filter((item) => item.product_id !== id);
+      localStorage.setItem("guest_cart", JSON.stringify(updatedCart));
+
       setProducts((prevProducts) =>
         prevProducts.filter((product) => product.id !== id)
       );
-      setCart(response.cart);
+
+      setCart({
+        user_id: null,
+        products: updatedCart,
+      });
     }
   };
 
@@ -119,7 +194,6 @@ function Cart({ cart, setCart, selectCart, setSelectCart }) {
 
     setSelectCart(filteredCart);
   }, [selectedProducts, cart, setSelectCart]);
-
 
   return (
     <div className={cx("div-cart")}>

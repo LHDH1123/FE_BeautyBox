@@ -140,7 +140,7 @@ function ListProduct({ title }) {
       return;
     }
 
-    const isLiked = like.products.some((item) => item._id === productId);
+    const isLiked = like?.products?.some((item) => item._id === productId);
     if (isLiked) {
       handleRemoveLike(productId);
     } else {
@@ -164,7 +164,7 @@ function ListProduct({ title }) {
           </button>
         )}
         <div className={cx("list_product")} ref={scrollableRef}>
-          {listProducts.map((product, index) => (
+          {listProducts?.map((product, index) => (
             <div key={product._id} className={cx("product")}>
               <div
                 className={cx("tym")}

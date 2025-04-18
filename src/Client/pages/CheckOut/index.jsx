@@ -81,12 +81,13 @@ const CheckoutPage = () => {
         const response = await getAllAddress(userId);
         if (response) {
           setAllAddress(response);
+          const defaultAddress = response.find(
+            (address) => address.status === true
+          );
+          console.log(response);
+          setDefaultddress(defaultAddress);
+          setSelectedAddress(defaultAddress._id);
         }
-        const defaultAddress = response.find(
-          (address) => address.status === true
-        );
-        setDefaultddress(defaultAddress);
-        setSelectedAddress(defaultAddress._id);
       }
     } catch (error) {
       console.error(error);
@@ -721,13 +722,13 @@ const BuyerInfo = ({ defaultddress, handleModalAllAddress, userEmail }) => {
       >
         <div>
           <div className={cx("contact-info")}>
-            {defaultddress.last_name} {defaultddress.name} |{" "}
-            {defaultddress.phone} | {defaultddress.email}
+            {defaultddress?.last_name} {defaultddress?.name} |{" "}
+            {defaultddress?.phone} | {defaultddress?.email}
           </div>
           <div>
-            {defaultddress.titleAddress} | {defaultddress.address},{" "}
-            {defaultddress.ward}, {defaultddress.districts},{" "}
-            {defaultddress.city}
+            {defaultddress?.titleAddress} | {defaultddress?.address},{" "}
+            {defaultddress?.ward}, {defaultddress?.districts},{" "}
+            {defaultddress?.city}
           </div>
         </div>
         <div className={cx("change")} onClick={() => handleModalAllAddress()}>

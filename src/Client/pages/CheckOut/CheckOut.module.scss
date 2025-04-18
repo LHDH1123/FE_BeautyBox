@@ -449,6 +449,25 @@
 .title-default {
   max-width: 200px;
   color: #1d39c4;
+  font-size: 13px;
+  line-height: 1.5715;
+}
+
+.address-title {
+  margin-left: auto;
+  cursor: pointer;
+}
+
+.change {
+  color: #0992d0;
+  margin-left: auto;
+  cursor: pointer;
+}
+
+
+.title-default {
+  max-width: 200px;
+  color: #1d39c4;
   margin: 0 20px 0 0;
   padding: 0 7px;
   font-size: 12px;
@@ -483,6 +502,87 @@
   cursor: pointer;
   margin-left: auto;
   height: 40px;
+}
+
+@media (max-width: 1024px) {
+  .checkout-container {
+    grid-template-columns: 1fr;
+    padding: 10px;
+  }
+
+  .btn-order {
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .body {
+    max-height: 350px;
+    padding-right: 12px;
+  }
+
+  .order-summary {
+    font-size: 12px;
+  }
+
+  .img-product img {
+    width: 70px;
+    height: 70px;
+  }
+
+  .product {
+    margin-top: 10px;
+    font-size: 14px;
+  }
+
+  .product .title-product a {
+    font-size: 13px;
+  }
+
+  .body::-webkit-scrollbar {
+    width: 6px;
+  }
+}
+
+@media (max-width: 768px) {
+  .btn-order {
+    width: 100%;
+    margin-top: 12px;
+  }
+
+  .img-product img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .product {
+    font-size: 12px;
+  }
+
+  .product .title-product a {
+    font-size: 12px;
+  }
+
+  .total-cart {
+    font-size: 14px;
+  }
+
+  .body::-webkit-scrollbar {
+    width: 5px;
+  }
+}
+
+@media (max-width: 576px) {
+  .checkout-container {
+    padding: 8px;
+  }
+
+  .product .title-product a {
+    font-size: 11px;
+  }
+
+  .save {
+    margin-bottom: 16px;
+  }
 }
 
 .title-edit {
