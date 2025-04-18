@@ -1726,37 +1726,30 @@ const Header = () => {
             </div> */}
 
             <div>
-              {selectedCart === "delivery" && (
-                // <div className={cx("cart")}>
-                //   Bạn chưa có sản phẩm nào trong giỏ hàng
-                // </div>
-                <Cart
-                  cart={cart}
-                  setCart={setCart}
-                  selectCart={selectCart}
-                  setSelectCart={setSelectCart}
-                />
-              )}
+              <Cart
+                cart={cart}
+                setCart={setCart}
+                selectCart={selectCart}
+                setSelectCart={setSelectCart}
+              />
 
-              {selectedCart === "delivery" && (
-                <div className={cx("checkout")}>
-                  <div className={cx("shipment")}>
-                    <div className={cx("title-checkout")}>Tổng</div>
-                    <div className={cx("price")}>
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(totalPrice)}
-                    </div>
-                  </div>
-
-                  <div className={cx("btn-checkout")}>
-                    <button type="submit" onClick={handleNavigateCheckout}>
-                      Đặt hàng
-                    </button>
+              <div className={cx("checkout")}>
+                <div className={cx("shipment")}>
+                  <div className={cx("title-checkout")}>Tổng</div>
+                  <div className={cx("price")}>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(totalPrice)}
                   </div>
                 </div>
-              )}
+
+                <div className={cx("btn-checkout")}>
+                  <button type="submit" onClick={handleNavigateCheckout}>
+                    Đặt hàng
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div>

@@ -179,6 +179,12 @@
   padding: 0px 10px;
 }
 
+.pagnigation {
+  display: flex;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
 .tag-filter:hover {
   cursor: pointer;
 }

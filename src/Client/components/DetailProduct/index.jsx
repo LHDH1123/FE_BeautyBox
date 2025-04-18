@@ -16,7 +16,11 @@ import { getUser, refreshTokenUser } from "../../../services/user.service";
 import { jwtDecode } from "jwt-decode";
 import { AxiosInstance } from "../../../configs/axios";
 import { addToCart } from "../../../services/cart.service";
-import { addToLike } from "../../../services/like.service";
+import {
+  addToLike,
+  getLike,
+  removeFromLike,
+} from "../../../services/like.service";
 import {
   Avatar,
   Box,
@@ -60,8 +64,9 @@ const DetailProduct = ({ setLike, setCart }) => {
   const [commentText, setCommentText] = useState("");
   const [feedback, setFeedback] = useState([]);
 
-  const { user, setIsModalLogin } = useAuth();
+  const { user, setIsModalLogin, setSelectCart } = useAuth();
   const [selectedOption, setSelectedOption] = useState("COD");
+  // const [likedProducts, setLikedProducts] = useState([]); // list sản phẩm đã like
 
   const handleChange = (e) => {
     setSelectedOption(e.target.value);
@@ -151,16 +156,30 @@ const DetailProduct = ({ setLike, setCart }) => {
     }
   };
 
-  const handleLike = () => {
-    if (user === null) {
+  const handleLike = async () => {
+    if (!user) {
       setIsModalLogin(true);
       return;
     }
-    if (isLike === false) {
-      handleAddLike();
-      setIsLike(true);
+
+    if (!isLike) {
+      // Nếu chưa like
+      const response = await addToLike(userId, product._id);
+      if (response) {
+        setIsLike(true);
+        setLike(response.like);
+        // setLikedProducts((prev) => [...prev, product]); // cập nhật local
+      }
     } else {
-      setIsLike(false);
+      // Nếu đã like
+      const response = await removeFromLike(userId, product._id);
+      if (response) {
+        setIsLike(false);
+        setLike(response.like);
+        // setLikedProducts((prev) =>
+        //   prev.filter((item) => item._id !== product._id)
+        // );
+      }
     }
   };
 
@@ -275,29 +294,28 @@ const DetailProduct = ({ setLike, setCart }) => {
     }
   };
 
-  const handleAddLike = async () => {
-    if (!userId || !product._id) {
-      console.warn("⚠️ Không thể thêm vào giỏ hàng vì thiếu thông tin!");
-      return;
-    }
+  // const handleAddLike = async () => {
+  //   if (!userId || !product._id) {
+  //     console.warn("⚠️ Không thể thêm vào giỏ hàng vì thiếu thông tin!");
+  //     return;
+  //   }
 
-    try {
-      const response = await addToLike(userId, product._id);
+  //   try {
+  //     const response = await addToLike(userId, product._id);
 
-      if (response) {
-        console.log(response);
-        setLike(response.like);
-      }
-    } catch (error) {
-      console.error(
-        "❌ Lỗi khi gọi API:",
-        error.response?.data || error.message
-      );
-    }
-  };
+  //     if (response) {
+  //       setLike(response.like);
+  //     }
+  //   } catch (error) {
+  //     console.error(
+  //       "❌ Lỗi khi gọi API:",
+  //       error.response?.data || error.message
+  //     );
+  //   }
+  // };
 
   const handleCheckOut = async () => {
-    const selectCart = {
+    const selectCartBuy = {
       products: [
         {
           product_id: product._id,
@@ -306,9 +324,10 @@ const DetailProduct = ({ setLike, setCart }) => {
       ],
       user_id: userId,
     };
+    setSelectCart(selectCartBuy);
     navigate("/check-out", {
       state: {
-        selectCart,
+        // selectCartBuy,
         selectedOption,
       },
     });
@@ -340,6 +359,23 @@ const DetailProduct = ({ setLike, setCart }) => {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    const fetchLikedProducts = async () => {
+      if (userId && product._id) {
+        const response = await getLike(userId);
+        if (response) {
+          // setLikedProducts(response.products || []); // response có thể là mảng sản phẩm
+          const isProductLiked = response?.products.some(
+            (item) => item._id === product._id
+          );
+          setIsLike(isProductLiked);
+        }
+      }
+    };
+
+    fetchLikedProducts();
+  }, [userId, product._id]);
 
   return (
     <div className={cx("detail")}>
@@ -513,7 +549,7 @@ const DetailProduct = ({ setLike, setCart }) => {
             </div>
             <div className={cx("like")} onClick={handleLike}>
               <button>
-                {isLike === true ? (
+                {isLike ? (
                   <FavoriteIcon style={{ color: "red" }} />
                 ) : (
                   <FavoriteBorderIcon />

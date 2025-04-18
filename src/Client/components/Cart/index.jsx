@@ -13,7 +13,7 @@ import { useAuth } from "../../Context/AuthContext";
 
 const cx = classNames.bind(styles);
 
-function Cart({ cart, setCart, selectCart, setSelectCart }) {
+function Cart({ cart, setCart, setSelectCart }) {
   const [products, setProducts] = useState([]);
   const [selectAll, setSelectAll] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState([]);

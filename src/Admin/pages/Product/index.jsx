@@ -26,6 +26,7 @@ import {
   Dialog,
   DialogActions,
   DialogTitle,
+  Pagination,
   Snackbar,
 } from "@mui/material";
 import { useAuth } from "../../Context/Auth.context";
@@ -57,9 +58,10 @@ const Product = () => {
     setIsAllChecked(newCheckedState);
 
     if (newCheckedState) {
-      setSelectedProducts(listProducts.map((product) => product._id));
+      // Chỉ chọn tất cả các sản phẩm trong trang hiện tại
+      setSelectedProducts(currentProducts.map((product) => product._id));
     } else {
-      setSelectedProducts([]);
+      setSelectedProducts([]); // Deselect tất cả các sản phẩm trong trang hiện tại
     }
   };
 
@@ -70,13 +72,6 @@ const Product = () => {
         : [...prevSelected, id]
     );
   };
-
-  // Cập nhật trạng thái của checkbox tổng dựa trên selectedProducts
-  useEffect(() => {
-    setIsAllChecked(
-      selectedProducts.length === listProducts.length && listProducts.length > 0
-    );
-  }, [selectedProducts, listProducts]);
 
   const fetchProducts = async () => {
     try {
@@ -259,6 +254,31 @@ const Product = () => {
     navigate(`/adminbb/detail-product/${id}`);
   };
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const totalPage = Math.ceil(searchProducts.length / itemsPerPage);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+
+  const currentProducts = searchProducts.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  // Cập nhật trạng thái của checkbox tổng dựa trên selectedProducts
+  useEffect(() => {
+    setIsAllChecked(
+      selectedProducts.length === currentProducts.length &&
+        currentProducts.length > 0
+    );
+  }, [selectedProducts, currentProducts]);
+  
   return (
     <div className={cx("table")}>
       <Header title="Sản Phẩm" />
@@ -382,7 +402,7 @@ const Product = () => {
               </tr>
             </thead>
             <tbody>
-              {searchProducts.map((product) => (
+              {currentProducts.map((product) => (
                 <tr key={product.SKU} style={{ marginLeft: "4px" }}>
                   <td>
                     <label className={cx("checkboxs")}>
@@ -461,6 +481,15 @@ const Product = () => {
               ))}
             </tbody>
           </table>
+          {!searchQuery && (
+            <Pagination
+              className={cx("pagnigation")}
+              count={totalPage}
+              page={currentPage}
+              onChange={handlePageChange}
+              color="secondary"
+            />
+          )}
         </div>
       </div>
 

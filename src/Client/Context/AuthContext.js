@@ -44,7 +44,6 @@ export const AuthProvider = ({ children }) => {
   };
 
   const fetchCart = async (userId) => {
-    if (!userId) return; // Tránh gọi API nếu userId không tồn tại
     try {
       const response = await getCart(userId);
       if (response) {

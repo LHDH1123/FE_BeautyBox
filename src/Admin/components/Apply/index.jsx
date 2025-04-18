@@ -150,7 +150,7 @@ const Apply = ({
       }
 
       if (hasUpdated) {
-        setErrorMessage("Câph nhật thành công.");
+        setErrorMessage("Cập nhật thành công.");
         setIsAccess(true);
         setOpenSnackbar(true);
       } else {
