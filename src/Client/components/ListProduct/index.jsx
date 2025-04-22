@@ -6,13 +6,18 @@ import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import StarIcon from "@mui/icons-material/Star";
 import { getAllProducts } from "../../../services/product.service";
 import { getNameBrand } from "../../../services/brand.service";
-import { getNameCategory } from "../../../services/category.service";
+import {
+  getCategorys,
+  getDetailSlug,
+  getNameCategory,
+} from "../../../services/category.service";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import { addToLike, removeFromLike } from "../../../services/like.service";
+import { Rating } from "@mui/material";
+import { getProductFeedback } from "../../../services/review.service";
 
 const cx = classNames.bind(styles);
 
@@ -28,41 +33,92 @@ function ListProduct({ title }) {
   const scrollableRef = useRef(null);
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(false);
-  // const [favoritedItems, setFavoritedItems] = useState([]);
   const [listProducts, setListProducts] = useState([]);
   const navigate = useNavigate();
   const { user, like, setLike, setIsModalLogin } = useAuth();
+  const [activeTab, setActiveTab] = useState("trang-diem");
+
+  const fetchProductDetails = async (products) => {
+    return Promise.all(
+      products.map(async (product) => {
+        const [nameBrand, nameCategory, feedbacks] = await Promise.all([
+          getNameBrand(product.brand_id),
+          getNameCategory(product.category_id),
+          getProductFeedback(product._id),
+        ]);
+
+        return {
+          ...product,
+          nameBrand,
+          nameCategory,
+          feedbacks,
+          newPrice:
+            product.price - (product.price * product.discountPercentage) / 100,
+        };
+      })
+    );
+  };
+
+  const fetchInitialProducts = async () => {
+    try {
+      const products = await getAllProducts();
+      if (!products) return;
+
+      const enriched = await fetchProductDetails(products);
+      const sorted = enriched.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setListProducts(sorted.slice(0, 20));
+    } catch (error) {
+      console.error("Error fetching initial products:", error);
+    }
+  };
+
+  const fetchCategoryProducts = async (slug) => {
+    try {
+      const [allCategories, products] = await Promise.all([
+        getCategorys(),
+        getAllProducts(),
+      ]);
+      const detail = await getDetailSlug(slug);
+
+      if (!detail?._id) return;
+
+      const categorySet = new Set();
+      const findChildren = (id) => {
+        const strId = id.toString();
+        categorySet.add(strId);
+        allCategories.forEach((cat) => {
+          if (cat.parent_id === strId && !categorySet.has(cat._id.toString())) {
+            findChildren(cat._id);
+          }
+        });
+      };
+      findChildren(detail._id);
+
+      const filtered = products.filter((p) =>
+        categorySet.has(p.category_id?.toString())
+      );
+
+      const enriched = await fetchProductDetails(filtered);
+      const sorted = enriched.sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
+
+      setListProducts(sorted.slice(0, 20));
+    } catch (error) {
+      console.error("❌ Lỗi khi lấy sản phẩm theo category slug:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const response = await getAllProducts();
-        if (response) {
-          const productsWithBrand = await Promise.all(
-            response.map(async (product) => ({
-              ...product,
-              nameBrand: await getNameBrand(product.brand_id),
-              nameCategory: await getNameCategory(product.category_id),
-              newPrice:
-                product.price -
-                (product.price * product.discountPercentage) / 100,
-            }))
-          );
-          const sortedProducts = [...productsWithBrand].sort(
-            (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-          );
-
-          const products = sortedProducts.slice(0, 20);
-          setListProducts(products);
-          // setFavoritedItems(Array(productsWithBrand.length).fill(false));
-        }
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      }
-    };
-
-    fetchProducts();
-  }, []); // Thêm [] để tránh gọi API liên tục
+    if (title !== "Xu hướng làm đẹp") {
+      fetchInitialProducts();
+    } else {
+      fetchCategoryProducts(activeTab);
+    }
+  }, []);
 
   const handleScroll = () => {
     const container = scrollableRef.current;
@@ -76,7 +132,7 @@ function ListProduct({ title }) {
   useEffect(() => {
     const container = scrollableRef.current;
     if (container) {
-      handleScroll(); // Gọi ngay để cập nhật trạng thái nút
+      handleScroll();
       container.addEventListener("scroll", handleScroll);
     }
     return () => {
@@ -84,7 +140,7 @@ function ListProduct({ title }) {
         container.removeEventListener("scroll", handleScroll);
       }
     };
-  }, [listProducts]); // Gọi lại khi danh sách sản phẩm thay đổi
+  }, [listProducts]);
 
   const scrollLeft = () => {
     if (scrollableRef.current) {
@@ -106,15 +162,13 @@ function ListProduct({ title }) {
 
   const handleAddLike = async (productId) => {
     if (!user._id || !productId) {
-      console.warn("⚠️ Không thể thêm vào giỏ hàng vì thiếu thông tin!");
+      console.warn("⚠️ Không thể thêm vào yêu thích vì thiếu thông tin!");
       return;
     }
 
     try {
       const response = await addToLike(user._id, productId);
-
       if (response) {
-        console.log(response);
         setLike(response.like);
       }
     } catch (error) {
@@ -128,8 +182,6 @@ function ListProduct({ title }) {
   const handleRemoveLike = async (id) => {
     const response = await removeFromLike(like.user_id, id);
     if (response) {
-      console.log("Xóa sản phẩm thành công", response);
-
       setLike(response.like);
     }
   };
@@ -148,18 +200,51 @@ function ListProduct({ title }) {
       handleRemoveLike(productId);
     } else {
       handleAddLike(productId);
-      // call API to like
     }
   };
 
   const handleDetail = (slug) => {
     navigate(`/detailProduct/${slug}`);
-    // console.log(id, slug);
+  };
+
+  const handleChangeTab = (tab) => {
+    setActiveTab(tab);
+    if (title === "Xu hướng làm đẹp") {
+      fetchCategoryProducts(tab);
+    }
   };
 
   return (
     <div className={cx("list")}>
-      <h2>{title}</h2>
+      <div className={cx("list")}>
+        <h2>{title}</h2>
+        {title === "Xu hướng làm đẹp" && (
+          <div className={cx("listTitle-category")}>
+            <div
+              className={cx("title", activeTab === "cham-soc-da" && "active")}
+              onClick={() => handleChangeTab("cham-soc-da")}
+            >
+              Chăm sóc da
+            </div>
+            <div
+              className={cx("title", activeTab === "trang-diem" && "active")}
+              onClick={() => handleChangeTab("trang-diem")}
+            >
+              Trang điểm
+            </div>
+            <div
+              className={cx(
+                "title",
+                activeTab === "cham-soc-co-the" && "active"
+              )}
+              onClick={() => handleChangeTab("cham-soc-co-the")}
+            >
+              Chăm sóc cơ thể
+            </div>
+          </div>
+        )}
+      </div>
+
       <div className={cx("scroll-list")}>
         {isLeftVisible && (
           <button className={cx("scroll-button", "left")} onClick={scrollLeft}>
@@ -167,7 +252,7 @@ function ListProduct({ title }) {
           </button>
         )}
         <div className={cx("list_product")} ref={scrollableRef}>
-          {listProducts?.map((product, index) => (
+          {listProducts?.map((product) => (
             <div key={product._id} className={cx("product")}>
               <div
                 className={cx("tym")}
@@ -230,11 +315,21 @@ function ListProduct({ title }) {
                 </div>
                 <div className={cx("review")}>
                   <div className={cx("rate")}>
-                    {[...Array(5)].map((_, i) => (
-                      <StarIcon key={i} fontSize="inherit" />
-                    ))}
+                    <Rating
+                      name="half-rating-read"
+                      defaultValue={Number(product.feedbacks?.avgRating || 0)}
+                      precision={0.5}
+                      readOnly
+                      sx={{
+                        color: "black",
+                        fontSize: "16px",
+                        "& .MuiRating-icon": { marginRight: "6px" },
+                      }}
+                    />
                   </div>
-                  <div className={cx("amount")}>(0)</div>
+                  <div className={cx("amount")}>
+                    ({product.feedbacks?.totalReviews || 0})
+                  </div>
                 </div>
               </div>
             </div>

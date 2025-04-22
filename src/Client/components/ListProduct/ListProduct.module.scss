@@ -5,7 +5,7 @@
   text-align: center;
   text-transform: uppercase;
   margin-top: auto;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 .list {
@@ -224,6 +224,31 @@
   display: flex;
   align-items: center; /* Center content vertically inside amount */
   justify-content: center; /* Center content horizontally inside amount */
+}
+
+.listTitle-category {
+  display: flex;
+  justify-content: center; // căn giữa theo chiều ngang
+  align-items: center; // căn giữa theo chiều dọc (nếu cần)
+  gap: 40px; // khoảng cách giữa các mục, bạn có thể điều chỉnh theo ý
+  margin-top: 16px;
+  margin-bottom: 30px;
+}
+
+.title {
+  cursor: pointer;
+  color: #999;
+  font-weight: 400;
+  transition: color 0.2s;
+
+  &.active {
+    color: #000;
+    font-weight: 700;
+  }
+
+  &:hover {
+    color: #333;
+  }
 }
 
 /* Responsive styles */

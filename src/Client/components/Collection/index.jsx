@@ -16,11 +16,8 @@ Collection.propTypes = {
 function Collection({ props }) {
   // const [listBrand, setListBrand] = useState([]);
   const navigate = useNavigate();
-  const {
-    brands,
-    // setBrands,
-  } = useAuth();
-
+  const { brands, brandshaveProduct } = useAuth();
+  console.log(brandshaveProduct);
   // useEffect(() => {
   //   const fetchBrand = async () => {
   //     try {
@@ -57,9 +54,9 @@ function Collection({ props }) {
           </div>
         </div>
         <div className={cx("infos")}>
-          {brands.slice(0, 10).map((brand) => (
+          {brandshaveProduct?.slice(0, 10).map((brand) => (
             <div
-              key={brand._id}
+              key={brand.id}
               className={cx("title-info")}
               onClick={() => {
                 handleListProductBrand(brand.name);

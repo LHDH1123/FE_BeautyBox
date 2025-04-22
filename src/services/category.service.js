@@ -79,7 +79,10 @@ export async function changeStatus(id, status) {
 
 export async function changeMultiCategory(data) {
   try {
-    const response = await AxiosInstance.patch(`/categorys/change-multi`, data);
+    const response = await AxiosInstance.patch(
+      `/admin/categorys/change-multi`,
+      data
+    );
     return response;
   } catch (error) {
     console.error("Error editing category:", error);

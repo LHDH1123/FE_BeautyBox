@@ -304,6 +304,7 @@ const Header = () => {
   };
 
   const handleModalLoginUser = () => {
+    setIsMore(false);
     setIsModalLogin(true);
   };
 
@@ -478,6 +479,7 @@ const Header = () => {
       const response = await logout();
       if (response) {
         console.log("Logout successful:", response);
+        navigate("/");
         setLike("");
         setCart("");
         setUser("");
@@ -675,6 +677,31 @@ const Header = () => {
     fetchCartGuest();
   }, []);
 
+  const loginRef = useRef(null); // ref cho login/dropdown
+  const exceptRef = useRef(null); // ref cho phần tử ngoại lệ
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Kiểm tra nếu click ngoài loginRef và exceptRef
+      if (
+        loginRef.current &&
+        !loginRef.current.contains(event.target) &&
+        exceptRef.current &&
+        !exceptRef.current.contains(event.target)
+      ) {
+        setIsLogin(false);
+      }
+    };
+
+    // Lắng nghe sự kiện click trên document
+    document.addEventListener("click", handleClickOutside);
+
+    // Cleanup khi component unmount
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
+
   return (
     <div className={cx("header")}>
       <div className={cx("header_container")}>
@@ -787,74 +814,78 @@ const Header = () => {
               ))}
             </ul>
             <ul className={cx("list-more")}>
-              <li
-                className={cx("item")}
-                style={{
-                  fontSize: "16px",
-                  padding: "15px",
-                  fontWeight: "700",
-                }}
-              >
-                Hi, Lê Huy!
-              </li>
-              <li className={cx("item")} onClick={() => handleProfile()}>
-                <svg
-                  width="29"
-                  height="19"
-                  viewBox="0 0 29 19"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M25.7449 0H3.2551C1.45 0 0 1.48722 0 3.33866V15.6613C0 17.5128 1.45 19 3.2551 19H25.7449C27.55 19 29 17.5128 29 15.6613V3.33866C29 1.48722 27.55 0 25.7449 0ZM28.1122 15.631C28.1122 16.9665 27.0469 18.0591 25.7449 18.0591H3.2551C1.95306 18.0591 0.887755 16.9665 0.887755 15.631V3.33866C0.887755 2.0032 1.95306 0.910543 3.2551 0.910543H25.7449C27.0469 0.910543 28.1122 2.0032 28.1122 3.33866V15.631Z"
-                    fill="black"
-                  ></path>
-                  <path
-                    d="M10.4459 9.25719C11.1561 8.65016 11.5704 7.73962 11.6 6.79872C11.6296 5.00799 10.1796 3.42971 8.43367 3.39936C7.54592 3.36901 6.71735 3.70288 6.06633 4.34026C5.41531 4.97764 5.0898 5.82748 5.0898 6.73802C5.0898 7.70927 5.50408 8.65016 6.24388 9.28754C4.58673 10.1374 3.72857 11.8067 3.72857 14.2348H4.61633C4.61633 12.0192 5.35612 10.623 6.8949 9.98562C7.13163 9.89457 7.27959 9.65176 7.30918 9.40895C7.33878 9.16613 7.22041 8.92332 7.01327 8.77157C6.36225 8.31629 5.94796 7.55751 5.94796 6.76837C5.94796 6.10064 6.21429 5.49361 6.65816 5.03834C7.13163 4.58307 7.72347 4.34026 8.37449 4.34026C9.64694 4.37061 10.7122 5.52396 10.6827 6.82907C10.6531 7.61821 10.2684 8.34665 9.64694 8.80192C9.4398 8.95367 9.32143 9.19649 9.35102 9.4393C9.38061 9.68211 9.52857 9.92492 9.76531 10.016C11.3041 10.6534 12.0439 12.0495 12.0439 14.2652H12.9316C12.9316 11.7764 12.1031 10.1374 10.4459 9.25719Z"
-                    fill="black"
-                  ></path>
-                  <path
-                    d="M25.3306 4.58307H15.2102V5.49361H25.3306V4.58307Z"
-                    fill="black"
-                  ></path>
-                  <path
-                    d="M25.3306 9.04473H15.2102V9.95527H25.3306V9.04473Z"
-                    fill="black"
-                  ></path>
-                  <path
-                    d="M25.3306 13.476H15.2102V14.3866H25.3306V13.476Z"
-                    fill="black"
-                  ></path>
-                </svg>
-                <div className={cx("title-item")}>
-                  <div className={cx("title-li")}>Thông tin tài khoản</div>
+              {user && (
+                <div>
+                  <li
+                    className={cx("item")}
+                    style={{
+                      fontSize: "16px",
+                      padding: "15px",
+                      fontWeight: "700",
+                    }}
+                  >
+                    Hi, {nameUser}!
+                  </li>
+                  <li className={cx("item")} onClick={() => handleProfile()}>
+                    <svg
+                      width="29"
+                      height="19"
+                      viewBox="0 0 29 19"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M25.7449 0H3.2551C1.45 0 0 1.48722 0 3.33866V15.6613C0 17.5128 1.45 19 3.2551 19H25.7449C27.55 19 29 17.5128 29 15.6613V3.33866C29 1.48722 27.55 0 25.7449 0ZM28.1122 15.631C28.1122 16.9665 27.0469 18.0591 25.7449 18.0591H3.2551C1.95306 18.0591 0.887755 16.9665 0.887755 15.631V3.33866C0.887755 2.0032 1.95306 0.910543 3.2551 0.910543H25.7449C27.0469 0.910543 28.1122 2.0032 28.1122 3.33866V15.631Z"
+                        fill="black"
+                      ></path>
+                      <path
+                        d="M10.4459 9.25719C11.1561 8.65016 11.5704 7.73962 11.6 6.79872C11.6296 5.00799 10.1796 3.42971 8.43367 3.39936C7.54592 3.36901 6.71735 3.70288 6.06633 4.34026C5.41531 4.97764 5.0898 5.82748 5.0898 6.73802C5.0898 7.70927 5.50408 8.65016 6.24388 9.28754C4.58673 10.1374 3.72857 11.8067 3.72857 14.2348H4.61633C4.61633 12.0192 5.35612 10.623 6.8949 9.98562C7.13163 9.89457 7.27959 9.65176 7.30918 9.40895C7.33878 9.16613 7.22041 8.92332 7.01327 8.77157C6.36225 8.31629 5.94796 7.55751 5.94796 6.76837C5.94796 6.10064 6.21429 5.49361 6.65816 5.03834C7.13163 4.58307 7.72347 4.34026 8.37449 4.34026C9.64694 4.37061 10.7122 5.52396 10.6827 6.82907C10.6531 7.61821 10.2684 8.34665 9.64694 8.80192C9.4398 8.95367 9.32143 9.19649 9.35102 9.4393C9.38061 9.68211 9.52857 9.92492 9.76531 10.016C11.3041 10.6534 12.0439 12.0495 12.0439 14.2652H12.9316C12.9316 11.7764 12.1031 10.1374 10.4459 9.25719Z"
+                        fill="black"
+                      ></path>
+                      <path
+                        d="M25.3306 4.58307H15.2102V5.49361H25.3306V4.58307Z"
+                        fill="black"
+                      ></path>
+                      <path
+                        d="M25.3306 9.04473H15.2102V9.95527H25.3306V9.04473Z"
+                        fill="black"
+                      ></path>
+                      <path
+                        d="M25.3306 13.476H15.2102V14.3866H25.3306V13.476Z"
+                        fill="black"
+                      ></path>
+                    </svg>
+                    <div className={cx("title-item")}>
+                      <div className={cx("title-li")}>Thông tin tài khoản</div>
+                    </div>
+                  </li>
+                  <li className={cx("item")} onClick={handleNavigateProfile}>
+                    <svg
+                      width="29"
+                      height="21"
+                      viewBox="0 0 29 21"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M29 8.4062C29 3.78434 25.4769 0 21.1094 0C18.8966 0 16.8876 0.961594 15.4608 2.54357C15.0532 2.35746 14.5873 2.2644 14.1506 2.2644H3.40663C1.51406 2.2644 0 3.90842 0 5.89365V17.4018C0 19.387 1.51406 21 3.37751 21H14.1797C16.0432 21 17.5572 19.387 17.5572 17.4018V15.9129C18.6345 16.5022 19.8283 16.8124 21.1094 16.8124C22.4197 16.8124 23.6717 16.4712 24.749 15.8508L27.4859 20.7518L28.243 20.2866L25.506 15.3855C27.6315 13.8656 29 11.322 29 8.4062ZM10.8022 3.19498V9.52289C10.8022 9.89513 10.511 10.2053 10.1616 10.2053H7.39558C7.04619 10.2053 6.75502 9.89513 6.75502 9.52289V3.19498H10.8022ZM16.7129 17.4018C16.7129 18.8907 15.5773 20.0694 14.2088 20.0694H3.37751C1.97992 20.0694 0.873494 18.8597 0.873494 17.4018V5.89365C0.873494 4.40473 2.00904 3.226 3.37751 3.226H5.88153V9.55392C5.88153 10.4535 6.5512 11.1669 7.39558 11.1669H10.1616C11.006 11.1669 11.6757 10.4535 11.6757 9.55392V3.226H14.1797C14.4127 3.226 14.6456 3.25702 14.8785 3.35008C13.8594 4.77696 13.248 6.54505 13.248 8.43722C13.248 11.322 14.6165 13.8656 16.7129 15.3855V17.4018ZM14.1215 8.4062C14.1215 4.28065 17.2661 0.930576 21.1386 0.930576C25.011 0.930576 28.1556 4.28065 28.1556 8.4062C28.1556 12.5318 25.011 15.8818 21.1386 15.8818C17.2661 15.8818 14.1215 12.5318 14.1215 8.4062Z"
+                        fill="black"
+                      ></path>
+                      <path
+                        d="M24.6034 5.95569H17.6446V6.88626H24.6034V5.95569Z"
+                        fill="black"
+                      ></path>
+                      <path
+                        d="M24.6034 9.92615H17.6446V10.8567H24.6034V9.92615Z"
+                        fill="black"
+                      ></path>
+                    </svg>
+                    <div className={cx("title-item")}>
+                      <div className={cx("title-li")}>Lịch sử đặt hàng</div>
+                    </div>
+                  </li>
                 </div>
-              </li>
-              <li className={cx("item")} onClick={handleNavigateProfile}>
-                <svg
-                  width="29"
-                  height="21"
-                  viewBox="0 0 29 21"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M29 8.4062C29 3.78434 25.4769 0 21.1094 0C18.8966 0 16.8876 0.961594 15.4608 2.54357C15.0532 2.35746 14.5873 2.2644 14.1506 2.2644H3.40663C1.51406 2.2644 0 3.90842 0 5.89365V17.4018C0 19.387 1.51406 21 3.37751 21H14.1797C16.0432 21 17.5572 19.387 17.5572 17.4018V15.9129C18.6345 16.5022 19.8283 16.8124 21.1094 16.8124C22.4197 16.8124 23.6717 16.4712 24.749 15.8508L27.4859 20.7518L28.243 20.2866L25.506 15.3855C27.6315 13.8656 29 11.322 29 8.4062ZM10.8022 3.19498V9.52289C10.8022 9.89513 10.511 10.2053 10.1616 10.2053H7.39558C7.04619 10.2053 6.75502 9.89513 6.75502 9.52289V3.19498H10.8022ZM16.7129 17.4018C16.7129 18.8907 15.5773 20.0694 14.2088 20.0694H3.37751C1.97992 20.0694 0.873494 18.8597 0.873494 17.4018V5.89365C0.873494 4.40473 2.00904 3.226 3.37751 3.226H5.88153V9.55392C5.88153 10.4535 6.5512 11.1669 7.39558 11.1669H10.1616C11.006 11.1669 11.6757 10.4535 11.6757 9.55392V3.226H14.1797C14.4127 3.226 14.6456 3.25702 14.8785 3.35008C13.8594 4.77696 13.248 6.54505 13.248 8.43722C13.248 11.322 14.6165 13.8656 16.7129 15.3855V17.4018ZM14.1215 8.4062C14.1215 4.28065 17.2661 0.930576 21.1386 0.930576C25.011 0.930576 28.1556 4.28065 28.1556 8.4062C28.1556 12.5318 25.011 15.8818 21.1386 15.8818C17.2661 15.8818 14.1215 12.5318 14.1215 8.4062Z"
-                    fill="black"
-                  ></path>
-                  <path
-                    d="M24.6034 5.95569H17.6446V6.88626H24.6034V5.95569Z"
-                    fill="black"
-                  ></path>
-                  <path
-                    d="M24.6034 9.92615H17.6446V10.8567H24.6034V9.92615Z"
-                    fill="black"
-                  ></path>
-                </svg>
-                <div className={cx("title-item")}>
-                  <div className={cx("title-li")}>Lịch sử đặt hàng</div>
-                </div>
-              </li>
+              )}
               <li className={cx("item")} onClick={handleNavigateSupport}>
                 <svg
                   width="29"
@@ -892,17 +923,31 @@ const Header = () => {
                   <div className={cx("title-li")}>Trung tâm hỗ trợ</div>
                 </div>
               </li>
-              <li
-                className={cx("item")}
-                style={{
-                  fontSize: "16px",
-                  padding: "15px",
-                  fontWeight: "400",
-                }}
-                onClick={() => handleLogOut()}
-              >
-                Đăng xuất
-              </li>
+              {user ? (
+                <li
+                  className={cx("item")}
+                  style={{
+                    fontSize: "16px",
+                    padding: "15px",
+                    fontWeight: "400",
+                  }}
+                  onClick={() => handleLogOut()}
+                >
+                  Đăng xuất
+                </li>
+              ) : (
+                <li
+                  className={cx("item")}
+                  style={{
+                    fontSize: "16px",
+                    padding: "15px",
+                    fontWeight: "400",
+                  }}
+                  onClick={() => handleModalLoginUser()}
+                >
+                  Đăng nhập
+                </li>
+              )}
             </ul>
           </div>
         </div>
@@ -952,7 +997,7 @@ const Header = () => {
         </div>
         <div className={cx("right-header")}>
           <div className={cx("menu-section")}>
-            <div
+            {/* <div
               className={cx("icon-section", "respone")}
               onClick={handleNavigateProfile}
             >
@@ -977,7 +1022,7 @@ const Header = () => {
                 ></path>
               </svg>
               <p>Tra cứu đơn hàng</p>
-            </div>
+            </div> */}
             <div
               className={cx("icon-section", "respone")}
               onClick={handleNavigateSupport}
@@ -1018,6 +1063,7 @@ const Header = () => {
             </div>
 
             <div
+              ref={exceptRef}
               className={cx("icon-section", "respone")}
               style={{ borderLeft: "groove" }}
             >
@@ -1056,7 +1102,11 @@ const Header = () => {
               )}
 
               {isLogin && (
-                <div className={cx("more")} style={{ right: "24px" }}>
+                <div
+                  ref={loginRef}
+                  className={cx("more")}
+                  style={{ right: "24px" }}
+                >
                   <ul className={cx("list-more")}>
                     <li
                       className={cx("item")}
@@ -1066,7 +1116,7 @@ const Header = () => {
                         fontWeight: "700",
                       }}
                     >
-                      Hi, Lê Huy!
+                      Chào mừng, {nameUser}!
                     </li>
                     <li className={cx("item")} onClick={() => handleProfile()}>
                       <svg

@@ -586,3 +586,8 @@ tr:nth-child(even) {
     font-size: 12px;
   }
 }
+.pagnigation {
+  display: flex;
+  margin-top: 20px;
+  justify-content: flex-end;
+}

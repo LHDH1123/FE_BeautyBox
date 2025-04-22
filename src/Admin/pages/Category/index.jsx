@@ -213,9 +213,22 @@ const Category = () => {
     }
   };
 
-  const filteredCategorys = getAllCategory.filter((category) =>
-    category.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filterCategoryTree = (categories, query) => {
+    return categories
+      .map((category) => {
+        const children = filterCategoryTree(category.children || [], query);
+        if (
+          category.title.toLowerCase().includes(query.toLowerCase()) ||
+          children.length > 0
+        ) {
+          return { ...category, children };
+        }
+        return null;
+      })
+      .filter(Boolean);
+  };
+
+  const filteredCategorys = filterCategoryTree(getAllCategory, searchQuery);
 
   const handleSearchCategory = (event) => {
     setSearchQuery(event.target.value);
@@ -322,7 +335,6 @@ const Category = () => {
         </Snackbar>
       )}
       <div className={cx("table-list")}>
-   
         <TableHeader
           selectedCategorys={selectedCategorys}
           fetchCategorys={fetchCategorys}

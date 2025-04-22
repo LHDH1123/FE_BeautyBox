@@ -315,6 +315,10 @@ const DetailProduct = ({ setLike, setCart }) => {
   // };
 
   const handleCheckOut = async () => {
+    if (user === null) {
+      setIsModalLogin(true);
+      return;
+    }
     const selectCartBuy = {
       products: [
         {
@@ -334,6 +338,10 @@ const DetailProduct = ({ setLike, setCart }) => {
   };
 
   const handleOpenCloseModal = () => {
+    if (user === null) {
+      setIsModalLogin(true);
+      return;
+    }
     setIsModalOpen(!isModalOpen);
   };
 

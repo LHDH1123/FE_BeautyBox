@@ -252,6 +252,7 @@ const Header = ({
       fetchAllCategorys();
       if (response) {
         console.log("Thêm danh mục thành công:", response);
+        setIsModalAdd(false);
       }
       setGetAllCategory(false);
       setCategory({

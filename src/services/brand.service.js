@@ -52,7 +52,10 @@ export async function deletebrand(id) {
 
 export async function updateBrand(id, brand) {
   try {
-    const response = await AxiosInstance.patch(`/admin/brands/edit/${id}`, brand);
+    const response = await AxiosInstance.patch(
+      `/admin/brands/edit/${id}`,
+      brand
+    );
     return response;
   } catch (error) {
     console.error("Error editing brand:", error);
@@ -63,7 +66,7 @@ export async function updateBrand(id, brand) {
 export async function changeStatus(id, status) {
   try {
     const response = await AxiosInstance.patch(
-      `/brands/change-status/${id}/${status}`
+      `/admin/brands/change-status/${id}/${status}`
     );
     return response;
   } catch (error) {
@@ -74,7 +77,10 @@ export async function changeStatus(id, status) {
 
 export async function changeMulti(data) {
   try {
-    const response = await AxiosInstance.patch(`/admin/brands/change-multi`, data);
+    const response = await AxiosInstance.patch(
+      `/admin/brands/change-multi`,
+      data
+    );
     return response;
   } catch (error) {
     console.error("Error editing brand:", error);

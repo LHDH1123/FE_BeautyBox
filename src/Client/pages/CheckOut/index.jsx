@@ -63,8 +63,6 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const { cart, setCart, selectCart } = useAuth();
 
-  console.log(selectCart);
-
   const fetchVoucherDiscount = async () => {
     try {
       if (selectedVoucher !== "") {
@@ -257,6 +255,25 @@ const CheckoutPage = () => {
           product.id === id ? { ...product, quantity: newQuantity } : product
         )
       );
+
+      setTotalPrice((prevTotal) => {
+        const productToUpdate = products.find((product) => product.id === id);
+        if (!productToUpdate) return prevTotal;
+
+        const oldSubtotal =
+          (productToUpdate.price -
+            (productToUpdate.price * productToUpdate.discountPercentage) /
+              100) *
+          productToUpdate.quantity;
+
+        const newSubtotal =
+          (productToUpdate.price -
+            (productToUpdate.price * productToUpdate.discountPercentage) /
+              100) *
+          newQuantity;
+
+        return prevTotal - oldSubtotal + newSubtotal;
+      });
     }
   };
 

@@ -18,6 +18,7 @@ import {
   List,
   ListItem,
   ListItemText,
+  Pagination,
   Snackbar,
   Typography,
 } from "@mui/material";
@@ -89,6 +90,19 @@ const Profile = () => {
     address,
     setAddress,
   } = useAuth();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
+  const filteredOrders = orders.filter((order) =>
+    order._id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders = filteredOrders.slice(
+    indexOfFirstOrder,
+    indexOfLastOrder
+  );
 
   const handleFoward = (tab) => {
     setActiveTab(tab);
@@ -232,16 +246,22 @@ const Profile = () => {
       console.error("Lỗi khi thêm địa chỉ:", error);
     }
   };
+
   const fetchOrders = async () => {
     try {
       const response = await getOrderUser(user._id);
       if (response) {
-        setOrders(response);
+        const sortedOrders = response.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setOrders(sortedOrders);
       }
     } catch (error) {
       console.error("Error fetching orders:", error);
     }
   };
+
+  console.log(orders);
 
   useEffect(() => {
     if (user?._id) {
@@ -474,7 +494,12 @@ const Profile = () => {
               <input
                 type="text"
                 className={cx("search-input")}
-                placeholder="Tìm kiếm"
+                placeholder="Tìm kiếm theo ID đơn hàng"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // reset về trang đầu khi tìm
+                }}
               />
             </div>
 
@@ -489,8 +514,8 @@ const Profile = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.length > 0 ? (
-                    orders.map((order) => (
+                  {currentOrders.length > 0 ? (
+                    currentOrders.map((order) => (
                       <tr key={order._id}>
                         <td>
                           <strong>#{order._id.slice(-8)}</strong>
@@ -526,6 +551,15 @@ const Profile = () => {
                   )}
                 </tbody>
               </table>
+              {!searchTerm && (
+                <Pagination
+                  className={cx("pagnigation")}
+                  count={Math.ceil(filteredOrders.length / ordersPerPage)}
+                  page={currentPage}
+                  onChange={(event, value) => setCurrentPage(value)}
+                  color="secondary"
+                />
+              )}
             </div>
           </div>
         )}
@@ -974,7 +1008,8 @@ const Profile = () => {
                     ) : (
                       <Typography>
                         Quý khách vui lòng thanh toán{" "}
-                        {parseInt(21233).toLocaleString()}đ khi nhận hàng
+                        {parseInt(orderDetail.totalVoucher).toLocaleString()}đ
+                        khi nhận hàng
                       </Typography>
                     )}
                   </CardContent>

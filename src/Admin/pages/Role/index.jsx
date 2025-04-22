@@ -178,7 +178,7 @@ const Role = () => {
         </Snackbar>
       )}
       <div className={cx("table-list")}>
-        <TableHeader title="Vai Trò & Quyền" />
+        {/* <TableHeader title="Vai Trò & Quyền" /> */}
 
         <div className={cx("brand-list")}>
           <table className={cx("table", "datanew")}>

@@ -48,6 +48,7 @@ function CategoryHeader({ props }) {
 
   const handleListProduct = (slug, title) => {
     navigate(`/products/${slug}`, { state: { title } });
+    // console.log(slug, title);
   };
 
   return (
@@ -67,9 +68,7 @@ function CategoryHeader({ props }) {
               {categoryGroup.children.map((child) => (
                 <li
                   key={child._id}
-                  onClick={() =>
-                    handleListProduct(child.slug, child._id, child.title)
-                  }
+                  onClick={() => handleListProduct(child.slug, child.title)}
                 >
                   {child.title}
                 </li>

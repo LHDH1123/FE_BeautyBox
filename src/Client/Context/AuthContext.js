@@ -5,8 +5,9 @@ import { getLike } from "../../services/like.service";
 import { getAllAddress } from "../../services/address.service";
 import { jwtDecode } from "jwt-decode";
 import { AxiosInstance } from "../../configs/axios";
-import { getBrands } from "../../services/brand.service";
+import { getBrands, getNameBrand } from "../../services/brand.service";
 import { getCategorys } from "../../services/category.service";
+import { getAllProducts } from "../../services/product.service";
 
 const AuthContext = createContext();
 
@@ -20,6 +21,7 @@ export const AuthProvider = ({ children }) => {
   const [listChildCategorys, setListChildCategorys] = useState([]);
   const [props, setProps] = useState(null);
   const [isModalLogin, setIsModalLogin] = useState(false);
+  const [brandshaveProduct, setBrandsHaveProduct] = useState(null);
 
   const [updateUser, setUpdateUser] = useState({
     id: "",
@@ -29,6 +31,34 @@ export const AuthProvider = ({ children }) => {
   });
 
   const [nameUser, setNameUser] = useState("");
+
+  const fetchBrandsHaveProduct = async () => {
+    try {
+      const products = await getAllProducts(); // Lấy tất cả sản phẩm
+      const uniqueBrandIds = [...new Set(products.map((p) => p.brand_id))]; // Lọc ra danh sách brand_id duy nhất
+
+      // Gọi API song song cho tất cả brand_id
+      const brandsData = await Promise.all(
+        uniqueBrandIds.map(async (id) => {
+          const name = await getNameBrand(id);
+          return { id, name };
+        })
+      );
+
+      // Lọc các brand có sản phẩm
+      const brandsWithProducts = brandsData.filter((brand) =>
+        products.some((product) => product.brand_id === brand.id)
+      );
+
+      setBrandsHaveProduct(brandsWithProducts);
+    } catch (error) {
+      console.error("❌ Lỗi khi tải các thương hiệu có sản phẩm:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchBrandsHaveProduct();
+  }, []);
 
   const fetchAddress = async (userId) => {
     if (!userId) return;
@@ -172,6 +202,7 @@ export const AuthProvider = ({ children }) => {
         setListChildCategorys,
         isModalLogin,
         setIsModalLogin,
+        brandshaveProduct,
       }}
     >
       {children}

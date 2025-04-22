@@ -11,7 +11,6 @@ import banner5 from "../../../assets/images/472a3c1a-e1c7-494a-9b0f-20810d5bdc23
 import ch1 from "../../../assets/images/ch1.webp";
 import ch2 from "../../../assets/images/ch2.webp";
 import ch3 from "../../../assets/images/ch3.webp";
-import logoSale from "../../../assets/images/logo_sale.webp";
 import ListProduct from "../../components/ListProduct";
 import ButtonAll from "../../components/ButtonAll";
 import Trademark from "../../components/Trademark";
@@ -73,7 +72,8 @@ const Home = () => {
 
       {/* Content Section */}
       <div className={cx("home_content")}>
-        <ListProduct title="Top sản phẩm bán chạy" />
+        <ListProduct title="Xu hướng làm đẹp" />
+
         <ButtonAll />
       </div>
 
