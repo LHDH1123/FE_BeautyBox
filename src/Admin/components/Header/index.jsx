@@ -48,7 +48,7 @@ const Header = ({
   const [voucher, setVoucher] = useState({
     title: "",
     discount: "",
-    description: "",
+    min_order_total: "",
     status: true,
   });
   const [role, setRole] = useState({
@@ -305,11 +305,12 @@ const Header = ({
       setOpenSnackbar(true);
       return;
     }
-    if (!voucher.description) {
-      setErrorMessage("Vui lòng nhập mô tả");
+    if (!voucher.min_order_total) {
+      setErrorMessage("Vui lòng nhập đơn hàng hàng tối thiểu");
       setOpenSnackbar(true);
       return;
     }
+
     try {
       const response = await createVoucher(voucher);
       if (response) {
@@ -319,7 +320,7 @@ const Header = ({
         setVoucher({
           title: "",
           discount: "",
-          description: "",
+          min_order_total: "",
           status: true,
         });
       }
@@ -782,13 +783,13 @@ const Header = ({
             </div>
             <div className={cx("formGroup")}>
               <div className={cx("label")}>
-                Mô tả <span style={{ color: "red" }}>*</span>
+                Đơn hàng tối thiểu <span style={{ color: "red" }}>*</span>
               </div>
               <input
                 type="text"
-                name="description"
+                name="min_order_total"
                 className={cx("input")}
-                value={voucher.description || ""}
+                value={voucher.min_order_total || ""}
                 onChange={handleChangeVoucher}
               />
             </div>

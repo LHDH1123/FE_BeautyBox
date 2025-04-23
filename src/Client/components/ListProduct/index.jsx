@@ -23,20 +23,22 @@ const cx = classNames.bind(styles);
 
 ListProduct.propTypes = {
   title: PropTypes.string,
+  onChangeActiveTab: PropTypes.func,
 };
 
 ListProduct.defaultProps = {
   title: "",
+  onChangeActiveTab: () => {},
 };
 
-function ListProduct({ title }) {
+function ListProduct({ title, onChangeActiveTab }) {
   const scrollableRef = useRef(null);
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(false);
   const [listProducts, setListProducts] = useState([]);
   const navigate = useNavigate();
   const { user, like, setLike, setIsModalLogin } = useAuth();
-  const [activeTab, setActiveTab] = useState("trang-diem");
+  const [activeTab, setActiveTab] = useState("cham-soc-co-the");
 
   const fetchProductDetails = async (products) => {
     return Promise.all(
@@ -209,6 +211,7 @@ function ListProduct({ title }) {
 
   const handleChangeTab = (tab) => {
     setActiveTab(tab);
+    onChangeActiveTab(tab); // gửi về Home
     if (title === "Xu hướng làm đẹp") {
       fetchCategoryProducts(tab);
     }
@@ -221,18 +224,6 @@ function ListProduct({ title }) {
         {title === "Xu hướng làm đẹp" && (
           <div className={cx("listTitle-category")}>
             <div
-              className={cx("title", activeTab === "cham-soc-da" && "active")}
-              onClick={() => handleChangeTab("cham-soc-da")}
-            >
-              Chăm sóc da
-            </div>
-            <div
-              className={cx("title", activeTab === "trang-diem" && "active")}
-              onClick={() => handleChangeTab("trang-diem")}
-            >
-              Trang điểm
-            </div>
-            <div
               className={cx(
                 "title",
                 activeTab === "cham-soc-co-the" && "active"
@@ -240,6 +231,19 @@ function ListProduct({ title }) {
               onClick={() => handleChangeTab("cham-soc-co-the")}
             >
               Chăm sóc cơ thể
+            </div>
+            <div
+              className={cx("title", activeTab === "trang-diem" && "active")}
+              onClick={() => handleChangeTab("trang-diem")}
+            >
+              Trang điểm
+            </div>
+
+            <div
+              className={cx("title", activeTab === "cham-soc-da" && "active")}
+              onClick={() => handleChangeTab("cham-soc-da")}
+            >
+              Chăm sóc da
             </div>
           </div>
         )}

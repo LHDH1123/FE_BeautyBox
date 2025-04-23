@@ -7,18 +7,19 @@ const cx = classNames.bind(styles);
 const ButtonAll = ({ title }) => {
   const navigate = useNavigate();
 
-  const toSlug = (str) => {
-    return str
-      .normalize("NFD") // tách dấu
-      .replace(/[\u0300-\u036f]/g, "") // xóa dấu
-      .replace(/[^a-zA-Z0-9\s]/g, "") // xóa ký tự đặc biệt
-      .trim()
-      .toLowerCase()
-      .replace(/\s+/g, "-"); // thay khoảng trắng bằng "-"
-  };
+  // const toSlug = (str) => {
+  //   return str
+  //     .normalize("NFD") // tách dấu
+  //     .replace(/[\u0300-\u036f]/g, "") // xóa dấu
+  //     .replace(/[^a-zA-Z0-9\s]/g, "") // xóa ký tự đặc biệt
+  //     .trim()
+  //     .toLowerCase()
+  //     .replace(/\s+/g, "-"); // thay khoảng trắng bằng "-"
+  // };
 
   const handleProduct = async () => {
-    navigate(`/products/${toSlug(title)}`);
+    if (title === null) return;
+    navigate(`/products/${title}`);
   };
   return (
     <div>

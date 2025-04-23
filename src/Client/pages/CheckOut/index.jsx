@@ -106,6 +106,8 @@ const CheckoutPage = () => {
       console.error(error);
     }
   };
+  console.log(sale);
+  console.log(vouchers);
 
   useEffect(() => {
     fetchVoucherDiscount();
@@ -797,7 +799,7 @@ const PaymentMethods = ({
       <div className={cx("payment-methods")}>
         {vouchers.map((voucher) => {
           // Điều kiện voucher có phù hợp với totalPrice không?
-          const isApplicable = totalPrice >= voucher.minOrderValue; // Giả sử voucher có minOrderValue
+          const isApplicable = totalPrice >= Number(voucher.min_order_total);
           return (
             <div
               key={voucher._id}
@@ -812,7 +814,9 @@ const PaymentMethods = ({
                 disabled={!isApplicable} // Không cho chọn nếu không đủ điều kiện
               />
               <label>{voucher.title}</label>
-              <div className={cx("condition")}>{voucher.description}</div>
+              <div className={cx("condition")}>
+                Điều kiện: Tổng đơn hàng tối thiểu {voucher.min_order_total}
+              </div>
             </div>
           );
         })}

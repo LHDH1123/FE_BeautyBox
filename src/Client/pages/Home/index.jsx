@@ -19,6 +19,8 @@ const cx = classNames.bind(styles);
 
 const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [activeTabFromChild, setActiveTabFromChild] =
+    useState("cham-soc-co-the");
 
   const images = [banner4, banner5, banner];
 
@@ -72,9 +74,11 @@ const Home = () => {
 
       {/* Content Section */}
       <div className={cx("home_content")}>
-        <ListProduct title="Xu hướng làm đẹp" />
-
-        <ButtonAll />
+        <ListProduct
+          title="Xu hướng làm đẹp"
+          onChangeActiveTab={(tab) => setActiveTabFromChild(tab)}
+        />
+        <ButtonAll title={activeTabFromChild} />
       </div>
 
       {/* Trademark Section */}
@@ -116,7 +120,7 @@ const Home = () => {
 
       <div className={cx("home_content")}>
         <ListProduct title="Sản phẩm mới" />
-        <ButtonAll title="Sản phẩm mới" />
+        <ButtonAll title="san-pham-moi" />
       </div>
 
       <div className={cx("content_genuine")}>

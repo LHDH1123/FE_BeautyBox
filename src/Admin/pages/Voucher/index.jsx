@@ -31,7 +31,7 @@ const Voucher = () => {
   const [editVoucher, setEditVoucher] = useState({
     title: "",
     discount: "",
-    description: "",
+    min_order_total: "",
     status: true,
   });
   const [errorMessage, setErrorMessage] = useState("");
@@ -151,8 +151,8 @@ const Voucher = () => {
 
       return;
     }
-    if (!editVoucher.description) {
-      setErrorMessage("Vui lòng nhập mô tả");
+    if (!editVoucher.min_order_total) {
+      setErrorMessage("Vui lòng nhập Đơn tối thiểu");
       setOpenSnackbar(true);
       setIsAccess(false);
 
@@ -335,13 +335,13 @@ const Voucher = () => {
             </div>
             <div className={cx("formGroup")}>
               <div className={cx("label")}>
-                Mô tả <span style={{ color: "red" }}>*</span>
+                Đơn tối thiểu <span style={{ color: "red" }}>*</span>
               </div>
               <input
                 type="text"
-                name="description"
+                name="min_order_total"
                 className={cx("input")}
-                value={editVoucher.description || ""}
+                value={editVoucher.min_order_total || ""}
                 onChange={handleChangeVoucher}
               />
             </div>

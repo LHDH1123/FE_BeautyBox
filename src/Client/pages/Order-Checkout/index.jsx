@@ -101,7 +101,13 @@ const OrderSummary = () => {
                 ) : (
                   <Typography>
                     Quý khách vui lòng thanh toán{" "}
-                    {parseInt(21233).toLocaleString()}đ khi nhận hàng
+                    <span style={{ fontWeight: "bold" }}>
+                      {parseInt(
+                        order.total + order.total * sale + 12000
+                      ).toLocaleString()}
+                      đ
+                    </span>{" "}
+                    khi nhận hàng
                   </Typography>
                 )}
               </CardContent>
@@ -202,13 +208,17 @@ const OrderSummary = () => {
             fontWeight="bold"
             px={0}
           >
-            <Typography>Tổng</Typography>
             <Typography>
-              {new Intl.NumberFormat("vi-VN", {
-                style: "currency",
-                fontWeight: "bold",
-                currency: "VND",
-              }).format(order.total + order.total * sale + 12000)}
+              <span style={{ fontWeight: "bold" }}>Tổng</span>
+            </Typography>
+            <Typography>
+              <span style={{ fontWeight: "bold" }}>
+                {new Intl.NumberFormat("vi-VN", {
+                  style: "currency",
+                  fontWeight: "bold",
+                  currency: "VND",
+                }).format(order.total + order.total * sale + 12000)}
+              </span>
             </Typography>
           </Box>
         </CardContent>
