@@ -26,7 +26,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { createOrder } from "../../../services/checkout.service";
 import { useAuth } from "../../Context/AuthContext";
-
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 const cx = classNames.bind(styles);
 
 const CheckoutPage = () => {
@@ -106,8 +106,6 @@ const CheckoutPage = () => {
       console.error(error);
     }
   };
-  console.log(sale);
-  console.log(vouchers);
 
   useEffect(() => {
     fetchVoucherDiscount();
@@ -435,6 +433,9 @@ const CheckoutPage = () => {
     }
   };
 
+  const exchangeRate = 24000; // 1 USD ≈ 24,000 VND
+  const amount = ((totalPrice + 12000) * (1 + sale)).toFixed(1) / exchangeRate;
+  console.log(amount);
   return (
     <div className={cx("checkout-container")}>
       <div className={cx("left-section")}>
@@ -463,9 +464,47 @@ const CheckoutPage = () => {
           handleRemoveCart={handleRemoveCart}
         />
         <div className={cx("btn")}>
-          <button className={cx("btn-order")} onClick={handleOrder}>
-            ĐẶT HÀNG
-          </button>
+          {selectedPayment === "ZaloPay" ? (
+            <PayPalScriptProvider
+              options={{
+                "client-id":
+                  "AU4TWfPSJlgGz3pbXppghOLuSa5v31krAn0deV2BZS8Q_jomNjMo21FvqeFoP1fn6cudVsluh8kwg8DP",
+              }}
+            >
+              <PayPalButtons
+                style={{
+                  layout: "vertical",
+                  color: "blue",
+                  shape: "rect",
+                  label: "paypal",
+                }}
+                createOrder={(data, actions) => {
+                  return actions.order.create({
+                    purchase_units: [
+                      {
+                        amount: {
+                          value: amount.toFixed(2),
+                          currency_code: "USD",
+                        },
+                      },
+                    ],
+                  });
+                }}
+                onApprove={async (data, actions) => {
+                  const details = await actions.order.capture();
+                  console.log("Transaction completed by", details);
+                  handleOrder(); // Gọi API đặt hàng sau khi thanh toán thành công
+                }}
+                onError={(err) => {
+                  console.error("PayPal Checkout Error:", err);
+                }}
+              />
+            </PayPalScriptProvider>
+          ) : (
+            <button className={cx("btn-order")} onClick={handleOrder}>
+              ĐẶT HÀNG
+            </button>
+          )}
         </div>
         <p className={cx("note")}>*Vui lòng không hủy đơn hàng đã thanh toán</p>
       </div>

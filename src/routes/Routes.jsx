@@ -23,6 +23,7 @@ import ReviewAdmin from "../Admin/pages/Review";
 import ProfileAdmin from "../Admin/pages/Profile";
 import Dashboard from "../Admin/pages/Dashboard";
 import Voucher from "../Admin/pages/Voucher";
+import OrderAdmin from "../Admin/pages/Order";
 import CreateProduct from "../Admin/pages/Product/CreateProduct";
 import DetailProduct from "../Admin/pages/DetailProduct";
 import EditProduct from "../Admin/pages/Product/EditProduct";
@@ -64,6 +65,7 @@ export default function Router() {
         <Route path="user" element={<AccountAdmin />} />
         <Route path="role" element={<RoleAdmin />} />
         <Route path="flashsale" element={<Voucher />} />
+        <Route path="order" element={<OrderAdmin />} />
         <Route path="review" element={<ReviewAdmin />} />
         <Route path="profile" element={<ProfileAdmin />} />
         <Route path="create-product" element={<CreateProduct />} />

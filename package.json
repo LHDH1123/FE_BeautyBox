@@ -9,6 +9,7 @@
     "@mui/material": "^6.2.1",
     "@mui/x-date-pickers": "^7.23.6",
     "@mui/x-date-pickers-pro": "^7.23.6",
+    "@paypal/react-paypal-js": "^8.8.3",
     "@radix-ui/react-popover": "^1.1.4",
     "@syncfusion/ej2-react-calendars": "^28.1.39",
     "autoprefixer": "^10.4.20",

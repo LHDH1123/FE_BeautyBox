@@ -278,7 +278,7 @@ const Product = () => {
         currentProducts.length > 0
     );
   }, [selectedProducts, currentProducts]);
-  
+
   return (
     <div className={cx("table")}>
       <Header title="Sản Phẩm" />
@@ -351,7 +351,7 @@ const Product = () => {
           {isSelectCategory && (
             <div
               className={cx("select-tagCategory")}
-              style={{ marginLeft: "165px" }}
+              // style={{ marginLeft: "165px" }}
             >
               <div
                 className={cx("tagCategory")}
@@ -488,6 +488,8 @@ const Product = () => {
               page={currentPage}
               onChange={handlePageChange}
               color="secondary"
+              siblingCount={1} // số trang hiển thị xung quanh trang hiện tại
+              boundaryCount={1} // số trang hiển thị ở đầu và cuối
             />
           )}
         </div>

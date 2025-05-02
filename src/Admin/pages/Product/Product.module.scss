@@ -299,6 +299,32 @@ td {
   cursor: pointer;
 }
 
+.select-tag {
+  position: absolute;
+  border: 1px solid rgba(145, 158, 171, 0.3);
+  border-radius: 5px;
+  background: #fff;
+  margin-top: 40px;
+  width: 149px;
+  z-index: 10;
+  cursor: pointer;
+  max-height: 300px; /* Set max height to prevent overflow */
+  overflow-y: auto; /* Allow vertical scrolling */
+}
+
+.select-tagCategory {
+  position: absolute;
+  border: 1px solid rgba(145, 158, 171, 0.3);
+  border-radius: 5px;
+  background: #fff;
+  margin-top: 40px;
+  margin-left: 165px;
+  width: 149px;
+  z-index: 10;
+  cursor: pointer;
+  max-height: 300px; /* Set max height to prevent overflow */
+  overflow-y: auto; /* Allow vertical scrolling */
+}
 @media screen and (max-width: 1024px) {
   .table-list {
     padding: 15px;
@@ -350,10 +376,15 @@ td {
     font-size: 13px;
   }
 
-  .select-tag,
+  .select-tag {
+    width: 95%;
+    margin-top: 38px;
+  }
+
   .select-tagCategory {
-    width: 100%;
-    margin-top: 10px;
+    width: 95%;
+    margin-top: 86px;
+    margin-left: 0px;
   }
 
   .name {
