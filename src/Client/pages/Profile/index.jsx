@@ -34,6 +34,7 @@ import {
 import { useAuth } from "../../Context/AuthContext";
 import { getOrderUser } from "../../../services/order.service";
 import { OrderSuccess } from "../../../services/checkout.service";
+import { useLocation } from "react-router-dom";
 
 const cx = classNames.bind(styles);
 
@@ -103,6 +104,9 @@ const Profile = () => {
     indexOfFirstOrder,
     indexOfLastOrder
   );
+
+  const location = useLocation();
+  const message = location.state?.message;
 
   const handleFoward = (tab) => {
     setActiveTab(tab);
@@ -264,6 +268,9 @@ const Profile = () => {
   console.log(orders);
 
   useEffect(() => {
+    if (message === "Đơn hàng") {
+      setActiveTab("Đơn hàng");
+    }
     if (user?._id) {
       fetchOrders();
     }

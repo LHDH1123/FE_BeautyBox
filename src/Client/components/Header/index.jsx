@@ -229,7 +229,10 @@ const Header = () => {
       setIsModalLogin(true);
       return;
     }
-    navigate("/profile");
+
+    navigate("/profile", {
+      state: { message: "Đơn hàng" },
+    });
     setIsMore(false);
   };
 
@@ -496,6 +499,7 @@ const Header = () => {
       return;
     }
     navigate("/profile");
+
     setIsLogin(false);
     setIsMore(false);
   };
@@ -880,7 +884,15 @@ const Header = () => {
                         fill="black"
                       ></path>
                     </svg>
-                    <div className={cx("title-item")}>
+                    <div
+                      className={cx("title-item")}
+                      onClick={() => {
+                        navigate("/profile", {
+                          state: { message: "Đơn hàng" },
+                        });
+                        setIsLogin(false);
+                      }}
+                    >
                       <div className={cx("title-li")}>Lịch sử đặt hàng</div>
                     </div>
                   </li>
@@ -1156,7 +1168,15 @@ const Header = () => {
                         </div>
                       </div>
                     </li>
-                    <li className={cx("item")}>
+                    <li
+                      className={cx("item")}
+                      onClick={() => {
+                        navigate("/profile", {
+                          state: { message: "Đơn hàng" },
+                        });
+                        setIsLogin(false);
+                      }}
+                    >
                       <svg
                         width="29"
                         height="21"
