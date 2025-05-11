@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import classNames from "classnames/bind";
 import styles from "./ListProduct.module.scss";
 import PropTypes from "prop-types";
@@ -6,18 +6,15 @@ import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { getAllProducts } from "../../../services/product.service";
-import { getNameBrand } from "../../../services/brand.service";
 import {
-  getCategorys,
-  getDetailSlug,
-  getNameCategory,
-} from "../../../services/category.service";
+  getAllProducts,
+  getAllProductSlug,
+} from "../../../services/product.service";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import { addToLike, removeFromLike } from "../../../services/like.service";
 import { Rating } from "@mui/material";
-import { getProductFeedback } from "../../../services/review.service";
+import { debounce } from "lodash";
 
 const cx = classNames.bind(styles);
 
@@ -36,100 +33,40 @@ function ListProduct({ title, onChangeActiveTab }) {
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(false);
   const [listProducts, setListProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // state loading
   const navigate = useNavigate();
   const { user, like, setLike, setIsModalLogin } = useAuth();
   const [activeTab, setActiveTab] = useState("cham-soc-co-the");
 
-  const fetchProductDetails = async (products) => {
-    return Promise.all(
-      products.map(async (product) => {
-        const [nameBrand, nameCategory, feedbacks] = await Promise.all([
-          getNameBrand(product.brand_id),
-          getNameCategory(product.category_id),
-          getProductFeedback(product._id),
-        ]);
-
-        return {
-          ...product,
-          nameBrand,
-          nameCategory,
-          feedbacks,
-          newPrice:
-            product.price - (product.price * product.discountPercentage) / 100,
-        };
-      })
-    );
-  };
-
-  const fetchInitialProducts = async () => {
+  const fetchProducts = useCallback(async () => {
     try {
-      const products = await getAllProducts();
-      if (!products) return;
-
-      const enriched = await fetchProductDetails(products);
-      const sorted = enriched.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-
-      setListProducts(sorted.slice(0, 20));
+      setIsLoading(true); // Bắt đầu loading
+      let products;
+      if (title === "Xu hướng làm đẹp") {
+        products = await getAllProductSlug(1, 20, activeTab);
+      } else if (title === "Sản phẩm mới") {
+        products = await getAllProducts(1, 20, "new");
+      }
+      setListProducts(products);
     } catch (error) {
-      console.error("Error fetching initial products:", error);
+      console.error("Error fetching products:", error);
+    } finally {
+      setIsLoading(false); // Kết thúc loading
     }
-  };
-
-  const fetchCategoryProducts = async (slug) => {
-    try {
-      const [allCategories, products] = await Promise.all([
-        getCategorys(),
-        getAllProducts(),
-      ]);
-      const detail = await getDetailSlug(slug);
-
-      if (!detail?._id) return;
-
-      const categorySet = new Set();
-      const findChildren = (id) => {
-        const strId = id.toString();
-        categorySet.add(strId);
-        allCategories.forEach((cat) => {
-          if (cat.parent_id === strId && !categorySet.has(cat._id.toString())) {
-            findChildren(cat._id);
-          }
-        });
-      };
-      findChildren(detail._id);
-
-      const filtered = products.filter((p) =>
-        categorySet.has(p.category_id?.toString())
-      );
-
-      const enriched = await fetchProductDetails(filtered);
-      const sorted = enriched.sort(
-        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-      );
-
-      setListProducts(sorted.slice(0, 20));
-    } catch (error) {
-      console.error("❌ Lỗi khi lấy sản phẩm theo category slug:", error);
-    }
-  };
+  }, [title, activeTab]);
 
   useEffect(() => {
-    if (title !== "Xu hướng làm đẹp") {
-      fetchInitialProducts();
-    } else {
-      fetchCategoryProducts(activeTab);
-    }
-  }, []);
+    fetchProducts();
+  }, [fetchProducts]);
 
-  const handleScroll = () => {
+  const handleScroll = debounce(() => {
     const container = scrollableRef.current;
     if (container) {
       const maxScrollLeft = container.scrollWidth - container.clientWidth;
       setIsLeftVisible(container.scrollLeft > 0);
       setIsRightVisible(container.scrollLeft < maxScrollLeft);
     }
-  };
+  }, 100);
 
   useEffect(() => {
     const container = scrollableRef.current;
@@ -144,23 +81,23 @@ function ListProduct({ title, onChangeActiveTab }) {
     };
   }, [listProducts]);
 
-  const scrollLeft = () => {
+  const scrollLeft = useCallback(() => {
     if (scrollableRef.current) {
       scrollableRef.current.scrollBy({
         left: -scrollableRef.current.offsetWidth,
         behavior: "smooth",
       });
     }
-  };
+  }, []);
 
-  const scrollRight = () => {
+  const scrollRight = useCallback(() => {
     if (scrollableRef.current) {
       scrollableRef.current.scrollBy({
         left: scrollableRef.current.offsetWidth,
         behavior: "smooth",
       });
     }
-  };
+  }, []);
 
   const handleAddLike = async (productId) => {
     if (!user._id || !productId) {
@@ -211,10 +148,26 @@ function ListProduct({ title, onChangeActiveTab }) {
 
   const handleChangeTab = (tab) => {
     setActiveTab(tab);
-    onChangeActiveTab(tab); // gửi về Home
+    onChangeActiveTab(tab);
     if (title === "Xu hướng làm đẹp") {
-      fetchCategoryProducts(tab);
+      fetchProducts(tab);
     }
+  };
+
+  const renderSkeletons = () => {
+    return Array.from({ length: 5 }).map((_, index) => (
+      <div key={index} className={cx("product")}>
+        <div className={cx("productList-img")}>
+          <div className={cx("skeleton-img")} />
+        </div>
+        <div className={cx("product_info")}>
+          <div className={cx("skeleton-text", "brand")} />
+          <div className={cx("skeleton-text", "title")} />
+          <div className={cx("skeleton-text", "price")} />
+          <div className={cx("skeleton-text", "rating")} />
+        </div>
+      </div>
+    ));
   };
 
   return (
@@ -238,7 +191,6 @@ function ListProduct({ title, onChangeActiveTab }) {
             >
               Trang điểm
             </div>
-
             <div
               className={cx("title", activeTab === "cham-soc-da" && "active")}
               onClick={() => handleChangeTab("cham-soc-da")}
@@ -256,88 +208,90 @@ function ListProduct({ title, onChangeActiveTab }) {
           </button>
         )}
         <div className={cx("list_product")} ref={scrollableRef}>
-          {listProducts?.map((product) => (
-            <div key={product._id} className={cx("product")}>
-              <div
-                className={cx("tym")}
-                onClick={() => handleClickTym(product._id)}
-              >
-                {(like?.products ?? []).some(
-                  (likedProduct) => likedProduct._id === product._id
-                ) ? (
-                  <FavoriteIcon style={{ color: "red" }} />
-                ) : (
-                  <FavoriteBorderIcon />
-                )}
-              </div>
+          {isLoading
+            ? renderSkeletons()
+            : listProducts?.map((product) => (
+                <div key={product._id} className={cx("product")}>
+                  <div
+                    className={cx("tym")}
+                    onClick={() => handleClickTym(product._id)}
+                  >
+                    {(like?.products ?? []).some(
+                      (likedProduct) => likedProduct._id === product._id
+                    ) ? (
+                      <FavoriteIcon style={{ color: "red" }} />
+                    ) : (
+                      <FavoriteBorderIcon />
+                    )}
+                  </div>
 
-              <div
-                className={cx("productList-img")}
-                onClick={() => handleDetail(product.slug)}
-              >
-                <img src={product.thumbnail[0]} alt="Product" />
-              </div>
-              <div
-                className={cx("product_info")}
-                onClick={() => handleDetail(product.slug)}
-              >
-                <a href={`/products/${product.nameBrand}`}>
-                  {product.nameBrand}
-                </a>
-                <div className={cx("description")}>{product.title}</div>
-                <div className={cx("price_product")}>
-                  {product.discountPercentage === 0 ? (
-                    <div className={cx("new_price")}>
-                      {new Intl.NumberFormat("vi-VN", {
-                        style: "currency",
-                        currency: "VND",
-                      }).format(product.newPrice)}
-                    </div>
-                  ) : (
-                    <div style={{ display: "flex" }}>
-                      <div className={cx("new_price")}>
-                        {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.newPrice)}
-                      </div>
-                      <div className={cx("price")}>
-                        {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(product.price)}
-                      </div>
-                    </div>
-                  )}
-                  {product.discountPercentage !== 0 && (
-                    <span className={cx("discount-tag")}>
-                      <div className={cx("tag")}>
-                        -{product.discountPercentage}%
-                      </div>
-                    </span>
-                  )}
-                </div>
-                <div className={cx("review")}>
-                  <div className={cx("rate")}>
-                    <Rating
-                      name="half-rating-read"
-                      defaultValue={Number(product.feedbacks?.avgRating || 0)}
-                      precision={0.5}
-                      readOnly
-                      sx={{
-                        color: "black",
-                        fontSize: "16px",
-                        "& .MuiRating-icon": { marginRight: "6px" },
-                      }}
-                    />
+                  <div
+                    className={cx("productList-img")}
+                    onClick={() => handleDetail(product.slug)}
+                  >
+                    <img src={product.thumbnail[0]} alt="Product" />
                   </div>
-                  <div className={cx("amount")}>
-                    ({product.feedbacks?.totalReviews || 0})
+                  <div
+                    className={cx("product_info")}
+                    onClick={() => handleDetail(product.slug)}
+                  >
+                    <a href={`/products/${product.nameBrand}`}>
+                      {product.nameBrand}
+                    </a>
+                    <div className={cx("description")}>{product.title}</div>
+                    <div className={cx("price_product")}>
+                      {product.discountPercentage === 0 ? (
+                        <div className={cx("new_price")}>
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(product.price)}
+                        </div>
+                      ) : (
+                        <div style={{ display: "flex" }}>
+                          <div className={cx("new_price")}>
+                            {new Intl.NumberFormat("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            }).format(product.newPrice)}
+                          </div>
+                          <div className={cx("price")}>
+                            {new Intl.NumberFormat("vi-VN", {
+                              style: "currency",
+                              currency: "VND",
+                            }).format(product.price)}
+                          </div>
+                        </div>
+                      )}
+                      {product.discountPercentage !== 0 && (
+                        <span className={cx("discount-tag")}>
+                          <div className={cx("tag")}>
+                            -{product.discountPercentage}%
+                          </div>
+                        </span>
+                      )}
+                    </div>
+                    <div className={cx("review")}>
+                      <div className={cx("rate")}>
+                        <Rating
+                          name="half-rating-read"
+                          defaultValue={Number(product?.avgRating || 0)}
+                          precision={0.5}
+                          readOnly
+                          sx={{
+                            color: "black",
+                            fontSize: "16px",
+                            "& .MuiRating-icon": { marginRight: "6px" },
+                          }}
+                        />
+                      </div>
+                      <div className={cx("amount")}>
+                        ({product?.totalReviews || 0})
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              ))}
         </div>
         {isRightVisible && (
           <button

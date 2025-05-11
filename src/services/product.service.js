@@ -1,8 +1,10 @@
 import { AxiosInstance } from "../configs/axios";
 
-export async function getAllProducts() {
+export async function getAllProducts(page = 1, limit = 10000) {
   try {
-    const response = await AxiosInstance.get("/client/products");
+    const response = await AxiosInstance.get("/client/products", {
+      params: { page, limit },
+    });
     return response;
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -24,6 +26,21 @@ export async function getDetailProductSlug(slug) {
   try {
     const response = await AxiosInstance.get(`/client/products/slug/${slug}`);
     return response;
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return null;
+  }
+}
+
+export async function getAllProductSlug(page = 1, limit = 20, slug) {
+  try {
+    const response = await AxiosInstance.get(
+      `/client/products/getAll/${slug}`,
+      {
+        params: { page, limit },
+      }
+    );
+    return response; // return the actual data
   } catch (error) {
     console.error("Error fetching products:", error);
     return null;
@@ -52,7 +69,10 @@ export async function deleteProduct(id) {
 
 export async function updateProduct(id, data) {
   try {
-    const response = await AxiosInstance.patch(`/admin/products/edit/${id}`, data);
+    const response = await AxiosInstance.patch(
+      `/admin/products/edit/${id}`,
+      data
+    );
     return response;
   } catch (error) {
     console.error("Error editing product:", error);
@@ -74,7 +94,10 @@ export async function changeStatusProduct(id, status) {
 
 export async function changeMultiProduct(data) {
   try {
-    const response = await AxiosInstance.patch(`/admin/products/change-multi`, data);
+    const response = await AxiosInstance.patch(
+      `/admin/products/change-multi`,
+      data
+    );
     return response;
   } catch (error) {
     console.error("Error editing product:", error);
