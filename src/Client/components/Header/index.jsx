@@ -13,7 +13,7 @@ import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import ArrowRightIcon from "@mui/icons-material/ArrowRight";
 import CloseOutlinedIcon from "@mui/icons-material/CloseOutlined";
-import { Dialog, Box, DialogActions } from "@mui/material";
+import { Dialog, Box, DialogActions, Snackbar, Alert } from "@mui/material";
 import Cart from "../Cart";
 import CartFav from "../CartFav";
 import { useNavigate } from "react-router-dom";
@@ -39,6 +39,7 @@ import { MuiOtpInput } from "mui-one-time-password-input";
 import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import ReactDOM from "react-dom";
 
 const cx = classNames.bind(styles);
 
@@ -117,6 +118,10 @@ const Header = () => {
   const [isEmailPassword, setIsEmailPassword] = useState("");
   const [isHaveAcc, setIsHaveAcc] = useState(false);
   const [isDataRegister, setIsDataRegister] = useState(false);
+
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
 
   // Tự động ẩn cảnh báo sau 10 giây
   useEffect(() => {
@@ -356,32 +361,31 @@ const Header = () => {
 
   const handleLogin = async (isRegister) => {
     try {
-      if (!login.email) {
-        setIsEmailPassword(true);
-        setIsDataRegister(true);
-        return;
-      }
-
-      if (!login.password) {
-        setIsEmailPassword(false);
-        setIsDataRegister(true);
-        return;
-      }
-
-      setIsEmailPassword("");
-
+      // Validate dữ liệu login
       if (!isRegister) {
-        // 🟢 Xử lý đăng nhập
+        if (!login.email) {
+          setIsEmailPassword(!login.password);
+          // setIsDataRegister(true);
+          return;
+        }
+        if (!login.password) {
+          setIsEmailPassword(false);
+          // setIsDataRegister(true);
+          return;
+        }
+        setIsEmailPassword("");
+
+        // 🟢 Gửi request login
         const response = await loginPost(login);
-        if (response === null) {
+        if (!response) {
           setIsHaveAcc(true);
+          return;
         }
 
-        if (response?.accessToken) {
+        if (response.accessToken) {
           const decodedUser = jwtDecode(response.accessToken);
           const userData = await getUser(decodedUser.userId);
 
-          // ✅ Cập nhật state ngay lập tức
           setUser(userData.user);
           setNameUser(userData.user.fullName);
           setUpdateUser({
@@ -391,75 +395,61 @@ const Header = () => {
             phone: userData.user.phone,
           });
 
-          // ✅ Cập nhật Axios với token mới
           AxiosInstance.defaults.headers.common[
             "Authorization"
           ] = `Bearer ${response.accessToken}`;
 
-          // ✅ Gọi API để cập nhật giỏ hàng & danh sách yêu thích
           const [cartData, likeData] = await Promise.all([
             getCart(userData.user._id),
             getLike(userData.user._id),
           ]);
+
           setCart(cartData);
           setLike(likeData);
-
-          // ✅ Đóng modal login nếu có
           setIsModalLogin(false);
         }
-      } else {
-        if (!register.fullName) {
-          setIsEmailPassword(true);
-          setIsDataRegister(true);
-          return;
-        }
+      }
 
-        if (!register.phone) {
-          setIsEmailPassword(true);
-          setIsDataRegister(true);
-          return;
-        }
+      // Validate dữ liệu register
+      else {
+        try {
+          const { fullName, phone, email, password, confirmPass } = register;
 
-        if (!register.email) {
-          setIsEmailPassword(true);
-          setIsDataRegister(true);
-          return;
-        }
+          if (!fullName || !phone || !email || !password || !confirmPass) {
+            setIsEmailPassword(!password || !confirmPass);
+            setIsDataRegister(true);
+            return;
+          }
 
-        if (!register.password) {
-          setIsEmailPassword(false);
-          setIsDataRegister(true);
-          return;
-        }
+          if (password !== confirmPass) {
+            setErrorMessage("Xác nhận mật khẩu không đúng");
+            setOpenSnackbar(true);
+            setIsAccess(false);
+            return;
+          }
 
-        if (!register.confirmPass) {
-          setIsEmailPassword(false);
-          setIsDataRegister(true);
-          return;
-        }
-        // 🔵 Xử lý đăng ký
-        if (register.password !== register.confirmPass) {
-          alert("Password and Confirm Password must be the same");
-          return;
-        }
-
-        const response = await registerPost({
-          fullName: register.fullName,
-          email: register.email,
-          password: register.password,
-          phone: register.phone,
-        });
-
-        if (response) {
-          console.log("🎉 Đăng ký thành công:", response);
-          setRegister({
-            fullName: "",
-            email: "",
-            password: "",
-            phone: "",
-            confirmPass: "",
+          // 🔵 Gửi request đăng ký
+          const response = await registerPost({
+            fullName,
+            email,
+            password,
+            phone,
           });
-          setIsRegister(false);
+          if (response) {
+            console.log("🎉 Đăng ký thành công:", response);
+            setRegister({
+              fullName: "",
+              email: "",
+              password: "",
+              phone: "",
+              confirmPass: "",
+            });
+            setIsRegister(false);
+          }
+        } catch (error) {
+          setErrorMessage(error.message);
+          setOpenSnackbar(true);
+          setIsAccess(false);
         }
       }
     } catch (error) {
@@ -509,15 +499,23 @@ const Header = () => {
       setIsModalLogin(true);
       return;
     }
+
     if (cart) {
       if (selectCart.products.length === 0) {
         setIsLogin(true);
         return;
       }
-      navigate("/check-out", { state: selectCart });
+
+      // ✅ Lưu selectCart vào localStorage
+      localStorage.setItem("checkout_cart", JSON.stringify(selectCart));
+
+      // ✅ Điều hướng đến trang thanh toán
+      navigate("/check-out");
+
+      // ✅ Đóng modal giỏ hàng
       setIsModalCart(false);
     } else {
-      console.log("không có sản phẩm nào trong giỏ hàng");
+      console.log("Không có sản phẩm nào trong giỏ hàng");
     }
   };
 
@@ -541,7 +539,9 @@ const Header = () => {
 
   const handleForgot = async () => {
     if (!emailForgot.email) {
-      alert("Vui lòng nhập địa chỉ email");
+      setErrorMessage("Vui lòng nhập địa chỉ email");
+      setOpenSnackbar(true);
+      setIsAccess(false);
       return;
     }
 
@@ -559,7 +559,9 @@ const Header = () => {
 
   const handleOTP = async () => {
     if (!otp) {
-      alert("Vui lòng nhập mã OTP");
+      setErrorMessage("Vui lòng nhập mã OTP");
+      setOpenSnackbar(true);
+      setIsAccess(false);
     }
     try {
       const response = await otpPasswordPost({
@@ -578,11 +580,15 @@ const Header = () => {
 
   const handleResetPass = async () => {
     if (!resetPass.password && !resetPass.confirmPass) {
-      alert("Vui lòng nhập mật khẩu và xác nhận mật khẩu");
+      setErrorMessage("Vui lòng nhập đầy đủ các trường");
+      setOpenSnackbar(true);
+      setIsAccess(false);
     }
 
     if (resetPass.password !== resetPass.confirmPass) {
-      alert("Mật khẩu và xác nhận mật khẩu không trùng nhau");
+      setErrorMessage("Mật khẩu không trung khớp");
+      setOpenSnackbar(true);
+      setIsAccess(false);
     }
 
     try {
@@ -719,7 +725,24 @@ const Header = () => {
           </div>
         </div>
       </div>
-
+      {errorMessage &&
+        ReactDOM.createPortal(
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000}
+            onClose={() => setOpenSnackbar(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          >
+            <Alert
+              severity={isAccess ? "success" : "warning"}
+              onClose={() => setOpenSnackbar(false)}
+              sx={{ width: "100%" }}
+            >
+              {errorMessage}
+            </Alert>
+          </Snackbar>,
+          document.body // 👈 Render trực tiếp ra <body>, đảm bảo đè lên tất cả
+        )}
       {isMore && (
         <div className={cx("sidebar", { open: isMore })}>
           <div className={cx("sidebar-header")}>
@@ -801,11 +824,7 @@ const Header = () => {
                             <li
                               key={child._id}
                               onClick={() =>
-                                handleListProduct(
-                                  child.slug,
-                                  child._id,
-                                  child.title
-                                )
+                                handleListProduct(child.slug, child.title)
                               }
                             >
                               {child.title}
@@ -1484,7 +1503,9 @@ const Header = () => {
               {/* Đăng ký: Họ và Tên */}
               {isRegister && (
                 <div className={cx("input-login")}>
-                  <div className={cx("label-login")}>Họ Tên</div>
+                  <div className={cx("label-login")}>
+                    Họ Tên <span style={{ color: "red" }}>*</span>{" "}
+                  </div>
                   <input type="text" name="fullName" onChange={handleChange} />
                 </div>
               )}
@@ -1526,20 +1547,26 @@ const Header = () => {
               {/* Đăng kí */}
               {isRegister && (
                 <div className={cx("input-login")}>
-                  <div className={cx("label-login")}>SĐT</div>
+                  <div className={cx("label-login")}>
+                    SĐT <span style={{ color: "red" }}>*</span>{" "}
+                  </div>
                   <input type="text" name="phone" onChange={handleChange} />
                 </div>
               )}
               {isRegister && (
                 <div className={cx("input-login")}>
-                  <div className={cx("label-login")}>Email</div>
+                  <div className={cx("label-login")}>
+                    Email<span style={{ color: "red" }}>*</span>{" "}
+                  </div>
                   <input type="text" name="email" onChange={handleChange} />
                 </div>
               )}
               {/* Đăng kí */}
               {isRegister && (
                 <div className={cx("input-login")}>
-                  <div className={cx("label-login")}>Mật khẩu</div>
+                  <div className={cx("label-login")}>
+                    Mật khẩu<span style={{ color: "red" }}>*</span>{" "}
+                  </div>
                   <input
                     type="password"
                     name="password"
@@ -1551,7 +1578,9 @@ const Header = () => {
               {/* Xác nhận mật khẩu (chỉ khi đăng ký) */}
               {isRegister && (
                 <div className={cx("input-login")}>
-                  <div className={cx("label-login")}>Xác nhận lại mật khẩu</div>
+                  <div className={cx("label-login")}>
+                    Xác nhận lại mật khẩu<span style={{ color: "red" }}>*</span>{" "}
+                  </div>
                   <input
                     type="password"
                     name="confirmPass"

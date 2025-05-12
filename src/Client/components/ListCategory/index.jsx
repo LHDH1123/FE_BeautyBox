@@ -3,8 +3,11 @@ import classNames from "classnames/bind";
 import styles from "./ListCategory.module.scss";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
-import { getAllProductSlug } from "../../../services/product.service";
-import { useNavigate } from "react-router-dom";
+import {
+  getAllProductName,
+  getAllProductSlug,
+} from "../../../services/product.service";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import { addToLike, removeFromLike } from "../../../services/like.service";
 import { Skeleton, Rating, useMediaQuery } from "@mui/material";
@@ -27,6 +30,7 @@ function ListCategory({
   const isTabletOrMobile = useMediaQuery("(max-width: 768px)");
   const [loading, setLoading] = useState(true); // Add loading state
 
+  console.log(slug);
   const handleClickTym = async (productId) => {
     if (!user) {
       setIsModalLogin(true);
@@ -48,17 +52,26 @@ function ListCategory({
   };
 
   const fetchData = async () => {
-    setLoading(true); // Start loading before fetching data
+    setLoading(true);
     try {
-      const products = await getAllProductSlug(1, 1000, slug);
+      let products = [];
+
+      if (slug.includes("-")) {
+        // Nếu slug có dấu "-", giả sử là slug của danh mục (category)
+        products = await getAllProductSlug(1, 1000, slug);
+      } else {
+        // Nếu slug không có dấu "-", giả sử là tên thương hiệu (brand)
+        products = await getAllProductName(1, 1000, slug);
+      }
+
       if (products) {
         setListProduct(products);
-        onTotalChange(products?.length);
+        onTotalChange(products.length);
       }
     } catch (error) {
-      console.error("Error fetching categories or products:", error);
+      console.error("Error fetching products:", error);
     } finally {
-      setLoading(false); // End loading once data is fetched
+      setLoading(false);
     }
   };
 

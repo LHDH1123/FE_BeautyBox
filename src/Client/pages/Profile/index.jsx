@@ -221,6 +221,20 @@ const Profile = () => {
   };
 
   const handleAdd = async () => {
+    if (
+      !editAddress.name &&
+      !editAddress.lastName &&
+      !editAddress.email &&
+      !editAddress.phone &&
+      !editAddress.city &&
+      !editAddress.districts &&
+      !editAddress.ward
+    ) {
+      setErrorMessage("Vui lòng nhập đầy đủ thông tin");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
     try {
       const response = await createAddress(updateUser.id, addAddress);
       if (response) {
@@ -1007,7 +1021,7 @@ const Profile = () => {
                     </Typography>
                     <Typography>
                       {orderDetail.isCheckout
-                        ? "Zalopay & Chuyển khoản Ngân Hàng"
+                        ? "PayPal & Chuyển khoản Ngân Hàng"
                         : "Trả tiền mặt khi nhận hàng (COD)"}
                     </Typography>
                     {orderDetail.isCheckout ? (

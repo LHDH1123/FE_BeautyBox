@@ -20,15 +20,13 @@ const cx = classNames.bind(styles);
 
 ListProduct.propTypes = {
   title: PropTypes.string,
-  onChangeActiveTab: PropTypes.func,
 };
 
 ListProduct.defaultProps = {
   title: "",
-  onChangeActiveTab: () => {},
 };
 
-function ListProduct({ title, onChangeActiveTab }) {
+function ListProduct({ title, activeTab, setActiveTab }) {
   const scrollableRef = useRef(null);
   const [isLeftVisible, setIsLeftVisible] = useState(false);
   const [isRightVisible, setIsRightVisible] = useState(false);
@@ -36,7 +34,6 @@ function ListProduct({ title, onChangeActiveTab }) {
   const [isLoading, setIsLoading] = useState(true); // state loading
   const navigate = useNavigate();
   const { user, like, setLike, setIsModalLogin } = useAuth();
-  const [activeTab, setActiveTab] = useState("cham-soc-co-the");
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -57,7 +54,7 @@ function ListProduct({ title, onChangeActiveTab }) {
 
   useEffect(() => {
     fetchProducts();
-  }, [fetchProducts]);
+  }, [title, activeTab]);
 
   const handleScroll = debounce(() => {
     const container = scrollableRef.current;
@@ -148,10 +145,9 @@ function ListProduct({ title, onChangeActiveTab }) {
 
   const handleChangeTab = (tab) => {
     setActiveTab(tab);
-    onChangeActiveTab(tab);
-    if (title === "Xu hướng làm đẹp") {
-      fetchProducts(tab);
-    }
+    // if (title === "Xu hướng làm đẹp") {
+    //   fetchProducts(tab);
+    // }
   };
 
   const renderSkeletons = () => {

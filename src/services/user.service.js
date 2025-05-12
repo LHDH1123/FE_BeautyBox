@@ -35,11 +35,8 @@ export async function registerPost(data) {
     const response = await AxiosInstance.post("/user/register", data);
     return response;
   } catch (error) {
-    console.error(
-      "Lỗi khi đăng ký:",
-      error.response?.data?.error || error.message
-    );
-    return null;
+    console.error("Lỗi khi đăng ký:", error.response.data);
+    throw new Error(error.response.data.message);
   }
 }
 
@@ -107,14 +104,15 @@ export async function refreshTokenUser() {
 
 export async function forgotPasswordPost(email) {
   try {
-    const response = await AxiosInstance.post(`/user/password/forgot`, { email }); // ✅ Bọc lại thành object
+    const response = await AxiosInstance.post(`/user/password/forgot`, {
+      email,
+    }); // ✅ Bọc lại thành object
     return response;
   } catch (error) {
     console.error("Lỗi khi nhập email thay đổi mật khẩu:", error);
     throw error;
   }
 }
-
 
 export async function otpPasswordPost(data) {
   try {

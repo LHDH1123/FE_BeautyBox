@@ -319,6 +319,8 @@ const DetailProduct = ({ setLike, setCart }) => {
       setIsModalLogin(true);
       return;
     }
+
+    // Tạo đối tượng selectCartBuy
     const selectCartBuy = {
       products: [
         {
@@ -328,10 +330,16 @@ const DetailProduct = ({ setLike, setCart }) => {
       ],
       user_id: userId,
     };
+
+    // Lưu selectCartBuy vào localStorage
+    localStorage.setItem("checkout_cart", JSON.stringify(selectCartBuy));
+
+    // Cập nhật state selectCart
     setSelectCart(selectCartBuy);
+
+    // Điều hướng đến trang thanh toán
     navigate("/check-out", {
       state: {
-        // selectCartBuy,
         selectedOption,
       },
     });
@@ -510,9 +518,7 @@ const DetailProduct = ({ setLike, setCart }) => {
                   checked={selectedOption === "ZaloPay"}
                   onChange={handleChange}
                 />
-                <label htmlFor="option2">
-                  ZaloPay & Chuyển khoản Ngân Hàng
-                </label>
+                <label htmlFor="option2">PayPal & Chuyển khoản Ngân Hàng</label>
               </li>
             </ul>
             {/* <div className={cx("note")}>

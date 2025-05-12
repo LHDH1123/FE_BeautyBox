@@ -47,6 +47,21 @@ export async function getAllProductSlug(page = 1, limit = 20, slug) {
   }
 }
 
+export async function getAllProductName(page = 1, limit = 20, name) {
+  try {
+    const response = await AxiosInstance.get(
+      `/client/products/getAllWithName/${name}`,
+      {
+        params: { page, limit },
+      }
+    );
+    return response; // return the actual data
+  } catch (error) {
+    console.error("Error fetching products:", error);
+    return null;
+  }
+}
+
 export async function addProduct(data) {
   try {
     const response = await AxiosInstance.post("/admin/products/create", data);

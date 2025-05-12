@@ -20,6 +20,10 @@
   box-sizing: border-box;
 }
 
+.product:hover {
+  cursor: pointer;
+}
+
 .productList-img {
   position: relative;
 }

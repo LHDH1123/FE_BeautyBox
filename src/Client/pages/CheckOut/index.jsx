@@ -21,7 +21,7 @@ import {
 } from "../../../services/address.service";
 import { getUser, refreshTokenUser } from "../../../services/user.service";
 import { jwtDecode } from "jwt-decode";
-import { Box, Dialog, DialogActions } from "@mui/material";
+import { Alert, Box, Dialog, DialogActions, Snackbar } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { createOrder } from "../../../services/checkout.service";
@@ -61,7 +61,10 @@ const CheckoutPage = () => {
   const [selectedAddress, setSelectedAddress] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const navigate = useNavigate();
-  const { cart, setCart, selectCart } = useAuth();
+  const { cart, setCart, selectCart, setSelectCart } = useAuth();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
 
   const fetchVoucherDiscount = async () => {
     try {
@@ -86,7 +89,6 @@ const CheckoutPage = () => {
           const defaultAddress = response.find(
             (address) => address.status === true
           );
-          console.log(response);
           setDefaultddress(defaultAddress);
           setSelectedAddress(defaultAddress._id);
         }
@@ -144,6 +146,13 @@ const CheckoutPage = () => {
   }, []);
 
   useEffect(() => {
+    const storedCart = localStorage.getItem("checkout_cart");
+    if (storedCart) {
+      setSelectCart(JSON.parse(storedCart));
+    }
+  }, []);
+
+  useEffect(() => {
     const fetchProductDetails = async () => {
       if (!selectCart || !selectCart.products) return;
 
@@ -187,7 +196,14 @@ const CheckoutPage = () => {
   const handleVoucherChange = (id) => {
     setSelectedVoucher(id);
   };
-  const [cartState, setCartState] = useState(selectCart);
+
+  useEffect(() => {
+    const selected = vouchers.find((v) => v._id === selectedVoucher);
+    if (selected && totalPrice < Number(selected.min_order_total)) {
+      setSelectedVoucher(null); // Bỏ chọn nếu không còn đủ điều kiện
+    }
+  }, [totalPrice, selectedVoucher, vouchers]);
+  // const [cartState, setCartState] = useState(selectCart);
 
   const handleUpdateQuantity = async (id, newQuantity) => {
     if (selectCart._id) {
@@ -205,9 +221,15 @@ const CheckoutPage = () => {
       );
 
       // Update the cart state with the new quantity
-      setCartState((prevCart) => ({
+      // setCartState((prevCart) => ({
+      //   ...prevCart,
+      //   products: prevCart?.products?.map((item) =>
+      //     item.product_id === id ? { ...item, quantity: newQuantity } : item
+      //   ),
+      // }));
+      setSelectCart((prevCart) => ({
         ...prevCart,
-        products: prevCart.products.map((item) =>
+        products: prevCart?.products?.map((item) =>
           item.product_id === id ? { ...item, quantity: newQuantity } : item
         ),
       }));
@@ -242,9 +264,15 @@ const CheckoutPage = () => {
         console.error("❌ Cập nhật số lượng thất bại");
       }
     } else {
-      setCartState((prevCart) => ({
+      // setCartState((prevCart) => ({
+      //   ...prevCart,
+      //   products: prevCart?.products?.map((item) =>
+      //     item.product_id === id ? { ...item, quantity: newQuantity } : item
+      //   ),
+      // }));
+      setSelectCart((prevCart) => ({
         ...prevCart,
-        products: prevCart.products.map((item) =>
+        products: prevCart?.products?.map((item) =>
           item.product_id === id ? { ...item, quantity: newQuantity } : item
         ),
       }));
@@ -305,6 +333,21 @@ const CheckoutPage = () => {
   };
 
   const handleUpdateAddress = async () => {
+    if (
+      !editAddress.name === "" ||
+      !editAddress.lastName === "" ||
+      !editAddress.email === "" ||
+      !editAddress.phone === "" ||
+      !editAddress.city === "" ||
+      !editAddress.districts === "" ||
+      !editAddress.ward === ""
+    ) {
+      setErrorMessage("Vui lòng nhập đầy đủ thông tin");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+
     try {
       const response = await updateAddress(editAddress._id, editAddress);
       if (response) {
@@ -325,6 +368,7 @@ const CheckoutPage = () => {
 
   const handleEdit = async (id) => {
     handleModal();
+    setIsAddress(false);
     try {
       const response = await getAddressById(id);
       if (response) {
@@ -355,6 +399,20 @@ const CheckoutPage = () => {
   };
 
   const handleAdd = async () => {
+    if (
+      !editAddress.name ||
+      !editAddress.lastName ||
+      !editAddress.email ||
+      !editAddress.phone ||
+      !editAddress.city ||
+      !editAddress.districts ||
+      !editAddress.ward
+    ) {
+      setErrorMessage("Vui lòng nhập đầy đủ thông tin");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
     try {
       const response = await createAddress(userId, editAddress);
       if (response) {
@@ -399,11 +457,18 @@ const CheckoutPage = () => {
   };
 
   const handleOrder = async () => {
+    if (!defaultddress) {
+      setErrorMessage("Vui lòng nhập địa chỉ giao hàng");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+    }
     try {
       const fullName = userEmail.fullName;
       const phone = userEmail.phone;
       const address = `${defaultddress.address}, ${defaultddress.ward}, ${defaultddress.districts}, ${defaultddress.city}`;
-      const orderCart = cartState.products;
+      // const orderCart = cartState?.products;
+      const orderCart = selectCart?.products;
+
       const voucher_id = selectedVoucher;
       const isCheckout = selectedPayment === "ZaloPay";
 
@@ -416,7 +481,6 @@ const CheckoutPage = () => {
         cart: orderCart,
       });
       if (response) {
-        console.log(response);
         const orderId = response;
         navigate("/order-checkout", { state: { orderId, sale } });
         setCart({
@@ -434,10 +498,33 @@ const CheckoutPage = () => {
   };
 
   const exchangeRate = 24000; // 1 USD ≈ 24,000 VND
-  const amount = ((totalPrice + 12000) * (1 + sale)).toFixed(1) / exchangeRate;
-  console.log(amount);
+  const amount = (((totalPrice + 12000) * (1 + sale)) / exchangeRate).toFixed(
+    2
+  );
+
   return (
     <div className={cx("checkout-container")}>
+      {errorMessage && (
+        <Snackbar
+          open={openSnackbar}
+          autoHideDuration={3000} // Ẩn sau 3 giây
+          onClose={() => setOpenSnackbar(false)}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+          sx={{
+            marginTop: "130px",
+          }}
+        >
+          {isAccess ? (
+            <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          ) : (
+            <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+              {errorMessage}
+            </Alert>
+          )}
+        </Snackbar>
+      )}
       <div className={cx("left-section")}>
         <div className={cx("title")}>Thông tin thanh toán</div>
         <BuyerInfo

@@ -93,7 +93,7 @@ const OrderSummary = () => {
                 </Typography>
                 <Typography>
                   {order.isCheckout
-                    ? "Zalopay & Chuyển khoản Ngân Hàng"
+                    ? "Paypal & Chuyển khoản Ngân Hàng"
                     : "Trả tiền mặt khi nhận hàng (COD)"}
                 </Typography>
                 {order.isCheckout ? (

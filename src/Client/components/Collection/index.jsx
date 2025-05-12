@@ -17,7 +17,7 @@ function Collection({ props }) {
   // const [listBrand, setListBrand] = useState([]);
   const navigate = useNavigate();
   const { brands, brandshaveProduct } = useAuth();
-  console.log(brandshaveProduct);
+
   // useEffect(() => {
   //   const fetchBrand = async () => {
   //     try {
