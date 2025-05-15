@@ -22,6 +22,7 @@ import {
   removeFromLike,
 } from "../../../services/like.service";
 import {
+  Alert,
   Avatar,
   Box,
   Button,
@@ -29,6 +30,7 @@ import {
   FormControl,
   Grid,
   InputLabel,
+  Snackbar,
   TextField,
   Typography,
 } from "@mui/material";
@@ -67,6 +69,9 @@ const DetailProduct = ({ setLike, setCart }) => {
   const { user, setIsModalLogin, setSelectCart } = useAuth();
   const [selectedOption, setSelectedOption] = useState("COD");
   // const [likedProducts, setLikedProducts] = useState([]); // list sản phẩm đã like
+  const [errorMessage, setErrorMessage] = useState("");
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [isAccess, setIsAccess] = useState(false);
 
   const handleChange = (e) => {
     setSelectedOption(e.target.value);
@@ -367,12 +372,20 @@ const DetailProduct = ({ setLike, setCart }) => {
 
     const response = await creatReview(user._id, product._id, formData);
     if (response) {
-      console.log(response);
+      setErrorMessage("Đánh giá thành công");
+      setOpenSnackbar(true);
+      setIsAccess(true);
+      setRating(5);
+      setCommentText("");
+      setUploadImages([]);
       handleOpenCloseModal();
     }
     try {
     } catch (error) {
-      console.error(error);
+      console.log(error);
+      setErrorMessage("Bạn đã đánh giá sản phẩm này");
+      setOpenSnackbar(true);
+      setIsAccess(false);
     }
   };
 
@@ -430,7 +443,25 @@ const DetailProduct = ({ setLike, setCart }) => {
             <img src={mainImage} alt="Main product" />
           </div>
         </div>
-
+        {errorMessage && (
+          <Snackbar
+            open={openSnackbar}
+            autoHideDuration={3000} // Ẩn sau 3 giây
+            onClose={() => setOpenSnackbar(false)}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }} // Hiển thị trên cùng
+            sx={{ zIndex: 99900 }}
+          >
+            {isAccess ? (
+              <Alert severity="success" onClose={() => setOpenSnackbar(false)}>
+                {errorMessage}
+              </Alert>
+            ) : (
+              <Alert severity="warning" onClose={() => setOpenSnackbar(false)}>
+                {errorMessage}
+              </Alert>
+            )}
+          </Snackbar>
+        )}
         <div className={cx("detail__content")}>
           <div className={cx("info-product")}>
             <a href={`/products/${product.nameBrand}`} className={cx("brand")}>

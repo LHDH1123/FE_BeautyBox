@@ -334,20 +334,20 @@ const CheckoutPage = () => {
 
   const handleUpdateAddress = async () => {
     if (
-      !editAddress.name === "" ||
-      !editAddress.lastName === "" ||
-      !editAddress.email === "" ||
-      !editAddress.phone === "" ||
-      !editAddress.city === "" ||
-      !editAddress.districts === "" ||
-      !editAddress.ward === ""
+      editAddress.name === "" ||
+      editAddress.last_name === "" ||
+      editAddress.email === "" ||
+      editAddress.phone === "" ||
+      editAddress.city === "" ||
+      editAddress.districts === "" ||
+      editAddress.ward === ""
     ) {
       setErrorMessage("Vui lòng nhập đầy đủ thông tin");
       setOpenSnackbar(true);
       setIsAccess(false);
       return;
     }
-
+    console.log(editAddress);
     try {
       const response = await updateAddress(editAddress._id, editAddress);
       if (response) {
@@ -401,13 +401,14 @@ const CheckoutPage = () => {
   const handleAdd = async () => {
     if (
       !editAddress.name ||
-      !editAddress.lastName ||
+      !editAddress.last_name ||
       !editAddress.email ||
       !editAddress.phone ||
       !editAddress.city ||
       !editAddress.districts ||
       !editAddress.ward
     ) {
+      console.log(editAddress);
       setErrorMessage("Vui lòng nhập đầy đủ thông tin");
       setOpenSnackbar(true);
       setIsAccess(false);
@@ -443,6 +444,9 @@ const CheckoutPage = () => {
   };
 
   const handleChooseAddress = async () => {
+    if (selectedAddress === "") {
+      return;
+    }
     try {
       const response = await getAddressById(selectedAddress);
       if (response) {
@@ -480,6 +484,7 @@ const CheckoutPage = () => {
         isCheckout,
         cart: orderCart,
       });
+      
       if (response) {
         const orderId = response;
         navigate("/order-checkout", { state: { orderId, sale } });
@@ -498,10 +503,7 @@ const CheckoutPage = () => {
   };
 
   const exchangeRate = 24000; // 1 USD ≈ 24,000 VND
-  const amount = (((totalPrice + 12000) * (1 + sale)) / exchangeRate).toFixed(
-    2
-  );
-
+  const amount = ((totalPrice + 12000) * (1 + sale)) / exchangeRate;
   return (
     <div className={cx("checkout-container")}>
       {errorMessage && (
@@ -566,6 +568,12 @@ const CheckoutPage = () => {
                   label: "paypal",
                 }}
                 createOrder={(data, actions) => {
+                  if (!defaultddress) {
+                    setErrorMessage("Vui lòng nhập địa chỉ giao hàng");
+                    setOpenSnackbar(true);
+                    setIsAccess(false);
+                    return;
+                  }
                   return actions.order.create({
                     purchase_units: [
                       {

@@ -436,7 +436,9 @@ const Header = () => {
             phone,
           });
           if (response) {
-            console.log("🎉 Đăng ký thành công:", response);
+            setErrorMessage("Đăng ký thành công");
+            setOpenSnackbar(true);
+            setIsAccess(true);
             setRegister({
               fullName: "",
               email: "",
@@ -444,6 +446,8 @@ const Header = () => {
               phone: "",
               confirmPass: "",
             });
+            setIsLoginUser(true);
+
             setIsRegister(false);
           }
         } catch (error) {
