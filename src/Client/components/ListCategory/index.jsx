@@ -20,17 +20,19 @@ function ListCategory({
   selectedPriceRanges,
   selectedBrands,
   selectedCategories,
+  filteredProducts,
+  setFilteredProducts,
+  setAllProducts,
 }) {
   const scrollableRef = useRef(null);
   const [listProduct, setListProduct] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
+  // const [filteredProducts, setFilteredProducts] = useState([]);
   const { user, like, setLike, setIsModalLogin } = useAuth();
   const navigate = useNavigate();
 
   const isTabletOrMobile = useMediaQuery("(max-width: 768px)");
   const [loading, setLoading] = useState(true); // Add loading state
 
-  console.log(slug);
   const handleClickTym = async (productId) => {
     if (!user) {
       setIsModalLogin(true);
@@ -66,6 +68,8 @@ function ListCategory({
 
       if (products) {
         setListProduct(products);
+        setAllProducts(products);
+
         onTotalChange(products.length);
       }
     } catch (error) {
@@ -104,9 +108,10 @@ function ListCategory({
       const matchesBrand =
         selectedBrands.length === 0 ||
         selectedBrands.includes(product.nameBrand);
+
       const matchesCategory =
         selectedCategories.length === 0 ||
-        selectedCategories.includes(product.categoryName);
+        selectedCategories.includes(product.nameCategory);
 
       return matchesPrice && matchesBrand && matchesCategory;
     });

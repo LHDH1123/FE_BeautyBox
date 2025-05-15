@@ -347,7 +347,34 @@ const CheckoutPage = () => {
       setIsAccess(false);
       return;
     }
-    console.log(editAddress);
+
+    const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/u;
+    if (
+      !nameRegex.test(editAddress.name) ||
+      !nameRegex.test(editAddress.last_name)
+    ) {
+      setErrorMessage("Họ và tên không được chứa ký tự đặc biệt hoặc số");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    // ✅ Validate phone
+    const phoneRegex = /^0\d{9}$/;
+    if (!phoneRegex.test(editAddress.phone)) {
+      setErrorMessage("Số điện thoại không hợp lệ");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    // ✅ Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editAddress.email)) {
+      setErrorMessage("Email không hợp lệ");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+
     try {
       const response = await updateAddress(editAddress._id, editAddress);
       if (response) {
@@ -414,6 +441,34 @@ const CheckoutPage = () => {
       setIsAccess(false);
       return;
     }
+
+    const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/u;
+    if (
+      !nameRegex.test(editAddress.name) ||
+      !nameRegex.test(editAddress.last_name)
+    ) {
+      setErrorMessage("Họ và tên không được chứa ký tự đặc biệt hoặc số");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    // ✅ Validate phone
+    const phoneRegex = /^0\d{9}$/;
+    if (!phoneRegex.test(editAddress.phone)) {
+      setErrorMessage("Số điện thoại không hợp lệ");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    // ✅ Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editAddress.email)) {
+      setErrorMessage("Email không hợp lệ");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    
     try {
       const response = await createAddress(userId, editAddress);
       if (response) {
@@ -484,7 +539,7 @@ const CheckoutPage = () => {
         isCheckout,
         cart: orderCart,
       });
-      
+
       if (response) {
         const orderId = response;
         navigate("/order-checkout", { state: { orderId, sale } });

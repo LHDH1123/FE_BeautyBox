@@ -44,6 +44,7 @@ import { useAuth } from "../../Context/AuthContext";
 import CheckIcon from "@mui/icons-material/Check";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import AutorenewIcon from "@mui/icons-material/Autorenew";
+import { getProductsAIRCMById } from "../../../services/RCM.service";
 
 const cx = classNames.bind(styles);
 
@@ -72,6 +73,26 @@ const DetailProduct = ({ setLike, setCart }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [isAccess, setIsAccess] = useState(false);
+  const [listRCM, setListRCM] = useState([]);
+
+  const fetchRCM = async () => {
+    try {
+      console.log(product._id);
+      const response = await getProductsAIRCMById(product._id);
+      if (response) {
+        console.log("Danh sách gợi ý:", response);
+        // Bạn có thể setState ở đây để render danh sách gợi ý nếu muốn
+      }
+    } catch (error) {
+      console.error("Lỗi khi lấy gợi ý sản phẩm:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (product?._id) {
+      fetchRCM();
+    }
+  }, [product]);
 
   const handleChange = (e) => {
     setSelectedOption(e.target.value);
@@ -320,7 +341,7 @@ const DetailProduct = ({ setLike, setCart }) => {
   // };
 
   const handleCheckOut = async () => {
-    if (user === null) {
+    if (user === null || user === "") {
       setIsModalLogin(true);
       return;
     }
@@ -351,7 +372,7 @@ const DetailProduct = ({ setLike, setCart }) => {
   };
 
   const handleOpenCloseModal = () => {
-    if (user === null) {
+    if (user === null || user === "") {
       setIsModalLogin(true);
       return;
     }

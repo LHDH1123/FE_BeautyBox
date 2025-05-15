@@ -10,7 +10,7 @@ import { getNameCategory } from "../../../services/category.service";
 
 const cx = classNames.bind(styles);
 
-function Sidebar() {
+function Sidebar({ allProducts }) {
   const {
     selectedPriceRanges,
     setSelectedPriceRanges,
@@ -38,40 +38,29 @@ function Sidebar() {
   ];
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const productRes = await getAllProducts();
-        if (!productRes) return;
+    if (!allProducts || allProducts.length === 0) return;
 
-        const products = productRes;
-        const uniqueBrandIds = [...new Set(products.map((p) => p.brand_id))];
-        const uniqueCategoryIds = [
-          ...new Set(products.map((p) => p.category_id)),
-        ];
+    // Lấy brand & category ID duy nhất
+    const uniqueBrandIds = [...new Set(allProducts.map((p) => p.brand_id))];
+    const uniqueCategoryIds = [
+      ...new Set(allProducts.map((p) => p.category_id)),
+    ];
 
-        const brandNames = await Promise.all(
-          uniqueBrandIds.map(async (id) => {
-            const name = await getNameBrand(id);
-            return { id, name };
-          })
-        );
+    // Từ allProducts đã có tên thương hiệu và danh mục rồi (nameBrand, nameCategory)
+    const brandNames = uniqueBrandIds.map((id) => {
+      const product = allProducts.find((p) => p.brand_id === id);
+      return { id, name: product?.nameBrand };
+    });
 
-        const categoryNames = await Promise.all(
-          uniqueCategoryIds.map(async (id) => {
-            const name = await getNameCategory(id);
-            return { id, name };
-          })
-        );
+    const categoryNames = uniqueCategoryIds.map((id) => {
+      const product = allProducts.find((p) => p.category_id === id);
+      return { id, name: product?.nameCategory };
+    });
 
-        setBrandList(brandNames.filter((b) => b.name));
-        setCategoryList(categoryNames.filter((c) => c.name));
-      } catch (error) {
-        console.error("Lỗi khi lấy dữ liệu:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+    // Lọc những item có name hợp lệ (không undefined)
+    setBrandList(brandNames.filter((b) => b.name));
+    setCategoryList(categoryNames.filter((c) => c.name));
+  }, [allProducts]);
 
   const handleCheckboxChange = (e) => {
     const value = e.target.value;

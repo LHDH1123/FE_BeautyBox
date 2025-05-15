@@ -134,10 +134,40 @@ const Profile = () => {
 
   const handleSave = async () => {
     try {
+      const { fullName, email, phone } = updateUser;
+
+      // ✅ Validate fullName (chỉ chữ cái và khoảng trắng)
+      const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/u;
+      if (!nameRegex.test(fullName)) {
+        console.error("Họ và tên không hợp lệ");
+        setErrorMessage("Họ và tên không được chứa ký tự đặc biệt hoặc số");
+        setOpenSnackbar(true);
+        return;
+      }
+
+      // ✅ Validate email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        console.error("Email không hợp lệ");
+        setErrorMessage("Email không hợp lệ");
+        setOpenSnackbar(true);
+        return;
+      }
+
+      // ✅ Validate phone
+      const phoneRegex = /^0\d{9}$/;
+      if (!phoneRegex.test(phone)) {
+        console.error("Số điện thoại không hợp lệ");
+        setErrorMessage("Số điện thoại không hợp lệ");
+        setOpenSnackbar(true);
+        return;
+      }
+
+      // ✅ Gửi request nếu tất cả hợp lệ
       const response = await editUser(updateUser.id, {
-        fullName: updateUser.fullName,
-        email: updateUser.email,
-        phone: updateUser.phone,
+        fullName,
+        email,
+        phone,
       });
 
       if (response) {
@@ -150,9 +180,13 @@ const Profile = () => {
         }));
 
         setNameUser(response.user.fullName);
+        setErrorMessage("Cập nhật thông tin thành công");
+        setOpenSnackbar(true);
       }
     } catch (error) {
       console.error(error);
+      setErrorMessage("Đã xảy ra lỗi khi cập nhật thông tin");
+      setOpenSnackbar(true);
     }
   };
 
@@ -189,6 +223,33 @@ const Profile = () => {
   };
 
   const handleUpdateAddress = async () => {
+    const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/u;
+    if (
+      !nameRegex.test(editAddress.name) ||
+      !nameRegex.test(editAddress.last_name)
+    ) {
+      setErrorMessage("Họ và tên không được chứa ký tự đặc biệt hoặc số");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    // ✅ Validate phone
+    const phoneRegex = /^0\d{9}$/;
+    if (!phoneRegex.test(editAddress.phone)) {
+      setErrorMessage("Số điện thoại không hợp lệ");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    // ✅ Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(editAddress.email)) {
+      setErrorMessage("Email không hợp lệ");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+
     try {
       const response = await updateAddress(editAddress._id, editAddress);
       if (response) {
@@ -221,20 +282,50 @@ const Profile = () => {
   };
 
   const handleAdd = async () => {
+    console.log(addAddress);
     if (
-      !editAddress.name &&
-      !editAddress.lastName &&
-      !editAddress.email &&
-      !editAddress.phone &&
-      !editAddress.city &&
-      !editAddress.districts &&
-      !editAddress.ward
+      !addAddress.name &&
+      !addAddress.last_name &&
+      !addAddress.email &&
+      !addAddress.phone &&
+      !addAddress.city &&
+      !addAddress.districts &&
+      !addAddress.ward
     ) {
       setErrorMessage("Vui lòng nhập đầy đủ thông tin");
       setOpenSnackbar(true);
       setIsAccess(false);
       return;
     }
+    // ✅ Validate name & lastName - không có ký tự đặc biệt
+    const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/u;
+    if (
+      !nameRegex.test(addAddress.name) ||
+      !nameRegex.test(addAddress.last_name)
+    ) {
+      setErrorMessage("Họ và tên không được chứa ký tự đặc biệt hoặc số");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+    // ✅ Validate phone (10 chữ số bắt đầu bằng 0)
+    const phoneRegex = /^0\d{9}$/;
+    if (!phoneRegex.test(addAddress.phone)) {
+      setErrorMessage("Số điện thoại không hợp lệ");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+
+    // ✅ Validate email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(addAddress.email)) {
+      setErrorMessage("Email không hợp lệ");
+      setOpenSnackbar(true);
+      setIsAccess(false);
+      return;
+    }
+
     try {
       const response = await createAddress(updateUser.id, addAddress);
       if (response) {
@@ -278,8 +369,6 @@ const Profile = () => {
       console.error("Error fetching orders:", error);
     }
   };
-
-  console.log(orders);
 
   useEffect(() => {
     if (message === "Đơn hàng") {

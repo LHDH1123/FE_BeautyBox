@@ -11,7 +11,16 @@ import { useLocation, useParams } from "react-router-dom";
 const cx = classNames.bind(styles);
 
 // Tách phần nội dung vào function nhỏ bên trong để dùng được context
-const ProductContent = ({ slug, title, totalProducts, setTotalProducts }) => {
+const ProductContent = ({
+  slug,
+  title,
+  totalProducts,
+  setTotalProducts,
+  filteredProducts,
+  setFilteredProducts,
+  allProducts,
+  setAllProducts,
+}) => {
   const { selectedPriceRanges, selectedBrands, selectedCategorys } =
     useFilterContext(); // An toàn vì trong FilterProvider
 
@@ -21,7 +30,10 @@ const ProductContent = ({ slug, title, totalProducts, setTotalProducts }) => {
       <Filter total={totalProducts} />
       <div className={cx("container")}>
         <div className={cx("sidebar")}>
-          <Sidebar />
+          <Sidebar
+            filteredProducts={filteredProducts}
+            allProducts={allProducts}
+          />
         </div>
         <ListCategory
           slug={slug}
@@ -29,6 +41,9 @@ const ProductContent = ({ slug, title, totalProducts, setTotalProducts }) => {
           selectedPriceRanges={selectedPriceRanges}
           selectedBrands={selectedBrands}
           selectedCategories={selectedCategorys}
+          filteredProducts={filteredProducts}
+          setFilteredProducts={setFilteredProducts}
+          setAllProducts={setAllProducts}
         />
       </div>
     </div>
@@ -40,6 +55,8 @@ const Product = () => {
   const { title } = location.state || {};
   const { slug } = useParams();
   const [totalProducts, setTotalProducts] = useState(0);
+  const [filteredProducts, setFilteredProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
 
   return (
     <FilterProvider>
@@ -48,6 +65,10 @@ const Product = () => {
         slug={slug}
         totalProducts={totalProducts}
         setTotalProducts={setTotalProducts}
+        filteredProducts={filteredProducts}
+        setFilteredProducts={setFilteredProducts}
+        allProducts={allProducts}
+        setAllProducts={setAllProducts}
       />
     </FilterProvider>
   );

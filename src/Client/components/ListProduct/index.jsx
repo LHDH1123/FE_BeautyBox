@@ -123,7 +123,7 @@ function ListProduct({ title, activeTab, setActiveTab }) {
   };
 
   const handleClickTym = (productId) => {
-    if (user === null) {
+    if (user === null || user === "") {
       setIsModalLogin(true);
       return;
     }

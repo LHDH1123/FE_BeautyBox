@@ -230,7 +230,7 @@ const Header = () => {
   };
 
   const handleNavigateProfile = () => {
-    if (user === null) {
+    if (user === null || user === "") {
       setIsModalLogin(true);
       return;
     }
@@ -421,6 +421,31 @@ const Header = () => {
             return;
           }
 
+          const nameRegex = /^[a-zA-ZÀ-ỹ\s]+$/u;
+          if (!nameRegex.test(fullName)) {
+            setErrorMessage("Họ và tên không được chứa ký tự đặc biệt hoặc số");
+            setOpenSnackbar(true);
+            setIsAccess(false);
+            return;
+          }
+
+          // ✅ Validate phone format (Việt Nam: bắt đầu bằng 0, 10 digits)
+          const phoneRegex = /^(0[0-9]{9})$/;
+          if (!phoneRegex.test(phone)) {
+            setErrorMessage("Số điện thoại không hợp lệ");
+            setOpenSnackbar(true);
+            setIsAccess(false);
+            return;
+          }
+          // ✅ Validate email format
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailRegex.test(email)) {
+            setErrorMessage("Email không hợp lệ");
+            setOpenSnackbar(true);
+            setIsAccess(false);
+            return;
+          }
+
           if (password !== confirmPass) {
             setErrorMessage("Xác nhận mật khẩu không đúng");
             setOpenSnackbar(true);
@@ -435,6 +460,7 @@ const Header = () => {
             password,
             phone,
           });
+
           if (response) {
             setErrorMessage("Đăng ký thành công");
             setOpenSnackbar(true);
@@ -447,11 +473,10 @@ const Header = () => {
               confirmPass: "",
             });
             setIsLoginUser(true);
-
             setIsRegister(false);
           }
         } catch (error) {
-          setErrorMessage(error.message);
+          setErrorMessage(error.message || "Đã xảy ra lỗi");
           setOpenSnackbar(true);
           setIsAccess(false);
         }
@@ -488,7 +513,7 @@ const Header = () => {
   };
 
   const handleProfile = () => {
-    if (user === null) {
+    if (user === null || user === "") {
       setIsModalLogin(true);
       return;
     }
@@ -499,7 +524,7 @@ const Header = () => {
   };
 
   const handleNavigateCheckout = () => {
-    if (user === null) {
+    if (user === null || user === "") {
       setIsModalLogin(true);
       return;
     }
