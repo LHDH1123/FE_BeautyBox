@@ -10,6 +10,7 @@ export const AuthProvider = ({ children }) => {
   const fetchCurrentUser = async () => {
     try {
       const res = await checkLogin();
+
       if (res?.user) {
         const response = await getRole(res.user.role_id);
         if (response) {

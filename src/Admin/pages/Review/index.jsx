@@ -6,19 +6,18 @@ import {
   changePublic,
   edit,
   getAllReviews,
-} from "../../../services/review.service"; // assuming updateReview exists
+} from "../../../services/review.service";
 import { getUser } from "../../../services/user.service";
 import { getDetailProduct } from "../../../services/product.service";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import { useAuth } from "../../Context/Auth.context";
-import { Alert, Snackbar, TextField } from "@mui/material";
+import { Alert, Snackbar, TextField, Pagination } from "@mui/material";
 import Rating from "@mui/material/Rating";
 import Modal from "@mui/material/Modal";
 import Box from "@mui/material/Box";
 import CancelIcon from "@mui/icons-material/Cancel";
 
 const cx = classNames.bind(styles);
-// ... phần import không thay đổi
 
 const Review = () => {
   const [reviews, setReviews] = useState([]);
@@ -32,24 +31,16 @@ const Review = () => {
   const [editedRating, setEditedRating] = useState(0);
   const [editedImages, setEditedImages] = useState([]);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(20);
+
   const fetchReviews = async () => {
     try {
       const response = await getAllReviews();
-      if (response) {
-        const enrichedReviews = await Promise.all(
-          response.interactions.map(async (review) => {
-            const [user, product] = await Promise.all([
-              getUser(review.user_id),
-              getDetailProduct(review.product_id),
-            ]);
-            return {
-              ...review,
-              userName: user.user.fullName,
-              productName: product[0]?.title,
-            };
-          })
-        );
-        setReviews(enrichedReviews);
+      if (response && response.interactions) {
+        setReviews(response.interactions);
+      } else {
+        setReviews([]);
       }
     } catch (error) {
       console.error(error);
@@ -133,6 +124,15 @@ const Review = () => {
     }
   };
 
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentReviews = reviews?.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPage = Math.ceil(reviews.length / itemsPerPage);
+
   return (
     <div className={cx("table")}>
       <Header title="Đánh Giá" />
@@ -163,7 +163,7 @@ const Review = () => {
             </tr>
           </thead>
           <tbody>
-            {reviews.map((review) => (
+            {currentReviews.map((review) => (
               <tr key={review._id}>
                 <td>{review.userName}</td>
                 <td className={cx("comment")}>{review.comment}</td>
@@ -198,6 +198,15 @@ const Review = () => {
             ))}
           </tbody>
         </table>
+
+        <div className={cx("pagination")}>
+          <Pagination
+            count={totalPage}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="primary"
+          />
+        </div>
       </div>
 
       {/* Modal */}

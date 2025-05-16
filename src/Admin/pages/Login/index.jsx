@@ -8,6 +8,8 @@ const cx = classNames.bind(styles);
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -15,31 +17,41 @@ const Login = () => {
       ...formData,
       [e.target.name]: e.target.value,
     });
+    setError(""); // Reset error on input change
   };
 
   const handleLogin = async () => {
-    const response = await loginPost(formData);
+    try {
+      setLoading(true);
+      const response = await loginPost(formData);
+      setLoading(false);
 
-    if (response?.loggedIn) {
-      console.log("✅ Login thành công");
-      navigate("/adminbb");
-    } else {
-      console.error(
-        "❌ Đăng nhập thất bại:",
-        response?.error || "Không xác định"
-      );
+      if (response?.loggedIn) {
+        console.log("✅ Login thành công");
+        navigate("/adminbb");
+      } else {
+        setError(response?.error || "Đăng nhập thất bại");
+      }
+    } catch (err) {
+      setLoading(false);
+      console.error("🔥 Đăng nhập lỗi:", err);
+      setError("Có lỗi xảy ra. Vui lòng thử lại sau.");
     }
   };
 
   useEffect(() => {
     const checkAuth = async () => {
-      const res = await checkLogin();
-      if (res?.loggedIn) {
-        navigate("/adminbb");
+      try {
+        const res = await checkLogin();
+        if (res?.loggedIn) {
+          navigate("/adminbb");
+        }
+      } catch (err) {
+        // Không cần xử lý nếu chưa đăng nhập
       }
     };
     checkAuth();
-  }, []);
+  }, [navigate]);
 
   return (
     <div className={cx("container")}>
@@ -66,8 +78,13 @@ const Login = () => {
             value={formData.password}
             onChange={handleChange}
           />
-          <div className={cx("btn")} onClick={handleLogin}>
-            LOG IN
+          {error && <div className={cx("error")}>{error}</div>}
+
+          <div
+            className={cx("btn", { disabled: loading })}
+            onClick={!loading ? handleLogin : undefined}
+          >
+            {loading ? "ĐANG ĐĂNG NHẬP..." : "LOG IN"}
           </div>
         </div>
       </div>

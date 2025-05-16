@@ -44,31 +44,6 @@ const Dashboard = () => {
   const [chartData, setChartData] = useState([]);
   const [totalMonth, setTotalMonth] = useState([]);
 
-  const formatRevenueData = (orders) => {
-    const revenueByMonth = {};
-
-    orders.forEach((order) => {
-      const month = new Date(order.createdAt).getMonth() + 1;
-
-      order.products.forEach((product) => {
-        const { price, discountPercentage, quantity } = product;
-        const discountedPrice = price * (1 - discountPercentage / 100);
-        const total = discountedPrice * quantity;
-        revenueByMonth[month] = (revenueByMonth[month] || 0) + total;
-      });
-    });
-
-    const chartData = Array.from({ length: 12 }, (_, i) => {
-      const month = i + 1;
-      return {
-        name: `Tháng ${month}`,
-        Sales: Math.round(revenueByMonth[month] || 0),
-      };
-    });
-
-    return chartData;
-  };
-
   const fetchProduct = async () => {
     try {
       const response = await getAllProducts();
@@ -100,29 +75,39 @@ const Dashboard = () => {
     }
   };
 
+  const formatRevenueData = (orders) => {
+    const revenueByMonth = {};
+
+    orders.forEach((order) => {
+      const createdAt = new Date(order.createdAt);
+      const month = createdAt.getMonth() + 1;
+
+      revenueByMonth[month] = (revenueByMonth[month] || 0) + order.total;
+    });
+
+    const chartData = Array.from({ length: 12 }, (_, i) => {
+      const month = i + 1;
+      return {
+        name: `Tháng ${month}`,
+        Sales: Math.round(revenueByMonth[month] || 0),
+      };
+    });
+
+    return chartData;
+  };
+
   const fetchOrders = async () => {
     try {
       const response = await getAllOrder();
       if (response) {
         setListOrder(response);
 
+        // 👉 Tính tổng doanh thu từ tất cả đơn hàng (không lọc isCheckout)
         const calculateTotalPrice = (orders) => {
-          return orders.reduce((total, order) => {
-            const orderTotal = order.products.reduce((sum, product) => {
-              return (
-                sum +
-                (product.price -
-                  (product.price * product.discountPercentage) / 100) *
-                  product.quantity
-              );
-            }, 0);
-            return total + orderTotal;
-          }, 0);
+          return orders.reduce((total, order) => total + order.total, 0);
         };
 
-        // Tổng doanh thu toàn bộ đơn hàng
-
-        // 👉 Doanh thu tháng hiện tại (KHÔNG cần kiểm tra isCheckout)
+        // 👉 Doanh thu tháng hiện tại (không lọc isCheckout)
         const now = new Date();
         const currentMonth = now.getMonth();
         const currentYear = now.getFullYear();
@@ -138,7 +123,7 @@ const Dashboard = () => {
         const totalMonthRevenue = calculateTotalPrice(ordersThisMonth);
         setTotalMonth(totalMonthRevenue.toLocaleString("vi-VN"));
 
-        // Dữ liệu biểu đồ
+        // 👉 Dữ liệu biểu đồ doanh thu theo tháng (không lọc isCheckout)
         const data = formatRevenueData(response);
         setChartData(data);
       }

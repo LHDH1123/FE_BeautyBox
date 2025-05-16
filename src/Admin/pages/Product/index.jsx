@@ -76,15 +76,9 @@ const Product = () => {
   const fetchProducts = async () => {
     try {
       const response = await getAllProducts();
+
       if (response) {
-        const productsWithBrand = await Promise.all(
-          response.map(async (product) => ({
-            ...product,
-            nameBrand: await getNameBrand(product.brand_id),
-            nameCategory: await getNameCategory(product.category_id),
-          }))
-        );
-        setListProducts(productsWithBrand);
+        setListProducts(response);
       }
     } catch (error) {
       console.error("Error fetching products:", error);

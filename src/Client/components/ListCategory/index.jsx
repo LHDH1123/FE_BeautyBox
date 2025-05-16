@@ -7,10 +7,15 @@ import {
   getAllProductName,
   getAllProductSlug,
 } from "../../../services/product.service";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import { addToLike, removeFromLike } from "../../../services/like.service";
-import { Skeleton, Rating, useMediaQuery } from "@mui/material";
+import {
+  Skeleton,
+  Rating,
+  useMediaQuery,
+  Pagination,
+} from "@mui/material";
 
 const cx = classNames.bind(styles);
 
@@ -26,12 +31,14 @@ function ListCategory({
 }) {
   const scrollableRef = useRef(null);
   const [listProduct, setListProduct] = useState([]);
-  // const [filteredProducts, setFilteredProducts] = useState([]);
   const { user, like, setLike, setIsModalLogin } = useAuth();
   const navigate = useNavigate();
-
   const isTabletOrMobile = useMediaQuery("(max-width: 768px)");
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
+
+  // Phân trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 30;
 
   const handleClickTym = async (productId) => {
     if (!user) {
@@ -59,17 +66,14 @@ function ListCategory({
       let products = [];
 
       if (slug.includes("-")) {
-        // Nếu slug có dấu "-", giả sử là slug của danh mục (category)
         products = await getAllProductSlug(1, 1000, slug);
       } else {
-        // Nếu slug không có dấu "-", giả sử là tên thương hiệu (brand)
         products = await getAllProductName(1, 1000, slug);
       }
 
       if (products) {
         setListProduct(products);
         setAllProducts(products);
-
         onTotalChange(products.length);
       }
     } catch (error) {
@@ -120,18 +124,36 @@ function ListCategory({
     onTotalChange(filtered.length);
   }, [listProduct, selectedPriceRanges, selectedBrands, selectedCategories]);
 
+  // Reset trang khi lọc hoặc slug thay đổi
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [slug, selectedPriceRanges, selectedBrands, selectedCategories]);
+
   const handleDetail = (slug) => {
     navigate(`/detailProduct/${slug}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+    scrollableRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredProducts.slice(
+    indexOfFirstItem,
+    indexOfLastItem
+  );
+
+  const totalPage = Math.ceil(filteredProducts.length / itemsPerPage);
 
   return (
     <div className={cx("list")}>
       <div className={cx("scroll-list")}>
         <div className={cx("list_product")} ref={scrollableRef}>
           {loading
-            ? // Show skeleton loader while loading
-              [...Array(8)].map((_, index) => (
+            ? [...Array(8)].map((_, index) => (
                 <div key={index} className={cx("product")}>
                   <div className={cx("productList-img")}>
                     <Skeleton variant="rectangular" width="100%" height={200} />
@@ -144,8 +166,7 @@ function ListCategory({
                   </div>
                 </div>
               ))
-            : // Show filtered products once loaded
-              filteredProducts.map((product) => (
+            : currentItems.map((product) => (
                 <div key={product._id} className={cx("product")}>
                   <div className={cx("productList-img")}>
                     <img
@@ -212,31 +233,17 @@ function ListCategory({
                     </div>
                     <div className={cx("review")}>
                       <div className={cx("rate")}>
-                        {product?.avgRating ? (
-                          <Rating
-                            name="half-rating-read"
-                            defaultValue={Number(product?.avgRating)}
-                            precision={0.5}
-                            readOnly
-                            sx={{
-                              color: "black",
-                              fontSize: isTabletOrMobile ? "14px" : "16px",
-                              "& .MuiRating-icon": { marginRight: "6px" },
-                            }}
-                          />
-                        ) : (
-                          <Rating
-                            name="half-rating-read"
-                            defaultValue={0}
-                            precision={0.5}
-                            readOnly
-                            sx={{
-                              color: "black",
-                              fontSize: isTabletOrMobile ? "14px" : "16px",
-                              "& .MuiRating-icon": { marginRight: "6px" },
-                            }}
-                          />
-                        )}
+                        <Rating
+                          name="half-rating-read"
+                          defaultValue={Number(product?.avgRating || 0)}
+                          precision={0.5}
+                          readOnly
+                          sx={{
+                            color: "black",
+                            fontSize: isTabletOrMobile ? "14px" : "16px",
+                            "& .MuiRating-icon": { marginRight: "6px" },
+                          }}
+                        />
                       </div>
                       <div className={cx("amount")}>
                         ({product?.totalReviews || 0})
@@ -246,6 +253,16 @@ function ListCategory({
                 </div>
               ))}
         </div>
+
+        {!loading && totalPage > 1 && (
+          <Pagination
+            className={cx("pagnigation")}
+            count={totalPage}
+            page={currentPage}
+            onChange={handlePageChange}
+            color="secondary"
+          />
+        )}
       </div>
     </div>
   );

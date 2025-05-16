@@ -28,7 +28,7 @@ const Order = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [open, setOpen] = useState(false);
 
-  const itemsPerPage = 10;
+  const itemsPerPage = 20;
 
   const totalPage = Math.ceil(listOrder.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;

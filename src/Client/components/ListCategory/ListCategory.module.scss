@@ -148,7 +148,7 @@
 
 .scroll-list {
   position: relative;
-  display: flex;
+  // display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
@@ -177,6 +177,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.pagnigation {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
 }
 
 @media screen and (max-width: 1200px) {
