@@ -543,6 +543,7 @@ const CheckoutPage = () => {
       if (response) {
         const orderId = response;
         navigate("/order-checkout", { state: { orderId, sale } });
+        window.scrollTo({ top: 0, behavior: "smooth" });
         setCart({
           products: cart.products.filter(
             (item) =>

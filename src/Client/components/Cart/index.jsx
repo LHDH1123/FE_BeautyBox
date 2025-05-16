@@ -156,6 +156,7 @@ function Cart({ cart, setCart, setSelectCart }) {
 
   const handleNavigate = (id, slug) => {
     navigate(`/detailProduct/${slug}`, { state: { id } });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleSelectAll = () => {

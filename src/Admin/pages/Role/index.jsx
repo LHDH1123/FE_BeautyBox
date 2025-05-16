@@ -154,6 +154,7 @@ const Role = () => {
 
   const handlePermission = (id) => {
     navigate(`permissions/${id}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (

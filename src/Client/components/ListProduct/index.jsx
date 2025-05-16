@@ -141,6 +141,7 @@ function ListProduct({ title, activeTab, setActiveTab }) {
 
   const handleDetail = (slug) => {
     navigate(`/detailProduct/${slug}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleChangeTab = (tab) => {

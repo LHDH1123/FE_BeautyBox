@@ -35,6 +35,7 @@ function Collection({ props }) {
 
   const handleListProductBrand = (name) => {
     navigate(`/products/${name}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
@@ -45,6 +46,7 @@ function Collection({ props }) {
             className={cx("title")}
             onClick={() => {
               navigate("/brands");
+              window.scrollTo({ top: 0, behavior: "smooth" });
             }}
           >
             {props === "Thương hiệu" ? "Tất cả thương hiệu" : props}

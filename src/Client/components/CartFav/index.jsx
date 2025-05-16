@@ -80,6 +80,7 @@ function CartFav({ like, setLike }) {
 
   const handleNavigate = (slug) => {
     navigate(`/detailProduct/${slug}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (

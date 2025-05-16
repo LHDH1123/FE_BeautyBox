@@ -61,17 +61,6 @@
   justify-content: flex-end;
 }
 
-.search-bar {
-  display: flex;
-  align-items: center;
-  background-color: #f5f5f5;
-  border-radius: 25px;
-  width: 400px;
-  margin-left: 40px;
-  height: 40px;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1); /* Tạo độ sâu */
-}
-
 .search-icon {
   color: rgb(61 50 50);
   font-size: 24px;
@@ -86,10 +75,6 @@
   font-size: 14px; /* Kích thước chữ */
   font-family: "Arial", sans-serif; /* Font chữ */
   color: #333; /* Màu chữ */
-}
-
-.search-bar:hover {
-  box-shadow: 0 0 0 1px black;
 }
 
 .search-input::placeholder {
@@ -683,9 +668,80 @@
   display: none;
 }
 
-// .sidebar {
-//   display: none;
-// }
+.search-bar {
+  display: flex;
+  position: relative; // ✅ Quan trọng: để .search-results bám theo .search-bar
+  align-items: center;
+  background-color: #f5f5f5;
+  border-radius: 25px;
+  width: 400px;
+  margin-left: 40px;
+  height: 40px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-bar:hover {
+  box-shadow: 0 0 0 1px black;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 95%;
+  padding: 10px;
+  background: #fff;
+  border: 1px solid #e0e0e0; /* Viền nhẹ */
+  border-top: none; /* Không viền ở trên để nối mượt với thanh search */
+  border-radius: 0 0 8px 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ mềm */
+  z-index: 10000;
+}
+
+.search-result-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  // border-bottom: 1px solid #eee;
+  transition: background 0.2s ease;
+  cursor: pointer;
+
+  &:hover {
+    background: #f9f9f9;
+  }
+
+  .thumbnail {
+    width: 55px;
+    height: 55px;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-right: 10px;
+  }
+
+  .info {
+    flex: 1;
+    .name {
+      font-size: 14px;
+      font-weight: 600;
+      margin: 0;
+      color: #000;
+    }
+    .sku {
+      font-size: 12px;
+      // color: #888;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+  }
+
+  .lock-icon {
+    margin-left: 8px;
+    svg {
+      font-size: 20px;
+      color: #444;
+    }
+  }
+}
 
 @media (max-width: 1024px) {
   .header {

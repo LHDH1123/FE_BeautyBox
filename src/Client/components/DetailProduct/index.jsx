@@ -33,6 +33,7 @@ import {
   Snackbar,
   TextField,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -67,7 +68,7 @@ const DetailProduct = ({ setLike, setCart }) => {
   const [commentText, setCommentText] = useState("");
   const [feedback, setFeedback] = useState([]);
 
-  const { user, setIsModalLogin, setSelectCart } = useAuth();
+  const { user, setIsModalLogin, setSelectCart, like } = useAuth();
   const [selectedOption, setSelectedOption] = useState("COD");
   // const [likedProducts, setLikedProducts] = useState([]); // list sản phẩm đã like
   const [errorMessage, setErrorMessage] = useState("");
@@ -75,12 +76,13 @@ const DetailProduct = ({ setLike, setCart }) => {
   const [isAccess, setIsAccess] = useState(false);
   const [listRCM, setListRCM] = useState([]);
 
+  const isTabletOrMobile = useMediaQuery("(max-width: 768px)");
+
   const fetchRCM = async () => {
     try {
-      console.log(product._id);
-      const response = await getProductsAIRCMById(product._id);
+      const response = await getProductsAIRCMById(product._id, 9);
       if (response) {
-        console.log("Danh sách gợi ý:", response);
+        setListRCM(response);
         // Bạn có thể setState ở đây để render danh sách gợi ý nếu muốn
       }
     } catch (error) {
@@ -369,6 +371,7 @@ const DetailProduct = ({ setLike, setCart }) => {
         selectedOption,
       },
     });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleOpenCloseModal = () => {
@@ -426,6 +429,35 @@ const DetailProduct = ({ setLike, setCart }) => {
 
     fetchLikedProducts();
   }, [userId, product._id]);
+
+  const handleDetail = (slug) => {
+    navigate(`/detailProduct/${slug}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  console.log(like);
+  console.log(listRCM);
+
+  const handleClickTym = async (productId) => {
+    if (!user) {
+      setIsModalLogin(true);
+      console.log("chưa login");
+      return;
+    }
+
+    const isLiked = like?.products?.some((item) => item._id === productId);
+    try {
+      const response = isLiked
+        ? await removeFromLike(user._id, productId)
+        : await addToLike(user._id, productId);
+      if (response) setLike(response.like);
+    } catch (error) {
+      console.error(
+        "❌ Error adding/removing like:",
+        error.response?.data || error.message
+      );
+    }
+  };
 
   return (
     <div className={cx("detail")}>
@@ -779,6 +811,113 @@ const DetailProduct = ({ setLike, setCart }) => {
               </div>
             ))
           )}
+        </div>
+      </div>
+
+      <div className={cx("recommend")}>
+        <div className={cx("title_rcm")}>Sản phẩm liên quan</div>
+
+        <div className={cx("list_product")}>
+          {listRCM.map((product) => (
+            <div key={product._id} className={cx("product")}>
+              <div className={cx("productList-img")}>
+                <img
+                  src={
+                    Array.isArray(product.thumbnail) &&
+                    product.thumbnail.length > 0
+                      ? product.thumbnail[0]
+                      : product.thumbnail
+                  }
+                  alt="Product"
+                  onClick={() => handleDetail(product.slug)}
+                />
+                <div
+                  className={cx("tym")}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleClickTym(product.product_id);
+                  }}
+                >
+                  {like?.products.some((p) => p._id === product.product_id) ? (
+                    <FavoriteIcon style={{ color: "red" }} />
+                  ) : (
+                    <FavoriteBorderIcon />
+                  )}
+                </div>
+              </div>
+              <div
+                className={cx("product_info")}
+                onClick={() => handleDetail(product.slug)}
+              >
+                <a
+                  href={`/products/${product.brand_title}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {product.brand_title}
+                </a>
+                <div className={cx("description")}>{product.title}</div>
+                <div className={cx("price_product")}>
+                  <div className={cx("new_price")}>
+                    {new Intl.NumberFormat("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    }).format(
+                      product.price -
+                        (product.price * product.discountPercentage) / 100
+                    )}
+                  </div>
+                  {product.discountPercentage !== 0 && (
+                    <div className={cx("discount")}>
+                      <div className={cx("price")}>
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(product.price)}
+                      </div>
+                      <span className={cx("discount-tag")}>
+                        <div className={cx("tag")}>
+                          -{product.discountPercentage}%
+                        </div>
+                      </span>
+                    </div>
+                  )}
+                </div>
+                <div className={cx("review")}>
+                  <div className={cx("rate")}>
+                    {product?.avg_rating ? (
+                      <Rating
+                        name="half-rating-read"
+                        defaultValue={Number(product?.avg_rating)}
+                        precision={0.5}
+                        readOnly
+                        sx={{
+                          color: "black",
+                          fontSize: isTabletOrMobile ? "14px" : "16px",
+                          "& .MuiRating-icon": { marginRight: "6px" },
+                        }}
+                      />
+                    ) : (
+                      <Rating
+                        name="half-rating-read"
+                        defaultValue={0}
+                        precision={0.5}
+                        readOnly
+                        sx={{
+                          color: "black",
+                          fontSize: isTabletOrMobile ? "14px" : "16px",
+                          "& .MuiRating-icon": { marginRight: "6px" },
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div className={cx("amount")}>
+                    ({product?.count_rating || 0})
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

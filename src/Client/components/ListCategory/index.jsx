@@ -122,6 +122,7 @@ function ListCategory({
 
   const handleDetail = (slug) => {
     navigate(`/detailProduct/${slug}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (

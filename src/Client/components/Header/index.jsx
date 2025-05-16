@@ -40,6 +40,8 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ReactDOM from "react-dom";
+import { getProductsAIRCMByTitle } from "../../../services/RCM.service";
+import LockIcon from "@mui/icons-material/Lock";
 
 const cx = classNames.bind(styles);
 
@@ -63,6 +65,30 @@ const Header = () => {
   const [isResetPass, setIsResetPass] = useState(false);
   const [alertData, setAlertData] = useState("");
   const [countdown, setCountdown] = useState(180); // 3 phút = 180 giây
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [isFocused, setIsFocused] = useState(false);
+
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setSearchResults([]);
+      return;
+    }
+
+    // Giả sử searchProduct là API tìm kiếm
+    const fetchResults = async () => {
+      try {
+        const res = await getProductsAIRCMByTitle(searchTerm);
+        console.log(res);
+        setSearchResults(res);
+      } catch (err) {
+        console.error("Search failed", err);
+      }
+    };
+
+    fetchResults();
+  }, [searchTerm]);
 
   const [emailForgot, setEmailForgot] = useState({
     email: "",
@@ -214,9 +240,12 @@ const Header = () => {
   const handleNavigate = (label) => {
     if (label === "Thương hiệu") {
       navigate("/brands");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
     if (label === "Sản phẩm mới") {
       navigate(`/products/san-pham-moi`);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -226,6 +255,7 @@ const Header = () => {
 
   const handleNavigateSupport = () => {
     navigate("/help-center");
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setIsMore(false);
   };
 
@@ -238,6 +268,7 @@ const Header = () => {
     navigate("/profile", {
       state: { message: "Đơn hàng" },
     });
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setIsMore(false);
   };
 
@@ -346,6 +377,7 @@ const Header = () => {
 
   const handleListProduct = (slug, title) => {
     navigate(`/products/${slug}`, { state: { title } });
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setIsMore(false);
   };
 
@@ -491,6 +523,7 @@ const Header = () => {
     if (like) {
       const response = await deleteAllLike(like.user_id);
       if (response) {
+        setLike([]);
         console.log("Xóa tất cả sản phẩm thành công", response);
       }
     }
@@ -518,6 +551,7 @@ const Header = () => {
       return;
     }
     navigate("/profile");
+    window.scrollTo({ top: 0, behavior: "smooth" });
 
     setIsLogin(false);
     setIsMore(false);
@@ -540,6 +574,7 @@ const Header = () => {
 
       // ✅ Điều hướng đến trang thanh toán
       navigate("/check-out");
+      window.scrollTo({ top: 0, behavior: "smooth" });
 
       // ✅ Đóng modal giỏ hàng
       setIsModalCart(false);
@@ -654,6 +689,7 @@ const Header = () => {
 
   const handleListProductBrand = (name) => {
     navigate(`/products/${name}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
     setIsMore(false);
   };
 
@@ -938,6 +974,7 @@ const Header = () => {
                         navigate("/profile", {
                           state: { message: "Đơn hàng" },
                         });
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                         setIsLogin(false);
                       }}
                     >
@@ -1042,7 +1079,7 @@ const Header = () => {
           </div>
         </div>
 
-        <div className={cx("search-bar")}>
+        {/* <div className={cx("search-bar")}>
           <div className={cx("search-icon")}>
             <SearchIcon />
           </div>
@@ -1054,7 +1091,59 @@ const Header = () => {
           <button className={cx("scan-search")} onClick={handleOpenModal}>
             <img src={ScanIcon} alt="" />
           </button>
+        </div> */}
+        <div className={cx("search-bar-wrapper")}>
+          <div className={cx("search-bar")}>
+            <div className={cx("search-icon")}>
+              <SearchIcon />
+            </div>
+            <input
+              type="text"
+              className={cx("search-input")}
+              placeholder="Son chính hãng chỉ 189K"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setTimeout(() => setIsFocused(false), 150)} // delay để user kịp click vào kết quả
+            />
+
+            <button className={cx("scan-search")} onClick={handleOpenModal}>
+              <img src={ScanIcon} alt="" />
+            </button>
+
+            {isFocused && searchResults.length > 0 && (
+              <div className={cx("search-results")}>
+                {searchResults.map((product) => (
+                  <div
+                    key={product.product_id}
+                    className={cx("search-result-item")}
+                    onClick={() => navigate(`/detailProduct/${product.slug}`)}
+                  >
+                    <img
+                      src={product.thumbnail[0]}
+                      alt={product.title}
+                      className={cx("thumbnail")}
+                    />
+                    <div className={cx("info")}>
+                      <p className={cx("name")}>{product.title}</p>
+                      <p className={cx("sku")}>
+                        Giá:{" "}
+                        {new Intl.NumberFormat("vi-VN", {
+                          style: "currency",
+                          currency: "VND",
+                        }).format(
+                          product.price -
+                            (product.price * product.discountPercentage) / 100
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
+
         <div className={cx("right-header")}>
           <div className={cx("menu-section")}>
             {/* <div
@@ -1222,6 +1311,7 @@ const Header = () => {
                         navigate("/profile", {
                           state: { message: "Đơn hàng" },
                         });
+                        window.scrollTo({ top: 0, behavior: "smooth" });
                         setIsLogin(false);
                       }}
                     >

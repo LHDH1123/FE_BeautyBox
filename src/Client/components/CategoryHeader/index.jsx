@@ -48,6 +48,7 @@ function CategoryHeader({ props }) {
 
   const handleListProduct = (slug, title) => {
     navigate(`/products/${slug}`, { state: { title } });
+    window.scrollTo({ top: 0, behavior: "smooth" });
     // console.log(slug, title);
   };
 

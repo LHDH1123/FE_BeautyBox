@@ -20,6 +20,7 @@ const ButtonAll = ({ title }) => {
   const handleProduct = async () => {
     if (title === null) return;
     navigate(`/products/${title}`);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
   return (
     <div>
