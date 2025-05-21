@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import classNames from "classnames/bind";
 import styles from "./HeaderLink.module.scss";
 import KeyboardArrowRightIcon from "@mui/icons-material/KeyboardArrowRight";
-import ScanIcon from "../../../assets/scan-image.gif";
+// import ScanIcon from "../../../assets/scan-image.gif";
 
 const cx = classNames.bind(styles);
 
@@ -35,14 +35,14 @@ function HeaderLink({ title }) {
         <div className={cx("title")}>{title}</div>
       </div>
 
-      {title !== "Cửa hàng" && (
+      {/* {title !== "Cửa hàng" && (
         <div className={cx("search")}>
           <button className={cx("scan-search")}>
             <img src={ScanIcon} alt="" />
             <div className={cx("title-search")}>Tìm kiếm bằng hình ảnh</div>
           </button>
         </div>
-      )}
+      )} */}
     </div>
   );
 }

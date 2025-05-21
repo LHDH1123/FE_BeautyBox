@@ -74,7 +74,7 @@ const Login = () => {
           <input
             type="password"
             name="password"
-            placeholder="Password"
+            placeholder="Mật khẩu"
             value={formData.password}
             onChange={handleChange}
           />
@@ -84,7 +84,7 @@ const Login = () => {
             className={cx("btn", { disabled: loading })}
             onClick={!loading ? handleLogin : undefined}
           >
-            {loading ? "ĐANG ĐĂNG NHẬP..." : "LOG IN"}
+            {loading ? "ĐANG ĐĂNG NHẬP..." : "ĐĂNG NHẬP"}
           </div>
         </div>
       </div>

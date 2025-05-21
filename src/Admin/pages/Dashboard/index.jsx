@@ -267,7 +267,7 @@ const Dashboard = () => {
             <div className={cx("card-title")}>Sản phẩm gần đây</div>
             <div className={cx("view-all-link")}>
               <a href="/adminbb/product-list" className={cx("view-all")}>
-                View All
+                Xem tất cả
               </a>
               <ArrowForwardIcon className={cx("icon")} fontSize="inherit" />
             </div>

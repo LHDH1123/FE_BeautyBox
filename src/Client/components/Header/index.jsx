@@ -2,7 +2,6 @@ import React, { useEffect, useRef, useState } from "react";
 import classNames from "classnames/bind";
 import styles from "./Header.module.scss";
 import logo from "../../../assets/images/logo.webp";
-import ScanIcon from "../../../assets/scan-image.gif";
 import SearchIcon from "@mui/icons-material/Search";
 // import StoreIcon from "@mui/icons-material/Storefront";
 // import NewspaperIcon from "@mui/icons-material/Newspaper";
@@ -41,7 +40,6 @@ import CloseIcon from "@mui/icons-material/Close";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import ReactDOM from "react-dom";
 import { getProductsAIRCMByTitle } from "../../../services/RCM.service";
-import LockIcon from "@mui/icons-material/Lock";
 
 const cx = classNames.bind(styles);
 
@@ -330,9 +328,6 @@ const Header = () => {
     };
   }, [listCategorys]);
 
-  const handleOpenModal = () => {
-    setIsModalUpload(true);
-  };
 
   const handleCloseModal = () => {
     setIsModalUpload(false);
@@ -1106,10 +1101,6 @@ const Header = () => {
               onFocus={() => setIsFocused(true)}
               onBlur={() => setTimeout(() => setIsFocused(false), 150)} // delay để user kịp click vào kết quả
             />
-
-            <button className={cx("scan-search")} onClick={handleOpenModal}>
-              <img src={ScanIcon} alt="" />
-            </button>
 
             {isFocused && searchResults.length > 0 && (
               <div className={cx("search-results")}>
