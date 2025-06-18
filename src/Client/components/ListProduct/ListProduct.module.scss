@@ -206,7 +206,8 @@
   position: sticky; /* Stick the element within the container */
   top: 10px; /* Position the sticky element 15px from the top of its parent */
   color: rgb(144, 144, 144);
-  margin-left: 215px;
+  margin-right: 5%;
+  text-align: right;
   cursor: pointer;
   z-index: 10; /* Ensure it's on top of other elements */
 }
