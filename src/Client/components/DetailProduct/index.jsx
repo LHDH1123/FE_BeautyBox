@@ -521,7 +521,7 @@ const DetailProduct = ({ setLike, setCart }) => {
               {product.nameBrand}
             </a>
             <h1>{product.title}</h1>
-            <div className={cx("review")}>
+            <div className={cx("review_DT")}>
               <div className={cx("evaluate")}>
                 <div className={cx("evaluate__star")}>
                   {feedback?.avgRating && (
@@ -547,8 +547,8 @@ const DetailProduct = ({ setLike, setCart }) => {
                 {product.SKU}
               </div>
             </div>
-            <div className={cx("price_product")}>
-              <div className={cx("new_price")}>
+            <div className={cx("price_product_DT")}>
+              <div className={cx("new_price_DT")}>
                 {new Intl.NumberFormat("vi-VN", {
                   style: "currency",
                   currency: "VND",
@@ -558,7 +558,7 @@ const DetailProduct = ({ setLike, setCart }) => {
                 )}
               </div>
               {product.discountPercentage !== 0 && (
-                <div className={cx("price")}>
+                <div className={cx("price_DT")}>
                   {new Intl.NumberFormat("vi-VN", {
                     style: "currency",
                     currency: "VND",
@@ -839,7 +839,7 @@ const DetailProduct = ({ setLike, setCart }) => {
                     handleClickTym(product.product_id);
                   }}
                 >
-                  {like?.products.some((p) => p._id === product.product_id) ? (
+                  {like?.products?.some((p) => p._id === product.product_id) ? (
                     <FavoriteIcon style={{ color: "red" }} />
                   ) : (
                     <FavoriteBorderIcon />

@@ -15,10 +15,10 @@ import {
   deleteProduct,
   getAllProducts,
 } from "../../../services/product.service";
-import { getBrands, getNameBrand } from "../../../services/brand.service";
+import { getBrands } from "../../../services/brand.service";
 import {
   getCategorys,
-  getNameCategory,
+  // getNameCategory,
 } from "../../../services/category.service";
 import { useNavigate } from "react-router-dom";
 import {

@@ -7,8 +7,8 @@ import {
   edit,
   getAllReviews,
 } from "../../../services/review.service";
-import { getUser } from "../../../services/user.service";
-import { getDetailProduct } from "../../../services/product.service";
+// import { getUser } from "../../../services/user.service";
+// import { getDetailProduct } from "../../../services/product.service";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import { useAuth } from "../../Context/Auth.context";
 import { Alert, Snackbar, TextField, Pagination } from "@mui/material";

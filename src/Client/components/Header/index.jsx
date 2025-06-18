@@ -131,8 +131,8 @@ const Header = () => {
 
   const menuHeaders = [
     { id: 1, label: "Thương hiệu", title: "collection" },
-    { id: 2, label: "Khuyến mãi hot", title: "new" },
-    { id: 3, label: "Sản phẩm cao cấp", title: "new" },
+    // { id: 2, label: "Khuyến mãi hot", title: "new" },
+    // { id: 3, label: "Sản phẩm cao cấp", title: "new" },
     { id: 4, label: "Sản phẩm mới", title: "new" },
     // { id: 5, label: "Mã giảm", title: "new" },
   ];
@@ -327,7 +327,6 @@ const Header = () => {
       clearTimeout(timeout);
     };
   }, [listCategorys]);
-
 
   const handleCloseModal = () => {
     setIsModalUpload(false);
@@ -1104,32 +1103,36 @@ const Header = () => {
 
             {isFocused && searchResults.length > 0 && (
               <div className={cx("search-results")}>
-                {searchResults.map((product) => (
-                  <div
-                    key={product.product_id}
-                    className={cx("search-result-item")}
-                    onClick={() => navigate(`/detailProduct/${product.slug}`)}
-                  >
-                    <img
-                      src={product.thumbnail[0]}
-                      alt={product.title}
-                      className={cx("thumbnail")}
-                    />
-                    <div className={cx("info")}>
-                      <p className={cx("name")}>{product.title}</p>
-                      <p className={cx("sku")}>
-                        Giá:{" "}
-                        {new Intl.NumberFormat("vi-VN", {
-                          style: "currency",
-                          currency: "VND",
-                        }).format(
-                          product.price -
-                            (product.price * product.discountPercentage) / 100
-                        )}
-                      </p>
+                {searchResults && searchResults.length > 0 ? (
+                  searchResults.map((product) => (
+                    <div
+                      key={product.product_id}
+                      className={cx("search-result-item")}
+                      onClick={() => navigate(`/detailProduct/${product.slug}`)}
+                    >
+                      <img
+                        src={product.thumbnail[0]}
+                        alt={product.title}
+                        className={cx("thumbnail")}
+                      />
+                      <div className={cx("info")}>
+                        <p className={cx("name")}>{product.title}</p>
+                        <p className={cx("sku")}>
+                          Giá:{" "}
+                          {new Intl.NumberFormat("vi-VN", {
+                            style: "currency",
+                            currency: "VND",
+                          }).format(
+                            product.price -
+                              (product.price * product.discountPercentage) / 100
+                          )}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className={cx("no-results")}>Không tìm thấy kết quả</p>
+                )}
               </div>
             )}
           </div>

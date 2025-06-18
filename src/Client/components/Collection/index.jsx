@@ -16,7 +16,7 @@ Collection.propTypes = {
 function Collection({ props }) {
   // const [listBrand, setListBrand] = useState([]);
   const navigate = useNavigate();
-  const { brands, brandshaveProduct } = useAuth();
+  const { brandshaveProduct } = useAuth();
 
   // useEffect(() => {
   //   const fetchBrand = async () => {

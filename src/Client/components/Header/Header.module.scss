@@ -686,13 +686,13 @@
 
 .search-results {
   position: absolute;
-  top: 100%;
+  top: 105%;
   left: 0;
   width: 95%;
   padding: 10px;
   background: #fff;
   border: 1px solid #e0e0e0; /* Viền nhẹ */
-  border-top: none; /* Không viền ở trên để nối mượt với thanh search */
+  border: none; /* Không viền ở trên để nối mượt với thanh search */
   border-radius: 0 0 8px 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Bóng đổ mềm */
   z-index: 10000;

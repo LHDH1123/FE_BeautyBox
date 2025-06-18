@@ -5,17 +5,13 @@ import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import {
   getAllProductName,
+  getAllProducts,
   getAllProductSlug,
 } from "../../../services/product.service";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../Context/AuthContext";
 import { addToLike, removeFromLike } from "../../../services/like.service";
-import {
-  Skeleton,
-  Rating,
-  useMediaQuery,
-  Pagination,
-} from "@mui/material";
+import { Skeleton, Rating, useMediaQuery, Pagination } from "@mui/material";
 
 const cx = classNames.bind(styles);
 
@@ -35,7 +31,8 @@ function ListCategory({
   const navigate = useNavigate();
   const isTabletOrMobile = useMediaQuery("(max-width: 768px)");
   const [loading, setLoading] = useState(true);
-
+  // console.log(title);
+  console.log(slug);
   // Phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 30;
@@ -65,7 +62,9 @@ function ListCategory({
     try {
       let products = [];
 
-      if (slug.includes("-")) {
+      if (slug === "san-pham-moi") {
+        products = await getAllProducts(1, 50);
+      } else if (slug.includes("-")) {
         products = await getAllProductSlug(1, 1000, slug);
       } else {
         products = await getAllProductName(1, 1000, slug);

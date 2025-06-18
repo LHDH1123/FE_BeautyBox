@@ -4,9 +4,9 @@ import styles from "./Sidebar.module.scss";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import { useFilterContext } from "../../Context/FilterContext";
-import { getAllProducts } from "../../../services/product.service";
-import { getNameBrand } from "../../../services/brand.service";
-import { getNameCategory } from "../../../services/category.service";
+// import { getAllProducts } from "../../../services/product.service";
+// import { getNameBrand } from "../../../services/brand.service";
+// import { getNameCategory } from "../../../services/category.service";
 
 const cx = classNames.bind(styles);
 

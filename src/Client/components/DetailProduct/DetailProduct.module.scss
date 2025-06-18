@@ -310,7 +310,7 @@
   font-size: 13px;
 }
 
-.review {
+.review_DT {
   display: flex;
   margin-top: 5px;
 }
@@ -320,18 +320,18 @@
   margin-left: 8px;
 }
 
-.price_product {
+.price_product_DT {
   display: flex;
   align-items: center;
   margin-top: 10px;
 }
 
-.new_price {
+.new_price_DT {
   font-size: 22px;
   font-weight: 700;
 }
 
-.price {
+.price_DT {
   font-size: 16px;
   text-decoration: line-through;
   margin-left: 10px;
@@ -862,7 +862,7 @@
     padding: 12px;
   }
 
-  .price_product {
+  .price_product_DT {
     flex-direction: column;
   }
 

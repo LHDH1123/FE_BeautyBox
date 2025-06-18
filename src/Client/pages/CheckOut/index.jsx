@@ -65,9 +65,12 @@ const CheckoutPage = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [isAccess, setIsAccess] = useState(false);
-
+  console.log(selectedVoucher);
   const fetchVoucherDiscount = async () => {
     try {
+      if (selectedVoucher == null) {
+        setSale(0);
+      }
       if (selectedVoucher !== "") {
         const response = await getVoucherById(selectedVoucher);
         if (response) {
@@ -468,7 +471,7 @@ const CheckoutPage = () => {
       setIsAccess(false);
       return;
     }
-    
+
     try {
       const response = await createAddress(userId, editAddress);
       if (response) {
@@ -560,6 +563,7 @@ const CheckoutPage = () => {
 
   const exchangeRate = 24000; // 1 USD ≈ 24,000 VND
   const amount = ((totalPrice + 12000) * (1 + sale)) / exchangeRate;
+  console.log(selectedPayment);
   return (
     <div className={cx("checkout-container")}>
       {errorMessage && (
